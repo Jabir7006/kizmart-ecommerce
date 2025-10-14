@@ -23,7 +23,7 @@ const chartData = [
   { month: "Dec", sales: 10500 },
 ];
 
-export function SalesChart() {
+export default function SalesChart() {
   const maxSales = Math.max(...chartData.map((d) => d.sales));
 
   return (

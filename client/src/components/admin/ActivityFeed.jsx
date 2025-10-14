@@ -5,8 +5,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+  ScrollArea,
+} from "@/components/ui";
+
 import {
   ShoppingCart,
   Package,
@@ -90,7 +91,7 @@ const iconColors = {
   error: "bg-red-500/10 text-red-600",
 };
 
-export function ActivityFeed() {
+export default function ActivityFeed() {
   return (
     <Card>
       <CardHeader>

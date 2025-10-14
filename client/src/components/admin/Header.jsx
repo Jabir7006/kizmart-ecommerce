@@ -1,10 +1,14 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Input,
+  Button,
+} from "@/components/ui";
 import { Search, Bell, Mail, Moon, Sun, Menu, Plus } from "lucide-react";
 
-export function Header({ onMenuClick }) {
+export default function Header({ onMenuClick }) {
   const [theme, setTheme] = React.useState("light");
 
   const toggleTheme = () => {

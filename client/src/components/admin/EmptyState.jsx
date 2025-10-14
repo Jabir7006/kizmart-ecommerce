@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function EmptyState({
+export default function EmptyState({
   icon: Icon,
   title,
   description,

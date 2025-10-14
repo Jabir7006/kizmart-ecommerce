@@ -1,92 +1,50 @@
 import React from "react";
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+  CardDescription,
+  CardContent,
+  Button,
+} from "@/components/ui";
+import { Link } from "react-router-dom";
 
 const topProducts = [
-  {
-    name: "Wireless Headphones Pro",
-    category: "Electronics",
-    sales: 1234,
-    revenue: "$369,200",
-    trend: "+12%",
-    stock: 45,
-  },
-  {
-    name: "Smart Watch Series 5",
-    category: "Wearables",
-    sales: 987,
-    revenue: "$492,513",
-    trend: "+8%",
-    stock: 23,
-  },
-  {
-    name: "Gaming Keyboard RGB",
-    category: "Accessories",
-    sales: 756,
-    revenue: "$120,156",
-    trend: "+15%",
-    stock: 67,
-  },
-  {
-    name: "4K Webcam Ultra",
-    category: "Electronics",
-    sales: 654,
-    revenue: "$130,800",
-    trend: "+5%",
-    stock: 12,
-  },
-  {
-    name: "Ergonomic Mouse Pad",
-    category: "Accessories",
-    sales: 543,
-    revenue: "$16,290",
-    trend: "+20%",
-    stock: 156,
-  },
+  { name: "Wireless Headphones", sales: 234, revenue: "$23,400" },
+  { name: "Smart Watch", sales: 189, revenue: "$37,800" },
+  { name: "Laptop Stand", sales: 156, revenue: "$7,800" },
+  { name: "USB-C Cable", sales: 145, revenue: "$2,900" },
+  { name: "Phone Case", sales: 134, revenue: "$4,020" },
 ];
 
-export function TopProducts() {
+export default function TopProducts() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top Products</CardTitle>
-        <CardDescription>Best performing products this month</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Top Products</CardTitle>
+            <CardDescription>Best selling products this month</CardDescription>
+          </div>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/admin/products">View all</Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {topProducts.map((product, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
-                  #{index + 1}
-                </div>
-                <div>
-                  <h4 className="font-semibold">{product.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {product.category} • {product.sales} sales
-                  </p>
-                </div>
+            <div key={product.name} className="flex items-center gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium">
+                {index + 1}
               </div>
-              <div className="text-right">
-                <div className="font-semibold">{product.revenue}</div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="success" className="text-xs">
-                    {product.trend}
-                  </Badge>
-                  <span className="text-muted-foreground">
-                    {product.stock} in stock
-                  </span>
-                </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium">{product.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {product.sales} sales
+                </p>
               </div>
+              <span className="text-sm font-medium">{product.revenue}</span>
             </div>
           ))}
         </div>

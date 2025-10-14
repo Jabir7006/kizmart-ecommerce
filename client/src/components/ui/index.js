@@ -13,3 +13,10 @@ export * from "./scroll-area";
 export * from "./separator";
 export * from "./table";
 export * from "./tabs";
+export * from "./sheet";
+export * from "./dialog";
+export * from "./label";
+export * from "./textarea";
+export * from "./checkbox";
+export * from "./select";
+

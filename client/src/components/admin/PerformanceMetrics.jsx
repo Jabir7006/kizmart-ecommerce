@@ -39,7 +39,7 @@ const metrics = [
   },
 ];
 
-export function PerformanceMetrics() {
+export default function PerformanceMetrics() {
   return (
     <Card>
       <CardHeader>

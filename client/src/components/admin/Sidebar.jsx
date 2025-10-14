@@ -1,8 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Button, ScrollArea, Separator } from "@/components/ui";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -17,6 +15,7 @@ import {
   ChevronRight,
   Layers,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const menuItems = [
   {
@@ -73,11 +72,11 @@ const menuItems = [
   },
 ];
 
-export function Sidebar({ collapsed, setCollapsed }) {
+export default function Sidebar({ collapsed, setCollapsed }) {
   return (
     <div
       className={cn(
-        "relative flex h-screen flex-col border-r bg-card transition-all duration-300",
+        " sticky top-0 flex h-screen flex-col border-r bg-card transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -118,26 +117,28 @@ export function Sidebar({ collapsed, setCollapsed }) {
           {menuItems.map((item, index) => (
             <React.Fragment key={item.href}>
               {index === menuItems.length - 1 && <Separator className="my-2" />}
-              <Button
-                variant={item.active ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start",
-                  collapsed && "justify-center px-2"
-                )}
-                title={collapsed ? item.title : undefined}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="ml-3">{item.title}</span>
-                    {item.badge && (
-                      <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </Button>
+              <Link to={item.href}>
+                <Button
+                  variant={item.active ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full justify-start cursor-pointer",
+                    collapsed && "justify-center px-2"
+                  )}
+                  title={collapsed ? item.title : undefined}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="ml-3">{item.title}</span>
+                      {item.badge && (
+                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Button>
+              </Link>
             </React.Fragment>
           ))}
         </div>
