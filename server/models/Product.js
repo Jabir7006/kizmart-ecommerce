@@ -60,17 +60,17 @@ const productSchema = new Schema(
       ref: "Brand",
       default: "no brand",
     },
-    variants: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Variant",
-        default: "no variant",
-      },
-    ],
-    attributes: {
-      type: Map,
-      of: String,
-    },
+    // variants: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Variant",
+    //     default: "no variant",
+    //   },
+    // ],
+    // attributes: {
+    //   type: Map,
+    //   of: String,
+    // },
     quantity: {
       type: Number,
       required: [true, "Product Quantity is required"],

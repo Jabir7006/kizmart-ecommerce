@@ -1,0 +1,5 @@
+// features that will implement later 
+
+product variants
+product dynamic quantity
+google, facebook, number login
