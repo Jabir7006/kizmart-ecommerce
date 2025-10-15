@@ -34,7 +34,7 @@ const ProductForm = ({defaultValues}) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Product Information */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 mt-5">
           <Card>
             <CardHeader>
               <CardTitle>Product Information</CardTitle>
