@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui";
 import { Plus } from "lucide-react";
 import ProductList from "../../../components/admin/product/ProductList";
 import AdminLayout from "../../../components/layouts/AdminLayout";
+import { Link } from "react-router-dom";
 const AdminProductsPage = () => {
   return (
     <AdminLayout>
@@ -14,9 +15,11 @@ const AdminProductsPage = () => {
           description="Manage your product inventory"
         >
           <PageHeader.Right>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
+            <Button asChild>
+              <Link to="/admin/product/add">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Link>
             </Button>
           </PageHeader.Right>
         </PageHeader>

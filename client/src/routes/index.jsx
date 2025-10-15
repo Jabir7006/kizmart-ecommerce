@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "../pages/public/HomePage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
-import AdminProductsPage from "../pages/admin/AdminProductsPage";
+import AddProductPage from "../pages/admin/product/AddProductPage";
+import AdminProductsPage from "../pages/admin/product/AdminProductsPage";
 
 const AppRouter = () => {
   return (
@@ -14,6 +15,7 @@ const AppRouter = () => {
       {/* Admin Routes */}
       <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
       <Route path="/admin/products" element={<AdminProductsPage />} />
+      <Route path="/admin/product/add" element={<AddProductPage />} />
     </Routes>
   );
 };
