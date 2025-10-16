@@ -5,7 +5,7 @@ export const validate = (schema) => (req, res, next) => {
   try {
     if (schema.body) {
       const result = schema.body.safeParse(req.body);
-      if (!result.success) throw result.error; // ✅ throw actual ZodError
+      if (!result.success) throw result.error; 
       req.validated = { ...req.validated, body: result.data };
     }
 

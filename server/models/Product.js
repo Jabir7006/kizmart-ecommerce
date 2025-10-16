@@ -98,7 +98,14 @@ const productSchema = new Schema(
   },
   { timestamps: true }
 );
-
+productSchema.index({
+  title: 1,
+  price: 1, 
+  category: 1,
+  brand: 1,
+  stockStatus: 1,
+  isFeatured: 1,
+});
 const Product = model("Product", productSchema);
 
 export default Product;

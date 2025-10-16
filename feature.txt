@@ -2,4 +2,5 @@
 
 product variants
 product dynamic quantity
+product rating and review functionality
 google, facebook, number login

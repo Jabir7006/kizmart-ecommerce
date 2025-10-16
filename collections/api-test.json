@@ -1,0 +1,33 @@
+{
+  "info": {
+    "_postman_id": "29263c3c-189a-470d-92e7-8c58f3fadd23",
+    "name": "API Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "c9abe0cc-771b-4e16-b076-319529c565f1"
+  },
+  "item": [
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products",
+          "host": [
+            "http:"
+          ],
+          "path": [
+            "localhost:3000",
+            "api",
+            "v1",
+            "products"
+          ],
+          "query": []
+        },
+        "body": {}
+      },
+      "response": [],
+      "event": []
+    }
+  ]
+}

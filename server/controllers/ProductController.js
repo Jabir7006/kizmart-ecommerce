@@ -1,5 +1,12 @@
-import { createNewProduct } from "../services/productService.js";
+// @route   POST /api/v1/products
+// @desc    Add a new product
 
+import {
+  createNewProduct,
+  findAllProducts,
+} from "../services/productService.js";
+
+// @access  Public
 const addNewProduct = async (req, res, next) => {
   try {
     const validatedData = req.validated.body;
@@ -16,4 +23,22 @@ const addNewProduct = async (req, res, next) => {
   }
 };
 
-export { addNewProduct };
+// @route   GET /api/v1/products
+// @desc    Get all products
+// @access  Public
+const getAllProducts = async (req, res, next) => {
+  try {
+    const validatedData = req.validated.query;
+    console.log(req.validated.query);
+
+    const result = await findAllProducts(validatedData);
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { addNewProduct, getAllProducts };

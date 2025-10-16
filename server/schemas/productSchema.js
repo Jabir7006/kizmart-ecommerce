@@ -59,3 +59,54 @@ export const createProductSchema = z.object({
 
   isFeatured: z.boolean().optional().default(false),
 });
+
+export const productIdParam = z.object({
+  id: z.string().regex(objectIdRegex, "Invalid MongoDB ObjectId format"),
+});
+
+export const productQuerySchema = z.object({
+  // Search keyword (optional)
+  search: z.string().optional(),
+
+  // Filtering (e.g., price[gte]=500)
+  category: z.string().optional(),
+  brand: z.string().optional(),
+  price: z
+    .union([
+      z.string(),
+      z.object({
+        gte: z.string().optional(),
+        gt: z.string().optional(),
+        lte: z.string().optional(),
+        lt: z.string().optional(),
+      }),
+    ])
+    .optional(),
+
+  // Sorting: e.g. sort=price,-ratings
+  sort: z
+    .string()
+    .regex(/^[-a-zA-Z0-9_,]+$/, "Invalid sort format")
+    .optional(),
+
+  // Fields selection: fields=title,price
+  fields: z
+    .string()
+    .regex(/^[a-zA-Z0-9_,]+$/, "Invalid fields format")
+    .optional(),
+
+  // Pagination
+  page: z
+    .string()
+    .transform((val) => parseInt(val))
+    .refine((val) => val > 0, { message: "Page must be greater than 0" })
+    .optional(),
+
+  limit: z
+    .string()
+    .transform((val) => parseInt(val))
+    .refine((val) => val > 0 && val <= 100, {
+      message: "Limit must be between 1 and 100",
+    })
+    .optional(),
+});
