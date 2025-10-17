@@ -1,7 +1,7 @@
 import Product from "../models/Product.js";
 import APIFeatures from "../utils/apiFeatures.js";
 import generateSlug from "../utils/slugGenerator.js";
-import Category from "../models/Category.js";
+
 const createNewProduct = async (data) => {
   try {
     const product = new Product({ ...data, slug: generateSlug(data.title) });
@@ -14,7 +14,7 @@ const createNewProduct = async (data) => {
 const findAllProducts = async (query) => {
   try {
     const features = new APIFeatures(
-      Product.find().populate("category", "title"),
+      Product.find(),
       query
     )
       .search("title")
