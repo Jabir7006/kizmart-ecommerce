@@ -11,6 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/products", productRoutes);
 
 app.use(notFound);
-app.use(errorHandler);
+   app.use(errorHandler);
 
 export default app;
