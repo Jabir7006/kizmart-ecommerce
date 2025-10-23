@@ -1,12 +1,6 @@
 import Product from "../models/Product.js";
 import generateSlug from "../utils/slugGenerator.js";
-<<<<<<< HEAD
-
-=======
-import paginationHandler, {
-  calculatePaginationMeta,
-} from "../utils/paginationHandler.js";
->>>>>>> main
+import Category from "../models/Category.js";
 const createNewProduct = async (data) => {
   try {
     const product = new Product({ ...data, slug: generateSlug(data.title) });
@@ -19,19 +13,7 @@ const createNewProduct = async (data) => {
 
 const findAllProducts = async (query) => {
   try {
-<<<<<<< HEAD
-    const features = new APIFeatures(
-      Product.find(),
-      query
-    )
-      .search("title")
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-=======
     const { skip, limit, page } = paginationHandler(query);
->>>>>>> main
 
     const [products, totalProducts] = await Promise.all([
       Product.find().skip(skip).limit(limit).lean().exec(),
