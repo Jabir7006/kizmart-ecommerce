@@ -1,6 +1,6 @@
 import Product from "../models/Product.js";
 import generateSlug from "../utils/slugGenerator.js";
-import Category from "../models/Category.js";
+
 const createNewProduct = async (data) => {
   try {
     const product = new Product({ ...data, slug: generateSlug(data.title) });
