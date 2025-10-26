@@ -1,5 +1,6 @@
 import Product from "../models/Product.js";
 import generateSlug from "../utils/slugGenerator.js";
+import paginationHandler, { calculatePaginationMeta } from "../utils/paginationHandler.js";
 
 const createNewProduct = async (data) => {
   try {
@@ -20,10 +21,10 @@ const findAllProducts = async (query) => {
       Product.countDocuments().exec(),
     ]);
 
-    if(page > Math.ceil(totalProducts / limit)){
+    if (page > Math.ceil(totalProducts / limit)) {
       throw new Error("Page not found");
     }
-    if(totalProducts === 0){
+    if (totalProducts === 0) {
       throw new Error("No products found");
     }
 
