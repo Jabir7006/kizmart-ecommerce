@@ -68,28 +68,32 @@ export const productQuerySchema = z.object({
   // Search keyword (optional)
   search: z.string().optional(),
 
-  // Filtering (e.g., price[gte]=500)
-  category: z.string().optional(),
+  // Filtering
+  // category: z.string().optional(),
   brand: z.string().optional(),
-  price: z
-    .union([
-      z.string(),
-      z.object({
-        gte: z.string().optional(),
-        gt: z.string().optional(),
-        lte: z.string().optional(),
-        lt: z.string().optional(),
-      }),
-    ])
+
+  // Price filtering (e.g., priceMin=100&priceMax=500)
+  priceMin: z
+    .string()
+    .transform((val) => parseFloat(val))
+    .refine((val) => val >= 0, { message: "Price minimum must be >= 0" })
+    .optional(),
+  priceMax: z
+    .string()
+    .transform((val) => parseFloat(val))
+    .refine((val) => val >= 0, { message: "Price maximum must be >= 0" })
     .optional(),
 
-  // Sorting: e.g. sort=price,-ratings
+  // Sorting: e.g. sort=price:asc or sort=createdAt:desc
   sort: z
     .string()
-    .regex(/^[-a-zA-Z0-9_,]+$/, "Invalid sort format")
+    .regex(
+      /^[a-zA-Z0-9_]+:(asc|desc)$/,
+      "Invalid sort format. Use 'field:asc' or 'field:desc'"
+    )
     .optional(),
 
-  // Fields selection: fields=title,price
+  // Fields selection: fields=title,price,description
   fields: z
     .string()
     .regex(/^[a-zA-Z0-9_,]+$/, "Invalid fields format")

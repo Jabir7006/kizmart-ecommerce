@@ -29,6 +29,7 @@ const addNewProduct = async (req, res, next) => {
 const getAllProducts = async (req, res, next) => {
   try {
     const validatedData = req.validated.query;
+console.log(validatedData);
 
     const { products, pagination } = await findAllProducts(validatedData);
 
@@ -37,7 +38,6 @@ const getAllProducts = async (req, res, next) => {
       message: "Products retrieved successfully",
       pagination,
       data: products,
-      count: products.length
     });
   } catch (error) {
     next(error);

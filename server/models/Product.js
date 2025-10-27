@@ -12,7 +12,7 @@ const productSchema = new Schema(
     slug: {
       type: String,
       required: [true, "Product Slug is required"],
-      unique: true,
+      unique: true, // Unique index handled by Mongoose automatically
       lowercase: true,
     },
 
@@ -27,6 +27,7 @@ const productSchema = new Schema(
       required: [true, "Product Price is required"],
       min: [0, "Price must be greater than 0"],
     },
+
     discountType: {
       type: String,
       enum: ["percentage", "fixed"],
@@ -37,6 +38,7 @@ const productSchema = new Schema(
       type: Number,
       min: [0, "Discount must be greater than 0"],
     },
+
     images: [
       {
         public_id: {
@@ -49,6 +51,7 @@ const productSchema = new Schema(
         },
       },
     ],
+
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
@@ -58,39 +61,45 @@ const productSchema = new Schema(
     brand: {
       type: Schema.Types.ObjectId,
       ref: "Brand",
-      default: "no brand",
+      default: null, // Corrected default
     },
+
     // variants: [
     //   {
     //     type: Schema.Types.ObjectId,
     //     ref: "Variant",
-    //     default: "no variant",
+    //     default: null,
     //   },
     // ],
     // attributes: {
     //   type: Map,
     //   of: String,
     // },
+
     quantity: {
       type: Number,
       required: [true, "Product Quantity is required"],
       default: 0,
     },
+
     stockStatus: {
       type: String,
       enum: ["in stock", "out of stock", "low stock"],
       default: "in stock",
     },
+
     sold: {
       type: Number,
       default: 0,
     },
+
     reviews: [
       {
         type: Schema.Types.ObjectId,
         ref: "Review",
       },
     ],
+
     isFeatured: {
       type: Boolean,
       default: false,
@@ -98,6 +107,13 @@ const productSchema = new Schema(
   },
   { timestamps: true }
 );
+
+// Single-field indexes
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ stockStatus: 1 });
+productSchema.index({ isFeatured: 1, createdAt: -1 });
 
 const Product = model("Product", productSchema);
 
