@@ -1,11 +1,9 @@
-// middlewares/validate.js
-import { ZodError } from "zod";
-
 export const validate = (schema) => (req, res, next) => {
   try {
+    req.validated = req.validated || {};
     if (schema.body) {
       const result = schema.body.safeParse(req.body);
-      if (!result.success) throw result.error; 
+      if (!result.success) throw result.error;
       req.validated = { ...req.validated, body: result.data };
     }
 

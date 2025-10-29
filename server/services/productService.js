@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import ApiError from "../utils/ApiError.js";
 import generateSlug from "../utils/slugGenerator.js";
 
 const createNewProduct = async (data) => {
@@ -7,7 +8,7 @@ const createNewProduct = async (data) => {
     await product.save();
     return product;
   } catch (error) {
-    throw error;
+    throw new ApiError(500, "Failed to create product", error.message, false);
   }
 };
 
@@ -63,7 +64,6 @@ const findAllProducts = async (query) => {
     // --- FILTER STAGE ---
     if (category) matchStage.category = category;
     if (brand) matchStage.brand = brand;
-
 
     if (priceMin || priceMax) {
       matchStage.price = {};
@@ -150,7 +150,7 @@ const findAllProducts = async (query) => {
       },
     };
   } catch (error) {
-    throw error;
+    throw new ApiError(500, "Failed to find products", error.message, false);
   }
 };
 export { createNewProduct, findAllProducts };

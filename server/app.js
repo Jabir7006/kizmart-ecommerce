@@ -1,9 +1,8 @@
 import express from "express";
-import { errorHandler, notFound } from "./middlewares/errorMiddleware.js";
+import { errorHandler, notFound } from "./middlewares/error.middleware.js";
 import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -12,6 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/products", productRoutes);
 
 app.use(notFound);
-   app.use(errorHandler);
+app.use(errorHandler);
 
 export default app;
