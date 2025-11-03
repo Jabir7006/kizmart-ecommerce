@@ -1,21 +1,20 @@
 import { Router } from "express";
-
 import {
-  createProductSchema,
-  productQuerySchema,
-} from "../schemas/productSchema.js";
-import {
-  addNewProduct,
-  getAllProducts,
+	addNewProduct,
+	getAllProducts,
 } from "../controllers/ProductController.js";
 import { validate } from "../middlewares/validateMiddleware.js";
+import {
+	createProductSchema,
+	productQuerySchema,
+} from "../schemas/productSchema.js";
 
 const productRouter = Router();
 
 productRouter.post(
-  "/new",
-  validate({ body: createProductSchema }),
-  addNewProduct
+	"/new",
+	validate({ body: createProductSchema }),
+	addNewProduct,
 );
 productRouter.get("/", validate({ query: productQuerySchema }), getAllProducts);
 
