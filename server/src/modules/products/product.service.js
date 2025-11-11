@@ -1,4 +1,4 @@
-import Product from "../models/Product.js";
+import Product from "./product.model.js";
 import ApiError from "../utils/ApiError.js";
 import generateSlug from "../utils/slugGenerator.js";
 

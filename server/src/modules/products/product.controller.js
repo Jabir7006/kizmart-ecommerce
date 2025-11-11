@@ -1,9 +1,7 @@
-// @route   POST /api/v1/products     const { products, pagination } = await findAllProducts(validatedData);// @desc    Add a new product
-
 import {
   createNewProduct,
   findAllProducts,
-} from "../services/productService.js";
+} from "./product.service.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 // @access  Public

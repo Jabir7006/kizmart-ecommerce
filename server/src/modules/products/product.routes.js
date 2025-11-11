@@ -3,12 +3,12 @@ import { Router } from "express";
 import {
   createProductSchema,
   productQuerySchema,
-} from "../schemas/productSchema.js";
+} from "./product.schema.js";
 import {
   addNewProduct,
   getAllProducts,
-} from "../controllers/ProductController.js";
-import { validate } from "../middlewares/validateMiddleware.js";
+} from "./product.controller.js";
+import { validate } from "../middlewares/validate.middleware.js";
 
 const productRouter = Router();
 
