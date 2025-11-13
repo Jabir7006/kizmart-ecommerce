@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import generateSlug from "../utils/slugGenerator.js";
 
 const productSchema = new Schema(
   {
@@ -114,6 +115,13 @@ productSchema.index({ brand: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ stockStatus: 1 });
 productSchema.index({ isFeatured: 1, createdAt: -1 });
+
+productSchema.pre("save", function (next) {
+  if (this.isModified("title")) {
+    this.slug = generateSlug(this.title);
+  }
+  next();
+});
 
 const Product = model("Product", productSchema);
 

@@ -1,12 +1,11 @@
 import Product from "./product.model.js";
 import ApiError from "../utils/ApiError.js";
-import generateSlug from "../utils/slugGenerator.js";
 
 const createNewProduct = async (data) => {
   try {
-    const product = new Product({ ...data, slug: generateSlug(data.title) });
-    await product.save();
-    return product;
+    const product = new Product({ ...data });
+    const savedProduct = await product.save();
+    return savedProduct;
   } catch (error) {
     throw new ApiError(500, "Failed to create product", error.message, false);
   }
