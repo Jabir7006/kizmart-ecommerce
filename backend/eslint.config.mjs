@@ -20,7 +20,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/server.ts', 'src/config/db.ts'],
+    files: ['src/server.ts', 'src/config/db.ts', 'src/app.ts'],
     rules: {
       'no-console': 'off',
     },
