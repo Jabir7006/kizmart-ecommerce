@@ -5,6 +5,7 @@ import {
   errorHandler,
   notFoundHandler,
 } from './middlewares/error.middleware.js';
+import authRoute from './Routes/auth.route.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get('/health', (req, res) => {
     message: 'OK',
   });
 });
+app.use('/api/v1/auth', authRoute);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
