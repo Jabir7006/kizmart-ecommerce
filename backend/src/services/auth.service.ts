@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '../constants/http.js';
 import User from '../models/user.model.js';
-import AppError from '../utils/AppError..js';
+import AppError from '../utils/AppError.js';
 
 type CreateUserData = {
   fullName: string;
