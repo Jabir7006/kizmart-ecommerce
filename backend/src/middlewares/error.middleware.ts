@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 import type { NextFunction, Request, Response } from 'express';
-import AppError from '../utils/AppError..js';
+import { ZodError } from 'zod';
+import AppError from '../utils/AppError.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import { NODE_ENV } from '../constants/env.js';
 
@@ -23,6 +25,23 @@ export const errorHandler = (
       success: false,
       status: err.statusCode,
       message: err.message,
+      ...(err.errors && { errors: err.errors }),
+    });
+  }
+
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
+    const formattedErrors = err.issues.map((issue) => ({
+      field: issue.path.join('.'),
+      message: issue.message,
+    }));
+    const message = formattedErrors.map((e) => e.message).join(', ');
+
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
+      success: false,
+      status: HTTP_STATUS.BAD_REQUEST,
+      message: message,
+      errors: formattedErrors,
     });
   }
 
