@@ -34,8 +34,7 @@ const verificationCodeSchema = new Schema<IVerificationCode>({
     }
 })
 
-verificationCodeSchema.index({createdAt : 1}, {expireAfterSeconds : 15 * 60 * 1000});
-
+verificationCodeSchema.index({createdAt : 1}, {expireAfterSeconds : 15 * 60});
 verificationCodeSchema.pre('save',async function() {
    if(!this.isModified('code')) return;
 
