@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { APP_ORIGIN } from './constants/env.js';
 import {
   errorHandler,
@@ -7,8 +8,10 @@ import {
 } from './middlewares/error.middleware.js';
 import authRoute from './Routes/auth.route.js';
 
+
 const app = express();
 
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
