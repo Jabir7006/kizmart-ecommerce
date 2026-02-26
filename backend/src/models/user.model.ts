@@ -1,5 +1,5 @@
 import { Document, Schema, model } from 'mongoose';
-import { comparePassword, hashPassword } from '../utils/bcypt.js';
+import { compareValue, hashValue } from '../utils/bcypt.js';
 
 export const ROLES = ['user', 'manager', 'admin'] as const;
 
@@ -57,11 +57,11 @@ userSchema.set('toJSON', {
 
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
-  this.password = await hashPassword(this.password);
+  this.password = await hashValue(this.password);
 });
 
 userSchema.methods.comparePassword = async function (password: string) {
-  return await comparePassword(this.password, password);
+  return await compareValue(password, this.password);
 };
 
 const User = model<IUser>('User', userSchema);
