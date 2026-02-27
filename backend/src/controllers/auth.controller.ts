@@ -1,5 +1,5 @@
 import { HTTP_STATUS } from '../constants/http.js';
-import { createUser } from '../services/auth.service.js';
+import { createUser, verifyEmail } from '../services/auth.service.js';
 import catchAsync from '../utils/catchAsync.js';
 import { setAuthCookies } from '../utils/cookies.js';
 
@@ -18,6 +18,18 @@ export const handleSignup = catchAsync(async (req, res) => {
     status: 'success',
     message:
       'Account created successfully. Please check your email for the verification code.',
+    data: user,
+  });
+});
+
+export const handleVerifyEmail = catchAsync(async (req, res) => {
+  const { code } = req.body;
+
+  const { user } = await verifyEmail(code);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Email verified successfully.',
     data: user,
   });
 });

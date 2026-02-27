@@ -47,3 +47,5 @@ export const createUser = async (data: CreateUserData) => {
   await sendMail({ to: user.email, subject, text, html });
   return { user, accessToken, refreshToken };
 };
+
+export const verifyEmail = async (code: string) => {};
