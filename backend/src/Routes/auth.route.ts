@@ -3,8 +3,13 @@ import {
   handleSignup,
   handleSignin,
   handleVerifyEmail,
+  handleSignout,
 } from '../controllers/auth.controller.js';
-import { signupSchema, signinSchema, verifyEmailSchema } from '../schemas/auth.schema.js';
+import {
+  signupSchema,
+  signinSchema,
+  verifyEmailSchema,
+} from '../schemas/auth.schema.js';
 import validate from '../middlewares/validate.middleware.js';
 import { protect } from '../middlewares/auth.middleware.js';
 
@@ -18,5 +23,7 @@ authRoute.post(
   validate(verifyEmailSchema),
   handleVerifyEmail,
 );
+
+authRoute.post('/signout', handleSignout);
 
 export default authRoute;

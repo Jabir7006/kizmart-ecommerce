@@ -1,9 +1,12 @@
 import { HTTP_STATUS } from '../constants/http.js';
-import { createUser, loginUser, verifyEmail } from '../services/auth.service.js';
+import {
+  createUser,
+  loginUser,
+  verifyEmail,
+} from '../services/auth.service.js';
 import catchAsync from '../utils/catchAsync.js';
-import { setAuthCookies } from '../utils/cookies.js';
+import { clearAuthCookies, setAuthCookies } from '../utils/cookies.js';
 import AppError from '../utils/AppError.js';
-
 
 export const handleSignup = catchAsync(async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -39,7 +42,6 @@ export const handleVerifyEmail = catchAsync(async (req, res) => {
   });
 });
 
-
 export const handleSignin = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
@@ -52,4 +54,11 @@ export const handleSignin = catchAsync(async (req, res) => {
     message: 'Login successful.',
     data: user,
   });
-})
+});
+
+export const handleSignout = catchAsync(async (_req, res) => {
+  clearAuthCookies(res).status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Logout successful',
+  });
+});
