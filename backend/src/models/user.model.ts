@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
       select: false,
-      min : [6, "Password must be at least 6 characters long"],
+      min: [6, "Password must be at least 6 characters long"],
     },
     role: {
       type: String,
@@ -60,8 +60,8 @@ userSchema.pre('save', async function () {
   this.password = await hashValue(this.password);
 });
 
-userSchema.methods.comparePassword = async function (password: string) {
-  return await compareValue(password, this.password);
+userSchema.methods.comparePassword = function (password: string) {
+  return compareValue(password, this.password);
 };
 
 const User = model<IUser>('User', userSchema);

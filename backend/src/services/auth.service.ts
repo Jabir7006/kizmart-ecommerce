@@ -85,3 +85,24 @@ export const verifyEmail = async (userId: string, code: string) => {
 
   return { user };
 };
+
+export const loginUser = async (email: string, password: string) => {
+  const user = await User.findOne({ email }).select("+password")
+
+  if (!user) {
+    throw new AppError("User not found with this email. please signup first", HTTP_STATUS.NOT_FOUND)
+  }
+
+  const isPasswordValid = await user.comparePassword(password)
+  if (!isPasswordValid) {
+    throw new AppError("Invalid credentials", HTTP_STATUS.UNAUTHORIZED)
+  }
+
+  const accessToken = signToken(
+    { userId: user._id, role: user.role },
+    accessTokenSignOptions,
+  );
+  const refreshToken = signToken({ userId: user._id }, refreshTokenSignOptions);
+
+  return { user, accessToken, refreshToken };
+}
