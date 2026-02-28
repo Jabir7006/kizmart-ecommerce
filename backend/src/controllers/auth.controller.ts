@@ -2,7 +2,7 @@ import { HTTP_STATUS } from '../constants/http.js';
 import { createUser, verifyEmail } from '../services/auth.service.js';
 import catchAsync from '../utils/catchAsync.js';
 import { setAuthCookies } from '../utils/cookies.js';
-
+import AppError from '../utils/AppError.js';
 export const handleSignup = catchAsync(async (req, res) => {
   const { fullName, email, password } = req.body;
 
@@ -24,8 +24,11 @@ export const handleSignup = catchAsync(async (req, res) => {
 
 export const handleVerifyEmail = catchAsync(async (req, res) => {
   const { code } = req.body;
-
-  const { user } = await verifyEmail(code);
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+  }
+  const { user } = await verifyEmail(userId, code);
 
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
