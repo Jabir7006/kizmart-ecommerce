@@ -7,11 +7,12 @@ import {
   notFoundHandler,
 } from './middlewares/error.middleware.js';
 import authRoute from './Routes/auth.route.js';
-
+import { protect } from './middlewares/auth.middleware.js';
+import userRoute from './Routes/user.route.js';
 
 const app = express();
 
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -29,6 +30,7 @@ app.get('/health', (req, res) => {
   });
 });
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/users', protect, userRoute);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
