@@ -6,9 +6,12 @@ import {
   accessTokenSignOptions,
   refreshTokenSignOptions,
   signToken,
+  verifyToken,
+  type refreshTokenPayload,
 } from '../utils/jwt.js';
 import sendMail from '../utils/sendMail.js';
 import { getEmailVerificationTemplate } from '../utils/mailTemplates.js';
+import { REFRESH_TOKEN_SECRET } from '../constants/env.js';
 
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -87,15 +90,18 @@ export const verifyEmail = async (userId: string, code: string) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email }).select("+password")
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    throw new AppError("User not found with this email. please signup first", HTTP_STATUS.NOT_FOUND)
+    throw new AppError(
+      'User not found with this email. please signup first',
+      HTTP_STATUS.NOT_FOUND,
+    );
   }
 
-  const isPasswordValid = await user.comparePassword(password)
+  const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
-    throw new AppError("Invalid credentials", HTTP_STATUS.UNAUTHORIZED)
+    throw new AppError('Invalid credentials', HTTP_STATUS.UNAUTHORIZED);
   }
 
   const accessToken = signToken(
@@ -105,4 +111,27 @@ export const loginUser = async (email: string, password: string) => {
   const refreshToken = signToken({ userId: user._id }, refreshTokenSignOptions);
 
   return { user, accessToken, refreshToken };
-}
+};
+
+export const refreshUserAccessToken = async (refreshToken: string) => {
+  const decoded = verifyToken(refreshToken, {
+    secret: REFRESH_TOKEN_SECRET,
+  }) as refreshTokenPayload;
+
+  if (!decoded || !decoded.userId) {
+    throw new AppError('Invalid refresh token', HTTP_STATUS.UNAUTHORIZED);
+  }
+
+  const user = await User.findById(decoded.userId);
+
+  if (!user) {
+    throw new AppError('User not found', HTTP_STATUS.UNAUTHORIZED);
+  }
+
+  const newAccessToken = signToken(
+    { userId: user._id, role: user.role },
+    accessTokenSignOptions,
+  );
+
+  return { newAccessToken };
+};

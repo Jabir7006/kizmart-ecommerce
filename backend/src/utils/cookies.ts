@@ -27,13 +27,15 @@ export const getRefreshTokenCookieOptions = (): CookieOptions => {
 type Params = {
   res: Response;
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 };
 
 export const setAuthCookies = ({ res, accessToken, refreshToken }: Params) => {
-  res
-    .cookie('accessToken', accessToken, getAccessTokenCookieOptions())
-    .cookie('refreshToken', refreshToken, getRefreshTokenCookieOptions());
+  res.cookie('accessToken', accessToken, getAccessTokenCookieOptions());
+
+  if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, getRefreshTokenCookieOptions());
+  }
 };
 
 export const clearAuthCookies = (res: Response) => {

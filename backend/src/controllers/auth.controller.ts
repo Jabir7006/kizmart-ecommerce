@@ -2,6 +2,7 @@ import { HTTP_STATUS } from '../constants/http.js';
 import {
   createUser,
   loginUser,
+  refreshUserAccessToken,
   verifyEmail,
 } from '../services/auth.service.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -60,5 +61,22 @@ export const handleSignout = catchAsync(async (_req, res) => {
   clearAuthCookies(res).status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
     message: 'Logout successful',
+  });
+});
+
+export const handleRefreshToken = catchAsync(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken as string | undefined;
+
+  if (!refreshToken) {
+    throw new AppError('Missing refresh token', HTTP_STATUS.UNAUTHORIZED);
+  }
+
+  const { newAccessToken } = await refreshUserAccessToken(refreshToken);
+
+  setAuthCookies({ res, accessToken: newAccessToken });
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Refresh token successful.',
   });
 });
