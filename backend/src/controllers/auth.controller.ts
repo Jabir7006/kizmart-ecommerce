@@ -3,6 +3,7 @@ import {
   createUser,
   loginUser,
   refreshUserAccessToken,
+  resendVerificationEmail,
   verifyEmail,
 } from '../services/auth.service.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -41,6 +42,21 @@ export const handleVerifyEmail = catchAsync(async (req, res) => {
     message: 'Email verified successfully.',
     data: user,
   });
+});
+
+export const handleResendVerificationEmail = catchAsync(async (req, res) => {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+  }
+
+  await resendVerificationEmail(userId);
+   
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Verification email resent successfully.'
+  });  
 });
 
 export const handleSignin = catchAsync(async (req, res) => {

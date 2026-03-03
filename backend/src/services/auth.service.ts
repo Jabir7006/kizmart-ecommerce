@@ -9,13 +9,10 @@ import {
   verifyToken,
   type refreshTokenPayload,
 } from '../utils/jwt.js';
-import sendMail from '../utils/sendMail.js';
-import { getEmailVerificationTemplate } from '../utils/mailTemplates.js';
 import { REFRESH_TOKEN_SECRET } from '../constants/env.js';
+import createVerificationCodeAndSendMail from '../utils/createVerificationCodeAndSendMail.js';
 
-const generateVerificationCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+
 
 type CreateUserData = {
   fullName: string;
@@ -31,23 +28,15 @@ export const createUser = async (data: CreateUserData) => {
 
   const user = await User.create(data);
 
-  const verificationCode = generateVerificationCode();
-  await VerificationCode.create({
-    user: user._id,
-    code: verificationCode,
-    type: 'email_verification',
-    expiresAt: Date.now() + 15 * 60 * 1000,
-  });
-
   const accessToken = signToken(
-    { userId: user._id, role: user.role },
+    { userId: user._id, role: user.role, verified: user.verified },
     accessTokenSignOptions,
   );
   const refreshToken = signToken({ userId: user._id }, refreshTokenSignOptions);
+  
+   await createVerificationCodeAndSendMail(user._id.toString(), user.email, 'email_verification');
 
-  const { subject, text, html } =
-    getEmailVerificationTemplate(verificationCode);
-  await sendMail({ to: user.email, subject, text, html });
+    
   return { user, accessToken, refreshToken };
 };
 
@@ -63,6 +52,7 @@ export const verifyEmail = async (userId: string, code: string) => {
       HTTP_STATUS.BAD_REQUEST,
     );
   }
+  
 
   const isValid = await verificationCode.isCodeValid(code);
   if (!isValid) {
@@ -77,17 +67,32 @@ export const verifyEmail = async (userId: string, code: string) => {
   if (user.verified) {
     throw new AppError('Email already verified', HTTP_STATUS.BAD_REQUEST);
   }
-
-  user.verified = true;
-  await user.save();
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: { verified: true } },
+    { new: true } 
+  );
 
   await VerificationCode.deleteMany({
     user: userId,
     type: 'email_verification',
   });
 
-  return { user };
+  return { user: updatedUser };
 };
+
+export const resendVerificationEmail = async (userId : string) => {
+  const user = await User.findById(userId);
+  if (!user) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
+  if (user.verified) throw new AppError('Email already verified', HTTP_STATUS.BAD_REQUEST);
+
+  await VerificationCode.deleteMany({
+    user: userId,
+    type: 'email_verification',
+  });
+   
+  await createVerificationCodeAndSendMail(userId, user.email, 'email_verification');
+}
 
 export const loginUser = async (email: string, password: string) => {
   const user = await User.findOne({ email }).select('+password');
@@ -105,7 +110,7 @@ export const loginUser = async (email: string, password: string) => {
   }
 
   const accessToken = signToken(
-    { userId: user._id, role: user.role },
+    { userId: user._id, role: user.role, verified: user.verified },
     accessTokenSignOptions,
   );
   const refreshToken = signToken({ userId: user._id }, refreshTokenSignOptions);
@@ -129,7 +134,7 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   }
 
   const newAccessToken = signToken(
-    { userId: user._id, role: user.role },
+    { userId: user._id, role: user.role, verified: user.verified },
     accessTokenSignOptions,
   );
 

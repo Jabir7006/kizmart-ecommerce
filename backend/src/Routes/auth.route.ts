@@ -5,6 +5,7 @@ import {
   handleVerifyEmail,
   handleSignout,
   handleRefreshToken,
+  handleResendVerificationEmail,
 } from '../controllers/auth.controller.js';
 import {
   signupSchema,
@@ -24,6 +25,7 @@ authRoute.post(
   validate(verifyEmailSchema),
   handleVerifyEmail,
 );
+authRoute.post('/resend-verification-email', protect, handleResendVerificationEmail);
 authRoute.post('/signout', handleSignout);
 authRoute.post('/refresh', handleRefreshToken);
 

@@ -9,6 +9,7 @@ export type refreshTokenPayload = {
 export type accessTokenPayload = {
   userId: IUser['_id'];
   role: IUser['role'];
+  verified: IUser['verified'];
 };
 
 type signOptionsAndSecret = SignOptions & {
