@@ -6,7 +6,7 @@ import { HTTP_STATUS } from '../constants/http.js';
 import { NODE_ENV } from '../constants/env.js';
 
 export const errorHandler = (
-  err: Error,
+  err: Error | AppError | ZodError | any, 
   req: Request,
   res: Response,
   _next: NextFunction,
@@ -76,6 +76,18 @@ export const errorHandler = (
       success: false,
       status: HTTP_STATUS.UNAUTHORIZED,
       message: 'Token expired',
+    });
+  }
+
+  if ('code' in err && err.code === 11000) {
+    const mongoErr = err as { keyValue?: Record<string, unknown> };
+    const field = Object.keys(mongoErr.keyValue || {})[0];
+    const value = field ? mongoErr.keyValue?.[field] : 'unknown';
+    
+    return res.status(HTTP_STATUS.CONFLICT).json({
+      success: false,
+      status: HTTP_STATUS.CONFLICT,
+      message: `${field || 'Field'} '${value}' already exists.`,
     });
   }
 

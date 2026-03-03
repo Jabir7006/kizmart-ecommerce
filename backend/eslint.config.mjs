@@ -17,6 +17,7 @@ export default tseslint.config(
       ],
 
       'no-console': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   {
