@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  handleGetCurrentUser,
   handleSignup,
   handleSignin,
   handleVerifyEmail,
@@ -17,6 +18,7 @@ import { protect } from '../middlewares/auth.middleware.js';
 
 const authRoute = express.Router();
 
+authRoute.get('/me', protect, handleGetCurrentUser);
 authRoute.post('/signup', validate(signupSchema), handleSignup);
 authRoute.post('/signin', validate(signinSchema), handleSignin);
 authRoute.post(
@@ -25,7 +27,11 @@ authRoute.post(
   validate(verifyEmailSchema),
   handleVerifyEmail,
 );
-authRoute.post('/resend-verification-email', protect, handleResendVerificationEmail);
+authRoute.post(
+  '/resend-verification-email',
+  protect,
+  handleResendVerificationEmail,
+);
 authRoute.post('/signout', handleSignout);
 authRoute.post('/refresh', handleRefreshToken);
 

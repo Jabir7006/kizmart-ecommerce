@@ -9,6 +9,24 @@ import {
 import catchAsync from '../utils/catchAsync.js';
 import { clearAuthCookies, setAuthCookies } from '../utils/cookies.js';
 import AppError from '../utils/AppError.js';
+import User from '../models/user.model.js';
+
+export const handleGetCurrentUser = catchAsync(async (req, res) => {
+  const userId = req.user?.userId;
+  if (!userId) {
+    throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    data: user,
+  });
+});
 
 export const handleSignup = catchAsync(async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -51,12 +69,11 @@ export const handleResendVerificationEmail = catchAsync(async (req, res) => {
   }
 
   await resendVerificationEmail(userId);
-   
 
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
-    message: 'Verification email resent successfully.'
-  });  
+    message: 'Verification email resent successfully.',
+  });
 });
 
 export const handleSignin = catchAsync(async (req, res) => {
