@@ -2,12 +2,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Link } from "react-router-dom";
+import { UserPlus } from "lucide-react";
 
 import { signupSchema } from "@/schemas/authSchema";
 import { FormInput } from "@/components/ui/FormInput";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import useAuth from "@/hooks/useAuth";
 
 const Signup = () => {
   const form = useForm<z.infer<typeof signupSchema>>({
@@ -19,15 +22,26 @@ const Signup = () => {
     },
   });
 
+  const { signupMutation } = useAuth();
+
   const onSubmit = (data: z.infer<typeof signupSchema>) => {
-    console.log(data);
-    // TODO: Implement actual signup logic
+    signupMutation.mutate(data);
   };
 
   const footerContent = (
     <>
-      <Button type="submit" form="signup-form" className="w-full text-md h-11">
-        Create account
+      <Button
+        type="submit"
+        form="signup-form"
+        className="w-full text-md h-11 cursor-pointer"
+        disabled={signupMutation.isPending}
+      >
+        {signupMutation.isPending ? (
+          <LoadingSpinner size={18} />
+        ) : (
+          <UserPlus className="size-4" />
+        )}
+        {signupMutation.isPending ? "Creating account..." : "Create account"}
       </Button>
       <div className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

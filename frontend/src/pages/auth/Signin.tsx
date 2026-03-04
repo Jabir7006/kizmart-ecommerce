@@ -2,13 +2,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Link } from "react-router-dom";
+import { LogIn } from "lucide-react";
 
 import { signinSchema } from "@/schemas/authSchema";
 import { FormInput } from "@/components/ui/FormInput";
-
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import useAuth from "@/hooks/useAuth";
 
 const Signin = () => {
   const form = useForm<z.infer<typeof signinSchema>>({
@@ -19,15 +21,26 @@ const Signin = () => {
     },
   });
 
+  const { loginMutation } = useAuth();
+
   const onSubmit = (data: z.infer<typeof signinSchema>) => {
-    console.log(data);
-    // TODO: Implement actual signin logic
+    loginMutation.mutate(data);
   };
 
   const footerContent = (
     <>
-      <Button type="submit" form="signin-form" className="w-full text-md h-11">
-        Sign in
+      <Button
+        type="submit"
+        form="signin-form"
+        className="w-full text-md h-11 cursor-pointer"
+        disabled={loginMutation.isPending}
+      >
+        {loginMutation.isPending ? (
+          <LoadingSpinner size={18} />
+        ) : (
+          <LogIn className="size-4" />
+        )}
+        {loginMutation.isPending ? "Signing in..." : "Sign in"}
       </Button>
       <div className="text-center text-sm text-muted-foreground">
         Don't have an account?{" "}
