@@ -14,3 +14,9 @@ export const signUp = async (credentials: SignUpData) =>
 
 export const signIn = async (credentials: SignInData) =>
   api.post("/auth/signin", credentials);
+
+export const verifyEmail = async (code: string) =>
+  api.post("/auth/verify-email", { code });
+
+export const resendVerificationEmail = async () =>
+  api.post("/auth/resend-verification-email");

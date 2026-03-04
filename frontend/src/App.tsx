@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 
 const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
+const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
         </Routes>
       </Suspense>
       <Toaster position="top-right" richColors closeButton />

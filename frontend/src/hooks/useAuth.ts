@@ -1,6 +1,8 @@
 import {
   signIn,
   signUp,
+  verifyEmail,
+  resendVerificationEmail,
   type SignInData,
   type SignUpData,
 } from "@/services/api/auth/authApi";
@@ -48,7 +50,31 @@ const useAuth = () => {
     onSuccess: (response) => {
       setUser(response.data.data);
       toast.success(response.data.message || "Account created successfully!");
+      navigate("/verify-email");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+
+  const verifyEmailMutation = useMutation({
+    mutationFn: (code: string) => verifyEmail(code),
+    onSuccess: (response) => {
+      setUser(response.data.data);
+      toast.success(response.data.message || "Email verified successfully!");
       navigate("/");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+
+  const resendVerificationMutation = useMutation({
+    mutationFn: () => resendVerificationEmail(),
+    onSuccess: (response) => {
+      toast.success(
+        response.data.message || "Verification email resent successfully!",
+      );
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
@@ -58,6 +84,8 @@ const useAuth = () => {
   return {
     loginMutation,
     signupMutation,
+    verifyEmailMutation,
+    resendVerificationMutation,
     logout,
   };
 };
