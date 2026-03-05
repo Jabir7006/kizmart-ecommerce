@@ -11,16 +11,11 @@ import {
 } from '../utils/jwt.js';
 import { REFRESH_TOKEN_SECRET } from '../constants/env.js';
 import createVerificationCodeAndSendMail from '../utils/createVerificationCodeAndSendMail.js';
+import type { CreateUserInput, LoginUserInput } from '../types/auth.types.js';
 
 
 
-type CreateUserData = {
-  fullName: string;
-  email: string;
-  password: string;
-};
-
-export const createUser = async (data: CreateUserData) => {
+export const createUser = async (data: CreateUserInput) => {
   const existsUser = await User.findOne({ email: data.email });
   if (existsUser) {
     throw new AppError('User already exists', HTTP_STATUS.CONFLICT);
@@ -94,7 +89,8 @@ export const resendVerificationEmail = async (userId : string) => {
   await createVerificationCodeAndSendMail(userId, user.email, 'email_verification');
 }
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (data: LoginUserInput) => {
+  const { email, password } = data;
   const user = await User.findOne({ email }).select('+password');
 
   if (!user) {

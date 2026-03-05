@@ -88,10 +88,9 @@ const ProductSchema = new Schema<IProduct>(
   },
 );
 
-ProductSchema.index(
-  { title: 'text', shortDescription: 'text' },
-  { weights: { title: 10, shortDescription: 5 } },
-);
+ProductSchema.index({ category: 1 });
+ProductSchema.index({ brand: 1 });
+ProductSchema.index({ price: 1 });
 
 const Product = model<IProduct>('Product', ProductSchema);
 export default Product;
