@@ -6,7 +6,7 @@ export interface IImage {
   altText: string;
 }
 
-const ImageSchema = new Schema(
+export const ImageSchema = new Schema(
   {
     publicId: { type: String, required: true },
     secureUrl: { type: String, required: true },
@@ -21,7 +21,7 @@ export interface IProduct extends Document {
   shortDescription: string;
   longDescription: string;
   thumbnail: IImage;
-  gallery: IImage[];
+  gallery?: IImage[];
   price: number;
   quantity: number;
   sold: number;
@@ -55,7 +55,6 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       required: true,
       min: [0, 'Price cannot be negative'],
-      index: true,
     },
     quantity: {
       type: Number,
@@ -67,12 +66,10 @@ const ProductSchema = new Schema<IProduct>(
       type: Schema.Types.ObjectId,
       ref: 'Category',
       required: true,
-      index: true,
     },
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'Brand',
-      index: true,
     },
     status: {
       type: String,
