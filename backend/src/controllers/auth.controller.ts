@@ -79,7 +79,7 @@ export const handleResendVerificationEmail = catchAsync(async (req, res) => {
 export const handleSignin = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
-  const { user, accessToken, refreshToken } = await loginUser(email, password);
+  const { user, accessToken, refreshToken } = await loginUser({email, password});
 
   setAuthCookies({ res, accessToken, refreshToken });
 
