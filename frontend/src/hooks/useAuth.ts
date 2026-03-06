@@ -5,6 +5,7 @@ import {
   resendVerificationEmail,
   type SignInData,
   type SignUpData,
+  signOut,
 } from "@/services/api/auth/authApi";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
@@ -81,11 +82,24 @@ const useAuth = () => {
     },
   });
 
+  const signOutMutation = useMutation({
+    mutationFn: () => signOut(),
+    onSuccess: () => {
+      logout();
+      toast.success("Signed out successfully");
+      navigate("/");
+    },
+    onError: () => {
+      toast.error("Failed to sign out");
+    },
+  });
+
   return {
     loginMutation,
     signupMutation,
     verifyEmailMutation,
     resendVerificationMutation,
+    signOutMutation,
     logout,
   };
 };

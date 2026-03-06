@@ -7,6 +7,7 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import GuestRoute from "@/components/routes/GuestRoute";
 import VerifyEmailRoute from "@/components/routes/VerifyEmailRoute";
+import MainLayout from "@/components/layouts/MainLayout";
 import Home from "@/pages/Home";
 
 const Signin = lazy(() => import("@/pages/auth/Signin"));
@@ -25,10 +26,18 @@ const App = () => {
           }
         >
           <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Home />} />
+            {/* Routes with header */}
+            <Route element={<MainLayout />}>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
 
-            {/* Guest-only routes */}
+              {/* Protected routes (auth + verified email required) */}
+              <Route element={<ProtectedRoute />}>
+                {/* Future: checkout, admin, etc. */}
+              </Route>
+            </Route>
+
+            {/* Guest-only routes (no header) */}
             <Route element={<GuestRoute />}>
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
@@ -37,11 +46,6 @@ const App = () => {
             {/* Verify email (auth required, but redirects if already verified) */}
             <Route element={<VerifyEmailRoute />}>
               <Route path="/verify-email" element={<VerifyEmail />} />
-            </Route>
-
-            {/* Protected routes (auth + verified email required) */}
-            <Route element={<ProtectedRoute />}>
-              {/* Future: checkout, admin, etc. */}
             </Route>
           </Routes>
         </Suspense>
@@ -52,3 +56,4 @@ const App = () => {
 };
 
 export default App;
+

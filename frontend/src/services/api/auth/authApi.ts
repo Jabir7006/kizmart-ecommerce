@@ -22,3 +22,5 @@ export const resendVerificationEmail = async () =>
   api.post("/auth/resend-verification-email");
 
 export const checkAuth = async () => api.get("/auth/me");
+
+export const signOut = async () => api.post("/auth/signout");
