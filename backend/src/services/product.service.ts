@@ -12,6 +12,7 @@ import AppError from '../utils/AppError.js';
 import {
   buildMatchStage,
   buildPaginationStage,
+  buildProjectionStage,
   buildSearchStage,
   buildSortStage,
 } from '../utils/productPipeline.js';
@@ -47,16 +48,18 @@ export const getAllProducts = async (
   if (options.categorySlug) {
     const category = await Category.findOne({
       slug: options.categorySlug,
-    }).select('_id');
+    })
+      .select('_id')
+      .lean();
     // If user searches for a category that doesn't exist, return empty results early
     if (!category) return noMeta;
     categoryId = category._id;
   }
 
   if (options.brandSlug) {
-    const brand = await Brand.findOne({ slug: options.brandSlug }).select(
-      '_id',
-    );
+    const brand = await Brand.findOne({ slug: options.brandSlug })
+      .select('_id')
+      .lean();
     if (!brand) return noMeta;
     brandId = brand._id;
   }
@@ -77,6 +80,7 @@ export const getAllProducts = async (
   );
   if (sortStage) pipeline.push(sortStage);
 
+  pipeline.push(buildProjectionStage());
   pipeline.push(buildPaginationStage(options.page, options.limit));
 
   // 3. Execute

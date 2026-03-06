@@ -62,6 +62,21 @@ export const buildSortStage = (
   return null; // Let Atlas Search sort by relevance
 };
 
+export const buildProjectionStage = (): PipelineStage => ({
+  $project: {
+    title: 1,
+    slug: 1,
+    thumbnail: 1,
+    price: 1,
+    status: 1,
+    ratings: 1,
+    numReviews: 1,
+    isFeatured: 1,
+    createdAt: 1,
+    updatedAt: 1,
+  },
+});
+
 export const buildPaginationStage = (
   page: number = 1,
   limit: number = 10,
