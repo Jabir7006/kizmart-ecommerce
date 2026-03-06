@@ -7,25 +7,27 @@ interface Category {
   thumbnail?: IImage;
 }
 
-const categorySchema = new mongoose.Schema<Category>({
-  title: {
-    type: String,
-    required: true,
-    unique: true,
+const categorySchema = new mongoose.Schema<Category>(
+  {
+    title: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      index: true,
+    },
+    thumbnail: {
+      type: ImageSchema,
+    },
   },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-    index: true,
-  },
-  thumbnail: {
-    type: ImageSchema,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 const Category = mongoose.model('Category', categorySchema);
 

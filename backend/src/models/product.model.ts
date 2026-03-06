@@ -3,7 +3,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 export interface IImage {
   publicId: string;
   secureUrl: string;
-  altText: string;
+  altText?: string;
 }
 
 export const ImageSchema = new Schema(

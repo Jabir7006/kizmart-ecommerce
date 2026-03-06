@@ -9,6 +9,9 @@ import {
 import authRoute from './Routes/auth.route.js';
 import { protect } from './middlewares/auth.middleware.js';
 import userRoute from './Routes/user.route.js';
+import productRoute from './Routes/product.route.js';
+import categoryRoute from './Routes/category.route.js';
+import brandRoute from './Routes/brand.route.js';
 
 const app = express();
 
@@ -31,6 +34,9 @@ app.get('/health', (req, res) => {
 });
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', protect, userRoute);
+app.use('/api/v1/products', productRoute);
+app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/brands', brandRoute);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

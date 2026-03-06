@@ -6,25 +6,27 @@ interface Brand {
   slug: string;
   logo?: IImage;
 }
-const brandSchema = new mongoose.Schema<Brand>({
-  title: {
-    type: String,
-    required: true,
-    unique: true,
+const brandSchema = new mongoose.Schema<Brand>(
+  {
+    title: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      index: true,
+    },
+    logo: {
+      type: ImageSchema,
+    },
   },
-  slug: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-    index: true,
-  },
-  logo: {
-    type: ImageSchema,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 const Brand = mongoose.model('Brand', brandSchema);
 
