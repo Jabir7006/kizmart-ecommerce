@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // 1. Create the Axios instance
 const api = axios.create({
@@ -34,7 +35,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       
       // Prevent infinite loops if the refresh token endpoint itself fails
-      if (originalRequest.url.includes('/refresh-token')) {
+      if (originalRequest.url?.includes('/auth/refresh')) {
         return Promise.reject(error);
       }
 
@@ -66,8 +67,9 @@ api.interceptors.response.use(
         isRefreshing = false;
         processQueue(refreshError as AxiosError, null);
         
-        // If the refresh token fails (e.g., it expired), force the user to log in again
-        window.location.href = '/signin'; 
+        // Log out the user if the refresh token fails
+        // Do not redirect using window.location here as it would break guest access to public routes
+        useAuthStore.getState().logout();
         
         return Promise.reject(refreshError);
       }
