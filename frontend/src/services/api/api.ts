@@ -1,10 +1,10 @@
-import axios, { AxiosError } from 'axios';
-import { useAuthStore } from '@/store/useAuthStore';
+import axios, { AxiosError } from "axios";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // 1. Create the Axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, 
-  withCredentials: true, 
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 // Variables to handle concurrent requests during token refresh
@@ -14,7 +14,10 @@ let failedQueue: Array<{
   reject: (reason?: any) => void;
 }> = [];
 
-const processQueue = (error: AxiosError | null, token: string | null = null) => {
+const processQueue = (
+  error: AxiosError | null,
+  token: string | null = null,
+) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -33,9 +36,8 @@ api.interceptors.response.use(
 
     // Check if the error is 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
       // Prevent infinite loops if the refresh token endpoint itself fails
-      if (originalRequest.url?.includes('/auth/refresh')) {
+      if (originalRequest.url?.includes("/auth/refresh")) {
         return Promise.reject(error);
       }
 
@@ -56,8 +58,8 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post('/auth/refresh'); 
-        
+        await api.post("/auth/refresh");
+
         isRefreshing = false;
         processQueue(null);
 
@@ -66,18 +68,17 @@ api.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError as AxiosError, null);
-        
+
         // Log out the user if the refresh token fails
-        // Do not redirect using window.location here as it would break guest access to public routes
         useAuthStore.getState().logout();
-        
+
         return Promise.reject(refreshError);
       }
     }
 
     // For all other errors (or if retry is true), reject the promise
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
