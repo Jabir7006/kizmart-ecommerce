@@ -17,9 +17,7 @@ const TopBar = () => {
   return (
     <div className="bg-primary text-primary-foreground">
       <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 text-xs font-medium">
-        <p className="hidden sm:block">
-          🔥 Free Shipping on orders above ৳999
-        </p>
+        <p className="hidden sm:block">🔥 Free Shipping on orders above ৳999</p>
         <p className="sm:hidden text-center w-full">
           🔥 Free Shipping above ৳999
         </p>
@@ -82,7 +80,7 @@ const MainRow = () => {
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <Button asChild size="sm" className="hidden sm:inline-flex ml-2">
+            <Button asChild size="sm" className="sm:inline-flex ml-2">
               <Link to="/signin">Sign In</Link>
             </Button>
           )}

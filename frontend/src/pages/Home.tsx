@@ -7,8 +7,8 @@ const Home = () => {
   return (
     <main>
       <HeroSlider />
-      <div className="max-w-screen-xl mx-auto px-2 py-4">
-        <h1 className="text-xl font-medium mb-4">Just For You</h1>
+      <div className="max-w-screen-xl mx-auto px-2 py-8">
+        <h1 className="text-xl font-medium mb-4">New Arrivals</h1>
 
         <ProductList products={products} productsQuery={productsQuery} />
       </div>
