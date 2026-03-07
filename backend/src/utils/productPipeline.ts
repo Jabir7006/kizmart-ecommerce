@@ -66,7 +66,9 @@ export const buildProjectionStage = (): PipelineStage => ({
   $project: {
     title: 1,
     slug: 1,
+    shortDescription: 1,
     thumbnail: 1,
+    gallary: 1,
     price: 1,
     status: 1,
     ratings: 1,

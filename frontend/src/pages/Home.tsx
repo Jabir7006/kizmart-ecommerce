@@ -1,6 +1,7 @@
 import HeroSlider from "@/components/home/carousel/HeroSlider";
 import useProduct from "@/hooks/useProduct";
-import ProductList from "@/product/ProductList";
+import ProductList from "@/components/product/ProductList";
+import QuickViewDialog from "@/components/product/QuickViewDialog";
 
 const Home = () => {
   const { products, productsQuery } = useProduct();
@@ -12,6 +13,7 @@ const Home = () => {
 
         <ProductList products={products} productsQuery={productsQuery} />
       </div>
+      <QuickViewDialog />
     </main>
   );
 };

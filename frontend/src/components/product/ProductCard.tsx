@@ -1,7 +1,8 @@
 import type { Product } from "@/types/productType";
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
-import placeholderSvg from "../assets/product-placeholder.svg";
+import { Star, Eye } from "lucide-react";
+import placeholderSvg from "@/assets/product-placeholder.svg";
+import { useProductStore } from "@/store/useProductStore";
 
 const ProductCard = ({ product }: { product: Product | any }) => {
   const { title, slug, price, thumbnail } = product;
@@ -14,6 +15,15 @@ const ProductCard = ({ product }: { product: Product | any }) => {
   const badge = product.badge || "New";
   const discountPercentage = product.discountPercentage || 25;
   const originalPrice = product.originalPrice || Math.round(price * 1.33);
+
+  const setSelectedProduct = useProductStore(
+    (state) => state.setSelectedProduct,
+  );
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setSelectedProduct(product);
+  };
   return (
     <Link to={`/product/${slug}`} className="group">
       <div className="relative overflow-hidden rounded-lg bg-white transition-all duration-200 hover:shadow-md">
@@ -29,6 +39,15 @@ const ProductCard = ({ product }: { product: Product | any }) => {
               {badge}
             </div>
           )}
+
+          <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={handleQuickView}
+              className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <Eye className="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         </div>
         <div className="p-2">
           <h3 className="text-[11px] xs:text-[13px] sm:text-sm text-gray-800 line-clamp-2 min-h-[2.5em] leading-tight font-medium">

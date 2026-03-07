@@ -102,3 +102,11 @@ export const getAllProducts = async (
     data,
   };
 };
+
+export const getProductBySlug = async (slug: string) => {
+  const product = await Product.findOne({ slug }).lean();
+  if (!product) {
+    throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+  }
+  return product;
+};

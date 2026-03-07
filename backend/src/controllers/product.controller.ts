@@ -1,5 +1,5 @@
 import { HTTP_STATUS } from '../constants/http.js';
-import { createProduct, getAllProducts } from '../services/product.service.js';
+import { createProduct, getAllProducts, getProductBySlug } from '../services/product.service.js';
 import type { ProductQueryOptions } from '../types/product.types.js';
 import catchAsync from '../utils/catchAsync.js';
 
@@ -61,3 +61,14 @@ export const handleGetAllProducts = catchAsync(async (req, res) => {
     data: paginatedResults,
   });
 });
+
+export const handleGetSinleProduct = catchAsync(async (req, res) => {
+  const { slug } = req.params;
+
+  const product = await getProductBySlug(slug as string);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    data: product,
+  });
+})
