@@ -37,7 +37,7 @@ const UserMenu = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full hover:bg-primary/10"
+          className="rounded-full hover:bg-primary/10 cursor-pointer"
         >
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">

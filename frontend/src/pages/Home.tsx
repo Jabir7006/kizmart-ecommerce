@@ -1,5 +1,11 @@
+import HeroSlider from "@/components/home/carousel/HeroSlider";
+
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <div>
+      <HeroSlider />
+    </div>
+  );
 };
 
 export default Home;
