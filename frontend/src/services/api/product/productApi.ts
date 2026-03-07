@@ -18,4 +18,4 @@ export const getAllProducts = async (filters: ProductFilters) => {
   return api.get("/products", { params });
 };
 
-export const getSingleProduct = async (slug: string) => api.get(`/products/${slug}`);
+export const getProductBySlug = async (slug: string) => api.get(`/products/${slug}`);

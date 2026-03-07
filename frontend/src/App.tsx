@@ -13,6 +13,7 @@ import Home from "@/pages/Home";
 const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
 const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
+const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
             <Route element={<MainLayout />}>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
+              <Route path="/product/:slug" element={<ProductDetails />} />
 
               {/* Protected routes (auth + verified email required) */}
               <Route element={<ProtectedRoute />}>
@@ -56,4 +58,3 @@ const App = () => {
 };
 
 export default App;
-

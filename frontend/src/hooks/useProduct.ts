@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllProducts } from "@/services/api/product/productApi";
+import { getAllProducts, getProductBySlug } from "@/services/api/product/productApi";
 import { useProductStore } from "@/store/useProductStore";
-import type { PaginatedProducts } from "@/types/productType";
+import type { Product, PaginatedProducts } from "@/types/productType";
 
 const useProduct = () => {
   const filters = useProductStore((state) => state.filters);
@@ -37,3 +37,15 @@ const useProduct = () => {
 };
 
 export default useProduct;
+
+export const useSingleProduct = (slug: string) => {
+  return useQuery<Product>({
+    queryKey: ["product", slug],
+    queryFn: async () => {
+      const response = await getProductBySlug(slug);
+      return response.data.data; 
+    },
+    enabled: !!slug, 
+    staleTime: 5 * 60 * 1000, 
+  });
+};
