@@ -17,6 +17,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
     price,
     ratings,
     numReviews,
+    category,
+    brand,
     status,
     quantity: stockQuantity,
   } = product;
@@ -51,6 +53,17 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           {badge}
         </span>
       )}
+
+      <div className="flex flex-wrap items-center gap-3 mb-3">
+        {category && (
+          <span className="text-[10px] sm:text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+            {category?.title}
+          </span>
+        )}
+        <span className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Brand: {brand?.title || "No Brand"}
+        </span>
+      </div>
 
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
         {title}

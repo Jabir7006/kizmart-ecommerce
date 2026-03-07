@@ -104,7 +104,10 @@ export const getAllProducts = async (
 };
 
 export const getProductBySlug = async (slug: string) => {
-  const product = await Product.findOne({ slug }).lean();
+  const product = await Product.findOne({ slug })
+    .populate('category', 'title slug')
+    .populate('brand', 'title slug')
+    .lean();
   if (!product) {
     throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
   }

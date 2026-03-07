@@ -15,8 +15,16 @@ export interface Product {
   price: number;
   quantity: number;
   sold: number;
-  category: string;
-  brand: string;
+  category: {
+    _id: string;
+    title: string;
+    slug: string;
+  };
+  brand: {
+    _id: string;
+    title: string;
+    slug: string;
+  };
   status: "draft" | "active" | "archived";
   ratings: number;
   numReviews: number;
