@@ -12,6 +12,7 @@ import userRoute from './Routes/user.route.js';
 import productRoute from './Routes/product.route.js';
 import categoryRoute from './Routes/category.route.js';
 import brandRoute from './Routes/brand.route.js';
+import cartRoute from './Routes/cart.route.js';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/v1/users', protect, userRoute);
 app.use('/api/v1/products', productRoute);
 app.use('/api/v1/categories', categoryRoute);
 app.use('/api/v1/brands', brandRoute);
+app.use('/api/v1/carts', protect, cartRoute);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
