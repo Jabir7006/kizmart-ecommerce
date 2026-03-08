@@ -6,13 +6,17 @@ import {
 } from "@/components/ui/dialog";
 import { useProductStore } from "@/store/useProductStore";
 import { Star } from "lucide-react";
+import { useAddToCart } from "@/hooks/useCart";
+import { useCartStore } from "@/store/useCartStore";
 
 const QuickViewDialog = () => {
   const { selectedProduct, setSelectedProduct } = useProductStore();
+  const setIsOpen = useCartStore((state) => state.setIsOpen);
+  const addToCart = useAddToCart();
 
   if (!selectedProduct) return null;
 
-  const { title, shortDescription, thumbnail, price, ratings, numReviews } =
+  const { title, shortDescription, thumbnail, price, ratings, numReviews, _id } =
     selectedProduct;
 
   const productBadge = (selectedProduct as any).badge;
@@ -94,13 +98,21 @@ const QuickViewDialog = () => {
             </p>
 
             <button
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 transform active:scale-[0.98] shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold flex-1 py-3.5 rounded-xl transition-all duration-300 transform active:scale-[0.98] shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               onClick={() => {
-                // Future: implement Add to Cart
-                setSelectedProduct(null);
+                addToCart.mutate(
+                  { productId: _id, quantity: 1 },
+                  {
+                    onSuccess: () => {
+                      setSelectedProduct(null);
+                      setIsOpen(true);
+                    },
+                  }
+                );
               }}
+              disabled={addToCart.isPending}
             >
-              Add to Cart
+              {addToCart.isPending ? "Adding..." : "Add to Cart"}
             </button>
           </div>
         </div>

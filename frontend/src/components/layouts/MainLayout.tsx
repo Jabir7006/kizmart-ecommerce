@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "@/components/header/Header";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 const MainLayout = () => {
   return (
@@ -8,6 +9,7 @@ const MainLayout = () => {
       <main className="flex-1">
         <Outlet />
       </main>
+      <CartDrawer />
     </div>
   );
 };

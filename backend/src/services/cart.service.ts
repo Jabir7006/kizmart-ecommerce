@@ -76,7 +76,12 @@ export const updateCartItemQuantity = async ({
   const item = cart.items.find((item) => item.product.toString() === productId);
   if (!item) throw new AppError('Product not found in cart', HTTP_STATUS.NOT_FOUND);
 
-  item.quantity = quantity;
+  const newQuantity = item.quantity + quantity;
+  if (newQuantity < 1) {
+    throw new AppError('Quantity cannot be less than 1. Use remove item instead.', 400);
+  }
+
+  item.quantity = newQuantity;
   return await cart.save();
 };
 

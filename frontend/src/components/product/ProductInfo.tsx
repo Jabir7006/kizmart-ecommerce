@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Star, Minus, Plus, ShoppingCart, Heart, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/types/productType";
+import { useAddToCart } from "@/hooks/useCart";
+import { useCartStore } from "@/store/useCartStore";
 
 interface ProductInfoProps {
   product: Product;
@@ -10,6 +12,9 @@ interface ProductInfoProps {
 const ProductInfo = ({ product }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  
+  const setIsOpen = useCartStore((state) => state.setIsOpen);
+  const addToCart = useAddToCart();
 
   const {
     title,
@@ -21,14 +26,14 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
     brand,
     status,
     quantity: stockQuantity,
+    _id,
   } = product;
 
-  // Derive badge and original price similar to QuickView
   const productBadge = (product as any).badge;
   const productDiscount = (product as any).discountPercentage;
   const productOriginalPrice = (product as any).originalPrice;
 
-  const badge = productBadge; // Might be undefined, handled conditionally
+  const badge = productBadge; 
   const discountPercentage = productDiscount || 25;
   const originalPrice = productOriginalPrice || Math.round(price * 1.33);
 
@@ -145,11 +150,21 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         <div className="flex flex-col sm:flex-row gap-4 mt-2">
           <Button
             size="lg"
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] text-base group py-2 cursor-pointer"
-            disabled={isOutOfStock}
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] text-base group py-2 cursor-pointer disabled:opacity-50"
+            disabled={isOutOfStock || addToCart.isPending}
+            onClick={() => {
+              addToCart.mutate(
+                { productId: _id, quantity },
+                {
+                  onSuccess: () => {
+                    setIsOpen(true);
+                  },
+                }
+              );
+            }}
           >
             <ShoppingCart className="mr-2 h-5 w-5 transition-transform group-hover:-rotate-12" />
-            Add to Cart
+            {addToCart.isPending ? "Adding..." : "Add to Cart"}
           </Button>
 
           <div className="flex gap-4">

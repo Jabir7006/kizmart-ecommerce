@@ -1,11 +1,13 @@
 import type { Product } from "@/types/productType";
 import { Link } from "react-router-dom";
-import { Star, Eye } from "lucide-react";
+import { Star, Eye, ShoppingCart } from "lucide-react";
 import placeholderSvg from "@/assets/product-placeholder.svg";
 import { useProductStore } from "@/store/useProductStore";
+import { useAddToCart } from "@/hooks/useCart";
+import { useCartStore } from "@/store/useCartStore";
 
 const ProductCard = ({ product }: { product: Product | any }) => {
-  const { title, slug, price, thumbnail } = product;
+  const { title, slug, price, thumbnail, _id } = product;
 
   const imageSrc = thumbnail?.secureUrl || placeholderSvg;
   const rating = product.ratings || 0;
@@ -19,11 +21,26 @@ const ProductCard = ({ product }: { product: Product | any }) => {
   const setSelectedProduct = useProductStore(
     (state) => state.setSelectedProduct,
   );
+  const setIsOpen = useCartStore((state) => state.setIsOpen);
+  const addToCart = useAddToCart();
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     setSelectedProduct(product);
   };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart.mutate(
+      { productId: _id, quantity: 1 },
+      {
+        onSuccess: () => {
+          setIsOpen(true);
+        },
+      }
+    );
+  };
+
   return (
     <Link to={`/product/${slug}`} className="group">
       <div className="relative overflow-hidden rounded-lg bg-white transition-all duration-200 hover:shadow-md">
@@ -43,9 +60,18 @@ const ProductCard = ({ product }: { product: Product | any }) => {
           <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
               onClick={handleQuickView}
-              className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition-colors cursor-pointer"
+              className="p-2 bg-white rounded-full shadow hover:bg-primary group/cart transition-colors cursor-pointer disabled:opacity-50"
+              title="Quick View"
             >
-              <Eye className="w-4 h-4 text-gray-700" />
+              <Eye className="w-4 h-4 text-gray-700 group-hover/cart:text-white transition-colors" />
+            </button>
+            <button
+              onClick={handleAddToCart}
+              disabled={addToCart.isPending}
+              className="p-2 bg-white rounded-full shadow hover:bg-primary group/cart transition-colors cursor-pointer disabled:opacity-50"
+              title="Add to Cart"
+            >
+              <ShoppingCart className="w-4 h-4 text-gray-700 group-hover/cart:text-white transition-colors" />
             </button>
           </div>
         </div>

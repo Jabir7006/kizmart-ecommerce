@@ -9,6 +9,7 @@ import GuestRoute from "@/components/routes/GuestRoute";
 import VerifyEmailRoute from "@/components/routes/VerifyEmailRoute";
 import MainLayout from "@/components/layouts/MainLayout";
 import Home from "@/pages/Home";
+import CartPage from "./pages/CartPage";
 
 const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
@@ -35,6 +36,7 @@ const App = () => {
 
               {/* Protected routes (auth + verified email required) */}
               <Route element={<ProtectedRoute />}>
+                <Route path="/cart" element={<CartPage />} />
                 {/* Future: checkout, admin, etc. */}
               </Route>
             </Route>
