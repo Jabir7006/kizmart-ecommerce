@@ -15,6 +15,7 @@ const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
 const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
 const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
+const Checkout = lazy(() => import("@/pages/Checkout"));
 
 const App = () => {
   return (
@@ -37,7 +38,8 @@ const App = () => {
               {/* Protected routes (auth + verified email required) */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/cart" element={<CartPage />} />
-                {/* Future: checkout, admin, etc. */}
+                <Route path="/checkout" element={<Checkout />} />
+                {/* Future: admin, etc. */}
               </Route>
             </Route>
 
