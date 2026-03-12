@@ -39,7 +39,6 @@ const App = () => {
               <Route element={<ProtectedRoute />}>
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<Checkout />} />
-                {/* Future: admin, etc. */}
               </Route>
             </Route>
 

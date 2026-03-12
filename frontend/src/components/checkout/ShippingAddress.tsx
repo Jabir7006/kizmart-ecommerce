@@ -1,53 +1,52 @@
-import { useState } from "react";
-import { MapPin, Plus, Check, Edit2, Trash2 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useState, useCallback, useEffect } from "react";
+import { MapPin, Plus, Check, Edit2, Trash2, Loader2 } from "lucide-react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { AxiosResponse } from "axios";
 import { Button } from "@/components/ui/button";
-
-interface Address {
-  id: string;
-  fullName: string;
-  phoneNumber: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  isDefault: boolean;
-}
-
-const DUMMY_ADDRESSES: Address[] = [
-  {
-    id: "1",
-    fullName: "Jabir Al Fatah",
-    phoneNumber: "01722222222",
-    streetAddress: "123 Dhanmondi Avenue, Floor 4",
-    city: "Dhaka",
-    state: "Dhaka",
-    postalCode: "1205",
-    isDefault: true,
-  },
-  {
-    id: "2",
-    fullName: "John Doe",
-    phoneNumber: "+1 (555) 123-4567",
-    streetAddress: "456 Shopping Mall Blvd",
-    city: "New York",
-    state: "NY",
-    postalCode: "10001",
-    isDefault: false,
-  },
-];
-
 import { ShippingAddressForm } from "@/components/checkout/ShippingAddressForm";
+import type { AddressFormData } from "@/types/addressType";
+import { addressSchema } from "@/schemas/addressSchema";
+import {
+  useAddressesQuery,
+  useCreateAddress,
+  useUpdateAddress,
+  useDeleteAddress,
+} from "@/hooks/useAddress";
+import type { Address } from "@/types/addressType";
 
-export const ShippingAddress = () => {
-  const [addresses, setAddresses] = useState<Address[]>(DUMMY_ADDRESSES);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    DUMMY_ADDRESSES.find((a) => a.isDefault)?.id || DUMMY_ADDRESSES[0]?.id,
-  );
+export const ShippingAddress = ({
+  onAddressSelect,
+}: {
+  onAddressSelect?: (id: string) => void;
+}) => {
+  const { data: addresses = [], isLoading } = useAddressesQuery();
+  const { mutate: createAddress, isPending: isCreating } = useCreateAddress();
+  const { mutate: updateAddress, isPending: isUpdating } = useUpdateAddress();
+  const { mutate: deleteAddress } = useDeleteAddress();
+
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { control, reset, handleSubmit } = useForm({
+  // Auto-select default address when addresses load and none is selected
+  useEffect(() => {
+    if (addresses.length === 0) return;
+
+    setSelectedAddressId((prev) => {
+      if (prev) return prev;
+      const defaultId =
+        addresses.find((a) => a.isDefault)?._id || addresses[0]?._id;
+      if (defaultId) {
+        onAddressSelect?.(defaultId);
+        return defaultId;
+      }
+      return prev;
+    });
+  }, [addresses, onAddressSelect]);
+
+  const formMethods = useForm<AddressFormData>({
+    resolver: zodResolver(addressSchema),
     defaultValues: {
       fullName: "",
       phoneNumber: "",
@@ -59,8 +58,16 @@ export const ShippingAddress = () => {
     },
   });
 
-  const handleAddNew = () => {
-    reset({
+  const handleSelectAddress = useCallback(
+    (id: string) => {
+      setSelectedAddressId(id);
+      onAddressSelect?.(id);
+    },
+    [onAddressSelect],
+  );
+
+  const handleAddNew = useCallback(() => {
+    formMethods.reset({
       fullName: "",
       phoneNumber: "",
       streetAddress: "",
@@ -71,46 +78,85 @@ export const ShippingAddress = () => {
     });
     setEditingId(null);
     setShowForm(true);
-  };
+  }, [formMethods]);
 
-  const handleEdit = (address: Address) => {
-    reset(address);
-    setEditingId(address.id);
-    setShowForm(true);
-  };
+  const handleEdit = useCallback(
+    (address: Address) => {
+      formMethods.reset({
+        fullName: address.fullName,
+        phoneNumber: address.phoneNumber,
+        streetAddress: address.streetAddress,
+        city: address.city,
+        state: address.state,
+        postalCode: address.postalCode,
+        isDefault: address.isDefault,
+      });
+      setEditingId(address._id);
+      setShowForm(true);
+    },
+    [formMethods],
+  );
 
-  const handleRemove = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setAddresses(addresses.filter((a) => a.id !== id));
-    if (selectedAddressId === id) {
-      setSelectedAddressId(addresses.find((a) => a.id !== id)?.id || "");
-    }
-  };
+  const handleRemove = useCallback(
+    (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      deleteAddress(id, {
+        onSuccess: () => {
+          if (selectedAddressId === id) {
+            const firstAvailable =
+              addresses.find((a) => a._id !== id)?._id || "";
+            setSelectedAddressId(firstAvailable);
+            onAddressSelect?.(firstAvailable);
+          }
+        },
+      });
+    },
+    [deleteAddress, addresses, selectedAddressId, onAddressSelect],
+  );
 
-  const onSubmit = (data: any) => {
-    if (editingId) {
-      setAddresses(
-        addresses.map((a) =>
-          a.id === editingId ? { ...data, id: editingId } : a,
-        ),
-      );
-    } else {
-      const newId = `addr_${addresses.length + 1}`;
-      setAddresses([...addresses, { ...data, id: newId }]);
-      setSelectedAddressId(newId);
-    }
-    setShowForm(false);
-  };
+  const onSubmit = useCallback(
+    (data: AddressFormData) => {
+      if (editingId) {
+        updateAddress(
+          { id: editingId, data },
+          {
+            onSuccess: () => setShowForm(false),
+          },
+        );
+      } else {
+        createAddress(data, {
+          onSuccess: (res: AxiosResponse) => {
+            setShowForm(false);
+            const newId = res?.data?.id;
+            if (newId) {
+              setSelectedAddressId(newId);
+              onAddressSelect?.(newId);
+            }
+          },
+        });
+      }
+    },
+    [editingId, updateAddress, createAddress, onAddressSelect],
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (showForm) {
     return (
-      <ShippingAddressForm
-        editingId={editingId}
-        control={control}
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-        onCancel={() => setShowForm(false)}
-      />
+      <FormProvider {...formMethods}>
+        <ShippingAddressForm
+          editingId={editingId}
+          onSubmit={onSubmit}
+          onCancel={() => setShowForm(false)}
+          isSubmitting={isCreating || isUpdating}
+        />
+      </FormProvider>
     );
   }
 
@@ -142,9 +188,9 @@ export const ShippingAddress = () => {
         <div className="grid gap-4">
           {addresses.map((address) => (
             <div
-              key={address.id}
-              onClick={() => setSelectedAddressId(address.id)}
-              className={`relative flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${selectedAddressId === address.id ? "border-primary bg-primary/5" : "border-neutral-200 dark:border-neutral-800 hover:border-primary/50"}`}
+              key={address._id}
+              onClick={() => handleSelectAddress(address._id)}
+              className={`relative flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${selectedAddressId === address._id ? "border-primary bg-primary/5" : "border-neutral-200 dark:border-neutral-800 hover:border-primary/50"}`}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -168,9 +214,9 @@ export const ShippingAddress = () => {
 
               <div className="flex flex-col items-end gap-2 ml-4">
                 <div
-                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${selectedAddressId === address.id ? "bg-primary border-primary text-white" : "border-neutral-300 dark:border-neutral-700"}`}
+                  className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${selectedAddressId === address._id ? "bg-primary border-primary text-white" : "border-neutral-300 dark:border-neutral-700"}`}
                 >
-                  {selectedAddressId === address.id && (
+                  {selectedAddressId === address._id && (
                     <Check className="w-3 h-3" />
                   )}
                 </div>
@@ -191,7 +237,7 @@ export const ShippingAddress = () => {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-neutral-500 hover:text-red-500"
-                    onClick={(e) => handleRemove(address.id, e)}
+                    onClick={(e) => handleRemove(address._id, e)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

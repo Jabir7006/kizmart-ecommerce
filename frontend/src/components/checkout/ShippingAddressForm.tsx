@@ -1,24 +1,25 @@
 import { MapPin } from "lucide-react";
-import type { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { FormInput } from "@/components/ui/FormInput";
 import { FormCheckbox } from "@/components/ui/FormCheckbox";
 import { Button } from "@/components/ui/button";
+import type { AddressFormData } from "@/types/addressType";
 
 interface ShippingAddressFormProps {
   editingId: string | null;
-  control: UseFormReturn<any>["control"];
-  handleSubmit: UseFormReturn<any>["handleSubmit"];
-  onSubmit: (data: any) => void;
+  onSubmit: (data: AddressFormData) => void;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
 export const ShippingAddressForm = ({
   editingId,
-  control,
-  handleSubmit,
   onSubmit,
   onCancel,
+  isSubmitting,
 }: ShippingAddressFormProps) => {
+  const { control, handleSubmit } = useFormContext<AddressFormData>();
+
   return (
     <section className="animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex flex-col gap-6 p-6 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800">
@@ -98,8 +99,8 @@ export const ShippingAddressForm = ({
           />
 
           <div className="flex justify-end mt-2">
-            <Button type="submit" className="px-8">
-              Save Address
+            <Button type="submit" className="px-8" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Address"}
             </Button>
           </div>
         </form>

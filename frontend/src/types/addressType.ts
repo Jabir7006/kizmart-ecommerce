@@ -1,4 +1,8 @@
+import type { addressSchema } from "@/schemas/addressSchema";
+import { z } from "zod";
+
 export interface Address {
+  _id: string;
   user: string;
   fullName: string;
   phoneNumber: string;
@@ -6,5 +10,7 @@ export interface Address {
   city: string;
   state: string;
   postalCode: string;
-  isDefault: boolean;
+  isDefault?: boolean;
 }
+
+export type AddressFormData = z.infer<typeof addressSchema>;

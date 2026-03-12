@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronLeft,
@@ -7,6 +7,7 @@ import {
   CreditCard,
   ShoppingBag,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { ShippingAddress } from "@/components/checkout/ShippingAddress";
 import { PaymentOptions } from "@/components/checkout/PaymentOptions";
@@ -27,6 +28,7 @@ const STEPS = [
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
   const subtotal = MOCK_CART.reduce(
     (acc: number, item: any) => acc + item.price * item.quantity,
@@ -36,10 +38,20 @@ const Checkout = () => {
   const taxes = subtotal * 0.08;
   const total = subtotal + shipping + taxes;
 
+  // Stable callback — won't cause unnecessary re-renders of ShippingAddress
+  const handleAddressSelect = useCallback((id: string) => {
+    setSelectedAddressId(id);
+  }, []);
+
   const handleNext = () => {
+    // Validate step 1: must have a selected address
+    if (currentStep === 1 && !selectedAddressId) {
+      toast.error("Please select a shipping address before continuing.");
+      return;
+    }
+
     if (currentStep < 3) setCurrentStep((currentStep + 1) as Step);
     if (currentStep === 2) {
-      // Scroll to top on finish
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -74,98 +86,102 @@ const Checkout = () => {
         </div>
 
         {/* Stepper UI */}
-        <div className="mb-10 animate-in fade-in duration-500">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+        <nav aria-label="Checkout progress" className="mb-10 animate-in fade-in duration-500">
+          <ol className="flex items-center justify-between max-w-2xl mx-auto">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
+              const isActive = currentStep === step.id;
+              const isCompleted = currentStep > step.id;
+
               return (
-                <div
+                <li
                   key={step.id}
                   className="flex flex-col items-center flex-1 relative"
+                  aria-current={isActive ? "step" : undefined}
                 >
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 
                     ${
-                      currentStep > step.id
+                      isCompleted
                         ? "bg-primary border-primary text-white"
-                        : currentStep === step.id
+                        : isActive
                           ? "border-primary text-primary bg-white dark:bg-neutral-950 shadow-md transform scale-110"
                           : "border-neutral-200 text-neutral-400 bg-white dark:bg-neutral-900 dark:border-neutral-800"
                     }`}
                   >
-                    {currentStep > step.id ? (
+                    {isCompleted ? (
                       <Check className="w-6 h-6" />
                     ) : (
                       <Icon className="w-5 h-5" />
                     )}
                   </div>
                   <span
-                    className={`text-xs mt-3 font-medium transition-colors duration-300 md:text-sm text-center ${currentStep >= step.id ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-400"}`}
+                    className={`text-xs mt-3 font-medium transition-colors duration-300 md:text-sm text-center ${isActive || isCompleted ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-400"}`}
                   >
                     {step.name}
                   </span>
                   {index < STEPS.length - 1 && (
                     <div
-                      className={`absolute top-6 left-[60%] w-[80%] h-[2px] transition-colors duration-500 z-0 ${currentStep > step.id ? "bg-primary" : "bg-neutral-200 dark:bg-neutral-800"}`}
+                      className={`absolute top-6 left-[60%] w-[80%] h-0.5 transition-colors duration-500 z-0 ${isCompleted ? "bg-primary" : "bg-neutral-200 dark:bg-neutral-800"}`}
                     />
                   )}
-                </div>
+                </li>
               );
             })}
-          </div>
-        </div>
+          </ol>
+        </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main Content Area */}
           <div
-            className={`${currentStep === 3 ? "lg:col-span-12" : "lg:col-span-7"} space-y-8 relative overflow-hidden min-h-[600px] transition-all duration-500`}
+            className={`${currentStep === 3 ? "lg:col-span-12" : "lg:col-span-7"} space-y-8 transition-all duration-500`}
           >
             {/* Step 1: Address */}
-            <div
-              className={`absolute top-0 w-full transition-all duration-500 ease-in-out ${currentStep === 1 ? "opacity-100 translate-x-0 relative" : "-translate-x-full opacity-0 absolute pointer-events-none"}`}
-            >
-              <ShippingAddress />
-              <div className="flex justify-end mt-6">
-                <Button
-                  onClick={handleNext}
-                  className="w-full sm:w-auto h-11 px-8 rounded-full font-medium"
-                >
-                  Continue to Payment
-                </Button>
+            {currentStep === 1 && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                <ShippingAddress onAddressSelect={handleAddressSelect} />
+                <div className="flex justify-end mt-6">
+                  <Button
+                    onClick={handleNext}
+                    className="w-full sm:w-auto h-11 px-8 rounded-full font-medium"
+                  >
+                    Continue to Payment
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Step 2: Payment */}
-            <div
-              className={`absolute top-0 w-full transition-all duration-500 ease-in-out ${currentStep === 2 ? "opacity-100 translate-x-0 relative" : currentStep > 2 ? "-translate-x-full opacity-0 absolute pointer-events-none" : "translate-x-full opacity-0 absolute pointer-events-none"}`}
-            >
-              <PaymentOptions
-                paymentMethod={paymentMethod}
-                setPaymentMethod={setPaymentMethod}
-              />
-              <div className="flex justify-between mt-6">
-                <Button
-                  onClick={handleBack}
-                  variant="outline"
-                  className="h-11 px-8 rounded-full font-medium"
-                >
-                  Back to Address
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  className="h-11 px-8 rounded-full font-medium"
-                >
-                  Complete Order
-                </Button>
+            {currentStep === 2 && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                <PaymentOptions
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                />
+                <div className="flex justify-between mt-6">
+                  <Button
+                    onClick={handleBack}
+                    variant="outline"
+                    className="h-11 px-8 rounded-full font-medium"
+                  >
+                    Back to Address
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    className="h-11 px-8 rounded-full font-medium"
+                  >
+                    Complete Order
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Step 3: Confirmation */}
-            <div
-              className={`absolute top-0 w-full transition-all duration-500 ease-in-out ${currentStep === 3 ? "opacity-100 translate-x-0 relative" : "translate-x-full opacity-0 absolute pointer-events-none"}`}
-            >
-              <OrderConfirmation total={total} paymentMethod={paymentMethod} />
-            </div>
+            {currentStep === 3 && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                <OrderConfirmation total={total} paymentMethod={paymentMethod} />
+              </div>
+            )}
           </div>
 
           {/* Order Summary Sticky Sidebar - Hide on Step 3 */}
