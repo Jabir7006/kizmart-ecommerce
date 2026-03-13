@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   ChevronLeft,
   Check,
@@ -13,7 +13,7 @@ import { ShippingAddress } from "@/components/checkout/ShippingAddress";
 import { PaymentOptions } from "@/components/checkout/PaymentOptions";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { OrderConfirmation } from "@/components/checkout/OrderConfirmation";
-import { MOCK_CART } from "@/lib/constants";
+import { useCartQuery } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 
 type PaymentMethod = "card" | "paypal" | "cod";
@@ -30,13 +30,14 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
-  const subtotal = MOCK_CART.reduce(
-    (acc: number, item: any) => acc + item.price * item.quantity,
-    0,
-  );
-  const shipping = 15.0;
-  const taxes = subtotal * 0.08;
-  const total = subtotal + shipping + taxes;
+  const { data: cart } = useCartQuery();
+  const totalPrice = cart?.totalPrice ?? 0;
+
+  // check if cart is empty
+  if (cart?.items.length === 0) {
+    toast.error("Your cart is empty. Please add items to your cart.");
+    return <Navigate to="/" replace />;
+  }
 
   // Stable callback — won't cause unnecessary re-renders of ShippingAddress
   const handleAddressSelect = useCallback((id: string) => {
@@ -86,7 +87,10 @@ const Checkout = () => {
         </div>
 
         {/* Stepper UI */}
-        <nav aria-label="Checkout progress" className="mb-10 animate-in fade-in duration-500">
+        <nav
+          aria-label="Checkout progress"
+          className="mb-10 animate-in fade-in duration-500"
+        >
           <ol className="flex items-center justify-between max-w-2xl mx-auto">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
@@ -179,7 +183,10 @@ const Checkout = () => {
             {/* Step 3: Confirmation */}
             {currentStep === 3 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                <OrderConfirmation total={total} paymentMethod={paymentMethod} />
+                <OrderConfirmation
+                  total={totalPrice}
+                  paymentMethod={paymentMethod}
+                />
               </div>
             )}
           </div>
@@ -188,11 +195,15 @@ const Checkout = () => {
           {currentStep !== 3 && (
             <div className="lg:col-span-5 relative z-10 transition-all duration-500">
               <OrderSummary
-                subtotal={subtotal}
-                shipping={shipping}
-                taxes={taxes}
-                total={total}
-                buttonText={currentStep === 1 ? "Continue to Payment" : (paymentMethod === "paypal" ? "Proceed with PayPal" : "Pay now")}
+                items={cart?.items ?? []}
+                totalPrice={totalPrice}
+                buttonText={
+                  currentStep === 1
+                    ? "Continue to Payment"
+                    : paymentMethod === "paypal"
+                      ? "Proceed with PayPal"
+                      : "Pay now"
+                }
                 onButtonClick={handleNext}
               />
             </div>
