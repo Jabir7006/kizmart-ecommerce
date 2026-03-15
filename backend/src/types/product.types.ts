@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 
 type ImageInput = {
   publicId: string;

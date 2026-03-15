@@ -1,23 +1,12 @@
 import slugify from 'slugify';
-import Product from '../models/product.model.js';
-import type {
-  PaginatedResult,
-  ProductInput,
-  ProductQueryOptions,
-} from '../types/product.types.js';
-import type { PipelineStage } from 'mongoose';
 import { Types } from 'mongoose';
+import type { PaginatedResult, ProductInput, ProductQueryOptions } from '../types/product.types.js';
+import Product from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
-import {
-  buildMatchStage,
-  buildPaginationStage,
-  buildProjectionStage,
-  buildSearchStage,
-  buildSortStage,
-} from '../utils/productPipeline.js';
 import Category from '../models/category.model.js';
 import Brand from '../models/brand.model.js';
+import { QueryBuilder } from '../utils/queryBuilder.js';
 
 export const createProduct = async (data: ProductInput) => {
   const product = await Product.create({
@@ -31,7 +20,6 @@ export const createProduct = async (data: ProductInput) => {
 export const getAllProducts = async (
   options: ProductQueryOptions,
 ): Promise<PaginatedResult<any>> => {
-  // 1. Resolve Slugs to ObjectIds
   let categoryId: Types.ObjectId | undefined;
   let brandId: Types.ObjectId | undefined;
 
@@ -64,29 +52,47 @@ export const getAllProducts = async (
     brandId = brand._id;
   }
 
-  // 2. Assemble the Pipeline
-  const pipeline: PipelineStage[] = [];
+  const baseMatch: Record<string, any> = { status: 'active' };
 
-  if (options.search) {
-    pipeline.push(buildSearchStage(options.search));
+  if (categoryId) baseMatch.category = categoryId;
+  if (brandId) baseMatch.brand = brandId;
+
+  if (options.minPrice !== undefined || options.maxPrice !== undefined) {
+    const price: { $gte?: number; $lte?: number } = {};
+    if (options.minPrice !== undefined) price.$gte = options.minPrice;
+    if (options.maxPrice !== undefined) price.$lte = options.maxPrice;
+    baseMatch.price = price;
   }
 
-  pipeline.push(buildMatchStage(options, categoryId, brandId));
+  const queryBuilder = new QueryBuilder({
+    options: {
+      ...options,
+      search: options.search || '',
+    },
+    baseMatch,
+    searchableFields: ['title', 'shortDescription'],
+    useAtlasSearch: true,
+    atlasIndex: 'default',
+    projection: {
+      title: 1,
+      slug: 1,
+      shortDescription: 1,
+      thumbnail: 1,
+      gallery: 1,
+      price: 1,
+      status: 1,
+      ratings: 1,
+      numReviews: 1,
+      isFeatured: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    },
+  });
 
-  const sortStage = buildSortStage(
-    options.search,
-    options.sortBy,
-    options.sortOrder,
-  );
-  if (sortStage) pipeline.push(sortStage);
+  const pipeline = queryBuilder.buildPipeline();
 
-  pipeline.push(buildProjectionStage());
-  pipeline.push(buildPaginationStage(options.page, options.limit));
-
-  // 3. Execute
   const result = await Product.aggregate(pipeline);
 
-  // 4. Format Output
   const data = result[0]?.data || [];
   const total = result[0]?.metadata[0]?.total || 0;
   const limit = options.limit || 10;
