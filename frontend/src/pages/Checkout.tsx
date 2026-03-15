@@ -33,16 +33,16 @@ const Checkout = () => {
   const { data: cart } = useCartQuery();
   const totalPrice = cart?.totalPrice ?? 0;
 
-  // check if cart is empty
-  if (cart?.items.length === 0) {
-    toast.error("Your cart is empty. Please add items to your cart.");
-    return <Navigate to="/" replace />;
-  }
-
   // Stable callback — won't cause unnecessary re-renders of ShippingAddress
   const handleAddressSelect = useCallback((id: string) => {
     setSelectedAddressId(id);
   }, []);
+
+  // check if cart is empty (after all hooks)
+  if (cart?.items.length === 0) {
+    toast.error("Your cart is empty. Please add items to your cart.");
+    return <Navigate to="/" replace />;
+  }
 
   const handleNext = () => {
     // Validate step 1: must have a selected address
