@@ -6,18 +6,22 @@ import {
   removeProductFromCart,
   clearCart,
 } from "../services/api/cart/cartApi";
+import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import type { Cart } from "@/types/cartType";
 import type { AxiosError } from "axios";
 import type { AxiosErrorType } from "@/types/errorType";
 
 export const useCartQuery = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useQuery<Cart>({
     queryKey: ["cart"],
     queryFn: async () => {
       const { data } = await getCart();
       return data.data;
     },
+    enabled: isAuthenticated,
   });
 };
 

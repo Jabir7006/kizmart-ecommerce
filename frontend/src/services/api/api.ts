@@ -36,8 +36,15 @@ api.interceptors.response.use(
 
     // Check if the error is 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Prevent infinite loops if the refresh token endpoint itself fails
-      if (originalRequest.url?.includes("/auth/refresh")) {
+    
+      const isAuthRoute =
+        originalRequest.url?.includes("/auth/refresh") ||
+        originalRequest.url?.includes("/auth/signin");
+        originalRequest.url?.includes("/auth/signup");
+        originalRequest.url?.includes("/auth/verify-email");
+        originalRequest.url?.includes("/auth/resend-verification-email");
+        originalRequest.url?.includes("/auth/signout");
+      if (isAuthRoute) {
         return Promise.reject(error);
       }
 
