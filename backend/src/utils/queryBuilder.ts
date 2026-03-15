@@ -16,7 +16,8 @@ type MatchValue =
   | number
   | boolean
   | Types.ObjectId
-  | { $gte?: number; $lte?: number }
+  | Date
+  | { $gte?: number | Date; $lte?: number | Date }
   | { $in?: (string | Types.ObjectId)[] }
   | { $regex: RegExp; $options?: string };
 

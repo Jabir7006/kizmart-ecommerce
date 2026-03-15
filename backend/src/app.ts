@@ -14,6 +14,8 @@ import categoryRoute from './Routes/category.route.js';
 import brandRoute from './Routes/brand.route.js';
 import cartRoute from './Routes/cart.route.js';
 import addressRoute from './Routes/address.route.js';
+import orderRoute from './Routes/order.route.js';
+import paymentRoute from './Routes/payment.route.js';
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use('/api/v1/categories', categoryRoute);
 app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/carts', protect, cartRoute);
 app.use('/api/v1/addresses', protect, addressRoute);
+app.use('/api/v1/orders', protect, orderRoute);
+app.use('/api/v1/payments', protect, paymentRoute);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
