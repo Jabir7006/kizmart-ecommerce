@@ -33,6 +33,7 @@ export interface IOrder extends Document {
   payment: Types.ObjectId;
   status: OrderStatus;
   subtotal: number;
+  shippingFee: number;
   total: number;
   createdAt: Date;
   updatedAt: Date;
@@ -102,6 +103,11 @@ const orderSchema = new Schema<IOrder>(
       default: 'pending',
     },
     subtotal: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    shippingFee: {
       type: Number,
       required: true,
       min: 0,

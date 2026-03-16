@@ -1,10 +1,5 @@
 import type { BaseQueryOptions } from '../utils/queryBuilder.js';
 
-export type OrderItemInput = {
-  productId: string;
-  quantity: number;
-};
-
 export type ShippingSnapshotInput = {
   fullName: string;
   phoneNumber: string;
@@ -15,7 +10,6 @@ export type ShippingSnapshotInput = {
 };
 
 export type OrderInput = {
-  items: OrderItemInput[];
   shippingAddress: ShippingSnapshotInput;
   paymentMethod: 'cash_on_delivery';
 };

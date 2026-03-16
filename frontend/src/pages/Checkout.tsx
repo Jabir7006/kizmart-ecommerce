@@ -82,11 +82,6 @@ const Checkout = () => {
       return;
     }
 
-    const items = cart.items.map((item) => ({
-      productId: item.product._id,
-      quantity: item.quantity,
-    }));
-
     const backendPaymentMethodMap: Record<PaymentMethod, string> = {
       cod: "cash_on_delivery",
       card: "card",
@@ -94,7 +89,6 @@ const Checkout = () => {
     };
 
     const payload = {
-      items,
       shippingAddress: {
         fullName: selectedAddressSnapshot.fullName,
         phoneNumber: selectedAddressSnapshot.phoneNumber,

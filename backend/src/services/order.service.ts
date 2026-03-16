@@ -30,7 +30,7 @@ export const createOrder = async (userId: string, payload: OrderInput) => {
       await deductInventoryOrThrow(cart.items, productMap, session);
 
       // 4. Calculate subtotal & format items
-      const { subtotal, orderItems, total } = prepareOrderData(
+      const { subtotal, orderItems, shippingFee, total } = prepareOrderData(
         cart.items,
         productMap,
         shippingAddress.city,
@@ -45,6 +45,7 @@ export const createOrder = async (userId: string, payload: OrderInput) => {
             user: userId,
             items: orderItems,
             subtotal: subtotal,
+            shippingFee: shippingFee,
             total: total,
             status: OrderStatus.PENDING,
             shippingAddress,

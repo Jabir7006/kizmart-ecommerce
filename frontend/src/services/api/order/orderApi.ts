@@ -1,13 +1,7 @@
 import type { AxiosResponse } from "axios";
 import api from "../api";
 
-export type CreateOrderItemPayload = {
-  productId: string;
-  quantity: number;
-};
-
 export type CreateOrderPayload = {
-  items: CreateOrderItemPayload[];
   shippingAddress: {
     fullName: string;
     phoneNumber: string;

@@ -36,5 +36,5 @@ export function prepareOrderData(
     };
   });
 
-  return { subtotal, orderItems, total };
+  return { subtotal, orderItems, shippingFee, total };
 }
