@@ -1,5 +1,6 @@
 import { Document, Schema, Types, model } from 'mongoose';
 import { applyGlobalTransform } from '../utils/mongoose.js';
+import { type IImage, ImageSchema } from './product.model.js';
 
 export interface IShippingSnapshot {
   fullName: string;
@@ -12,11 +13,18 @@ export interface IShippingSnapshot {
 
 export interface IOrderItem {
   product: Types.ObjectId;
+  title: string;
+  thumbnail: IImage;
   quantity: number;
   price: number;
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled';
 
 export interface IOrder extends Document {
   user: Types.ObjectId;
@@ -25,7 +33,6 @@ export interface IOrder extends Document {
   payment: Types.ObjectId;
   status: OrderStatus;
   subtotal: number;
-  shippingFee: number;
   total: number;
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +57,8 @@ const orderItemSchema = new Schema<IOrderItem>(
       ref: 'Product',
       required: true,
     },
+    title: { type: String, required: true },
+    thumbnail: { type: ImageSchema, required: true },
     quantity: {
       type: Number,
       required: true,
@@ -86,7 +95,6 @@ const orderSchema = new Schema<IOrder>(
     payment: {
       type: Schema.Types.ObjectId,
       ref: 'Payment',
-      required: true,
     },
     status: {
       type: String,
@@ -96,11 +104,6 @@ const orderSchema = new Schema<IOrder>(
     subtotal: {
       type: Number,
       required: true,
-      min: 0,
-    },
-    shippingFee: {
-      type: Number,
-      default: 0,
       min: 0,
     },
     total: {

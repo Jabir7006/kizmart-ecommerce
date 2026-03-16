@@ -1,66 +1,95 @@
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import Order from '../models/order.model.js';
 import Payment from '../models/payment.model.js';
-import Product from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
 import { QueryBuilder } from '../utils/queryBuilder.js';
-import type {
-  OrderInput,
-  OrderQueryOptions,
-  ShippingSnapshotInput,
-} from '../types/order.types.js';
+import type { OrderInput, OrderQueryOptions } from '../types/order.types.js';
 import type { PaginatedResult } from '../types/product.types.js';
+import { OrderStatus, PaymentStatus } from '../constants/status.js';
+import { lockUserCart, resetCart } from './cart.service.js';
+import {
+  fetchProductMap,
+  deductInventoryOrThrow,
+} from './inverntory.service.js';
+import { prepareOrderData } from '../utils/prepareOrderData.js';
 
 export const createOrder = async (userId: string, payload: OrderInput) => {
-  const { items, shippingAddress, paymentMethod } = payload;
+  const { shippingAddress, paymentMethod } = payload;
+  const session = await mongoose.startSession();
 
-  const orderItems: { product: Types.ObjectId; quantity: number; price: number }[] = [];
-  let subtotal = 0;
+  try {
+    const result = await session.withTransaction(async () => {
+      // 1. Lock cart
+      const cart = await lockUserCart(userId, session);
 
-  for (const item of items) {
-    const product = await Product.findById(item.productId).select('price').lean();
-    if (!product) {
-      throw new AppError(`Product not found: ${item.productId}`, HTTP_STATUS.NOT_FOUND);
-    }
-    const price = product.price;
-    const qty = Math.max(1, item.quantity);
-    orderItems.push({
-      product: new Types.ObjectId(item.productId),
-      quantity: qty,
-      price,
+      // 2. Load products
+      const productMap = await fetchProductMap(cart.items, session);
+
+      // 3. Deduct inventory atomically
+      await deductInventoryOrThrow(cart.items, productMap, session);
+
+      // 4. Calculate subtotal & format items
+      const { subtotal, orderItems, total } = prepareOrderData(
+        cart.items,
+        productMap,
+        shippingAddress.city,
+      );
+
+      // 5. Create Order & Payment
+      const paymentId = new mongoose.Types.ObjectId();
+
+      const [newOrder] = await Order.create(
+        [
+          {
+            user: userId,
+            items: orderItems,
+            subtotal: subtotal,
+            total: total,
+            status: OrderStatus.PENDING,
+            shippingAddress,
+            payment: paymentId,
+          },
+        ],
+        { session },
+      );
+
+      if (!newOrder)
+        throw new AppError(
+          'Order creation failed',
+          HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        );
+
+      const [payment] = await Payment.create(
+        [
+          {
+            _id: paymentId,
+            order: newOrder._id,
+            amount: total,
+            method: paymentMethod,
+            status: PaymentStatus.PENDING,
+          },
+        ],
+        { session },
+      );
+
+      if (!payment)
+        throw new AppError(
+          'Payment creation failed',
+          HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        );
+
+      // 6. Reset cart
+      await resetCart(cart._id, session);
+
+      return { orderId: newOrder._id };
     });
-    subtotal += price * qty;
+
+    // 7. Fetch populated order outside transaction
+    return await Order.findById(result.orderId).populate('payment').lean();
+  } finally {
+    await session.endSession();
   }
-
-  const shippingFee = 0;
-  const total = subtotal + shippingFee;
-
-  const payment = await Payment.create({
-    method: paymentMethod,
-    status: 'pending',
-    amount: total,
-  });
-
-  const order = await Order.create({
-    user: new Types.ObjectId(userId),
-    items: orderItems,
-    shippingAddress: shippingAddress as ShippingSnapshotInput,
-    payment: payment._id,
-    status: 'pending',
-    subtotal,
-    shippingFee,
-    total,
-  });
-
-  await Payment.findByIdAndUpdate(payment._id, { order: order._id });
-
-  const populated = await Order.findById(order._id)
-    .populate('payment')
-    .populate('items.product', 'title slug thumbnail price')
-    .lean();
-
-  return populated;
 };
 
 export const getOrderById = async (orderId: string, userId: string) => {

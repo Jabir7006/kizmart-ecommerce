@@ -13,7 +13,7 @@ export const handleCreateOrder = catchAsync(async (req, res) => {
 
   res.status(HTTP_STATUS.CREATED).json({
     status: 'success',
-    message: 'Order created successfully',
+    message: 'Order placed successfully',
     data: order,
   });
 });

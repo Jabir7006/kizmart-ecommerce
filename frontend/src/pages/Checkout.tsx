@@ -10,25 +10,41 @@ import { OrderConfirmation } from "@/components/checkout/OrderConfirmation";
 import { useCartQuery } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import Stepper from "@/components/checkout/Stepper";
+import { useCreateOrder } from "@/hooks/useOrder";
+import { useClearCart } from "@/hooks/useCart";
+import type { Address } from "@/types/addressType";
 
 type PaymentMethod = "card" | "paypal" | "cod";
 type Step = 1 | 2 | 3;
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [selectedAddressSnapshot, setSelectedAddressSnapshot] =
+    useState<Address | null>(null);
 
   const { data: cart } = useCartQuery();
   const totalPrice = cart?.totalPrice ?? 0;
 
-  // Stable callback — won't cause unnecessary re-renders of ShippingAddress
-  const handleAddressSelect = useCallback((id: string) => {
-    setSelectedAddressId(id);
-  }, []);
+  const { mutate: createOrder, isPending: isPlacingOrder } = useCreateOrder();
+  const { mutate: clearCart } = useClearCart();
 
-  // check if cart is empty (after all hooks)
-  if (cart?.items.length === 0) {
+  // Stable callback — won't cause unnecessary re-renders of ShippingAddress
+  const handleAddressSelect = useCallback(
+    (id: string, address?: Address) => {
+      setSelectedAddressId(id);
+      if (address) {
+        setSelectedAddressSnapshot(address);
+      } else {
+        setSelectedAddressSnapshot(null);
+      }
+    },
+    [],
+  );
+
+  // check if cart is empty (after all hooks) – but allow showing confirmation
+  if (currentStep !== 3 && cart?.items.length === 0) {
     toast.error("Your cart is empty. Please add items to your cart.");
     return <Navigate to="/" replace />;
   }
@@ -48,6 +64,55 @@ const Checkout = () => {
 
   const handleBack = () => {
     if (currentStep > 1) setCurrentStep((currentStep - 1) as Step);
+  };
+
+  const handlePlaceOrder = () => {
+    if (!cart || cart.items.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
+
+    if (!selectedAddressId || !selectedAddressSnapshot) {
+      toast.error("Please select a shipping address before placing your order.");
+      return;
+    }
+
+    if (paymentMethod !== "cod") {
+      toast.error("Only Cash on Delivery is available at the moment.");
+      return;
+    }
+
+    const items = cart.items.map((item) => ({
+      productId: item.product._id,
+      quantity: item.quantity,
+    }));
+
+    const backendPaymentMethodMap: Record<PaymentMethod, string> = {
+      cod: "cash_on_delivery",
+      card: "card",
+      paypal: "paypal",
+    };
+
+    const payload = {
+      items,
+      shippingAddress: {
+        fullName: selectedAddressSnapshot.fullName,
+        phoneNumber: selectedAddressSnapshot.phoneNumber,
+        streetAddress: selectedAddressSnapshot.streetAddress,
+        city: selectedAddressSnapshot.city,
+        state: selectedAddressSnapshot.state,
+        postalCode: selectedAddressSnapshot.postalCode,
+      },
+      paymentMethod: backendPaymentMethodMap[paymentMethod] as "cash_on_delivery",
+    };
+
+    createOrder(payload, {
+      onSuccess: () => {
+        clearCart();
+        setCurrentStep(3);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      },
+    });
   };
 
   return (
@@ -114,10 +179,11 @@ const Checkout = () => {
                     Back to Address
                   </Button>
                   <Button
-                    onClick={handleNext}
+                    onClick={handlePlaceOrder}
                     className="h-11 px-8 rounded-full font-medium"
+                    disabled={isPlacingOrder}
                   >
-                    Complete Order
+                    {isPlacingOrder ? "Placing Order..." : "Complete Order (COD)"}
                   </Button>
                 </div>
               </div>
@@ -143,11 +209,11 @@ const Checkout = () => {
                 buttonText={
                   currentStep === 1
                     ? "Continue to Payment"
-                    : paymentMethod === "paypal"
-                      ? "Proceed with PayPal"
-                      : "Pay now"
+                    : "Place Order"
                 }
-                onButtonClick={handleNext}
+                onButtonClick={
+                  currentStep === 1 ? handleNext : handlePlaceOrder
+                }
               />
             </div>
           )}

@@ -13,24 +13,27 @@ export interface Cart extends Document {
   status: 'active' | 'ordered' | 'abandoned';
 }
 
-const cartItemSchema = new Schema<CartItem>({
-  product: {
-    type: Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
+const cartItemSchema = new Schema<CartItem>(
+  {
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 1,
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
   },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1,
-    default: 1,
-  },
-  price: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-});
+  { _id: false },
+);
 
 const cartSchema = new Schema<Cart>(
   {
