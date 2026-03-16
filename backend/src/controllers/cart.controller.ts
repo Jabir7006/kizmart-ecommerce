@@ -4,7 +4,7 @@ import {
   getCart,
   removeFromCart,
   updateCartItemQuantity,
-  clearCart
+  clearCart,
 } from '../services/cart.service.js';
 import { HTTP_STATUS } from '../constants/http.js';
 
