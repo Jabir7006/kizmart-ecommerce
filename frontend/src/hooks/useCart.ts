@@ -75,7 +75,6 @@ export const useClearCart = () => {
     mutationFn: clearCart,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      toast.success("Cart cleared");
     },
     onError: (error: AxiosError<AxiosErrorType>) => {
       toast.error(error?.response?.data?.message || "Failed to clear cart");
