@@ -15,6 +15,8 @@ import type { CartItem as CartItemType } from "@/types/cartType";
 
 interface OrderSummaryProps {
   items: CartItemType[];
+  subtotal: number;
+  shippingFee: number;
   totalPrice: number;
   buttonText: string;
   onButtonClick: () => void;
@@ -22,6 +24,8 @@ interface OrderSummaryProps {
 
 export const OrderSummary = ({
   items,
+  subtotal,
+  shippingFee,
   totalPrice,
   buttonText,
   onButtonClick,
@@ -54,6 +58,22 @@ export const OrderSummary = ({
             <Separator className="my-6" />
 
             <div className="space-y-4">
+              <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
+                <span className="text-sm">Subtotal</span>
+                <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  ৳{subtotal.toFixed(2)}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
+                <span className="text-sm">Shipping</span>
+                <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  {shippingFee > 0 ? `৳${shippingFee.toFixed(2)}` : "Calculated at next step"}
+                </span>
+              </div>
+
+              <Separator className="my-4" />
+
               <div className="flex justify-between items-end">
                 <span className="text-base font-medium">Total</span>
                 <span className="text-2xl font-bold">

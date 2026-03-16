@@ -25,23 +25,28 @@ const Checkout = () => {
     useState<Address | null>(null);
 
   const { data: cart } = useCartQuery();
-  const totalPrice = cart?.totalPrice ?? 0;
+  const subtotal = cart?.totalPrice ?? 0;
+
+  const shippingFee = selectedAddressSnapshot
+    ? selectedAddressSnapshot.city?.toLowerCase() === "dhaka"
+      ? 60
+      : 120
+    : 0;
+
+  const totalPrice = subtotal + shippingFee;
 
   const { mutate: createOrder, isPending: isPlacingOrder } = useCreateOrder();
   const { mutate: clearCart } = useClearCart();
 
   // Stable callback — won't cause unnecessary re-renders of ShippingAddress
-  const handleAddressSelect = useCallback(
-    (id: string, address?: Address) => {
-      setSelectedAddressId(id);
-      if (address) {
-        setSelectedAddressSnapshot(address);
-      } else {
-        setSelectedAddressSnapshot(null);
-      }
-    },
-    [],
-  );
+  const handleAddressSelect = useCallback((id: string, address?: Address) => {
+    setSelectedAddressId(id);
+    if (address) {
+      setSelectedAddressSnapshot(address);
+    } else {
+      setSelectedAddressSnapshot(null);
+    }
+  }, []);
 
   // check if cart is empty (after all hooks) – but allow showing confirmation
   if (currentStep !== 3 && cart?.items.length === 0) {
@@ -73,7 +78,9 @@ const Checkout = () => {
     }
 
     if (!selectedAddressId || !selectedAddressSnapshot) {
-      toast.error("Please select a shipping address before placing your order.");
+      toast.error(
+        "Please select a shipping address before placing your order.",
+      );
       return;
     }
 
@@ -97,7 +104,9 @@ const Checkout = () => {
         state: selectedAddressSnapshot.state,
         postalCode: selectedAddressSnapshot.postalCode,
       },
-      paymentMethod: backendPaymentMethodMap[paymentMethod] as "cash_on_delivery",
+      paymentMethod: backendPaymentMethodMap[
+        paymentMethod
+      ] as "cash_on_delivery",
     };
 
     createOrder(payload, {
@@ -177,7 +186,9 @@ const Checkout = () => {
                     className="h-11 px-8 rounded-full font-medium"
                     disabled={isPlacingOrder}
                   >
-                    {isPlacingOrder ? "Placing Order..." : "Complete Order (COD)"}
+                    {isPlacingOrder
+                      ? "Placing Order..."
+                      : "Complete Order (COD)"}
                   </Button>
                 </div>
               </div>
@@ -199,11 +210,11 @@ const Checkout = () => {
             <div className="lg:col-span-5 relative z-10 transition-all duration-500">
               <OrderSummary
                 items={cart?.items ?? []}
+                subtotal={subtotal}
+                shippingFee={shippingFee}
                 totalPrice={totalPrice}
                 buttonText={
-                  currentStep === 1
-                    ? "Continue to Payment"
-                    : "Place Order"
+                  currentStep === 1 ? "Continue to Payment" : "Place Order"
                 }
                 onButtonClick={
                   currentStep === 1 ? handleNext : handlePlaceOrder
