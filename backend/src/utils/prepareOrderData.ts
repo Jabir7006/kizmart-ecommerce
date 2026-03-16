@@ -8,24 +8,16 @@ export function prepareOrderData(
   city: string,
 ) {
   let subtotal = 0;
-  let total = 0;
-  let shippingFee = 0;
 
+  // 1. Process items and calculate subtotal
   const orderItems = cartItems.map((i) => {
     const product = productMap.get(i.product.toString());
 
-    if (!product)
+    if (!product) {
       throw new AppError('Product missing', HTTP_STATUS.INTERNAL_SERVER_ERROR);
-
-    subtotal += product.price * i.quantity;
-
-    if (city.toLowerCase() === 'dhaka') {
-      shippingFee = 60;
-    } else {
-      shippingFee = 120;
     }
 
-    total = subtotal + shippingFee;
+    subtotal += product.price * i.quantity;
 
     return {
       product: i.product,
@@ -35,6 +27,10 @@ export function prepareOrderData(
       price: product.price,
     };
   });
+
+  // 2. Calculate shipping and final total ONCE outside the loop
+  const shippingFee = city.toLowerCase() === 'dhaka' ? 60 : 120;
+  const total = subtotal + shippingFee;
 
   return { subtotal, orderItems, shippingFee, total };
 }
