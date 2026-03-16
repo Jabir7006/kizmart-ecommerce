@@ -51,7 +51,8 @@ export const addToCart = async ({
 export const getCart = async (userId: string) => {
   const cart = await Cart.findOne({ user: userId, status: CartStatus.ACTIVE })
     .populate('items.product', 'title price thumbnail')
-    .select('-__v');
+    .select('-__v')
+    .lean();
   return cart;
 };
 
