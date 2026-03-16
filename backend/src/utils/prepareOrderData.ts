@@ -19,7 +19,7 @@ export function prepareOrderData(
 
     subtotal += product.price * i.quantity;
 
-    if (city === 'Dhaka') {
+    if (city.toLowerCase() === 'dhaka') {
       shippingFee = 60;
     } else {
       shippingFee = 120;
