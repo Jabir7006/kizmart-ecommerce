@@ -47,7 +47,9 @@ export const OrderSummary = ({
           <CardContent className="pt-6">
             <div className="max-h-75 overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
               {items.length > 0 ? (
-                items.map((item) => <CartItem key={item._id} item={item} />)
+                items.map((item) => (
+                  <CartItem key={item.product._id} item={item} />
+                ))
               ) : (
                 <p className="text-sm text-neutral-500 text-center py-4">
                   Your cart is empty.
