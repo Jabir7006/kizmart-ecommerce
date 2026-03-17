@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Stepper from "@/components/checkout/Stepper";
 import { useCreateOrder } from "@/hooks/useOrder";
 import { useClearCart } from "@/hooks/useCart";
+import { useOrderStore } from "@/store/useOrderStore";
 import type { Address } from "@/types/addressType";
 
 type PaymentMethod = "card" | "paypal" | "cod";
@@ -37,6 +38,11 @@ const Checkout = () => {
 
   const { mutate: createOrder, isPending: isPlacingOrder } = useCreateOrder();
   const { mutate: clearCart } = useClearCart();
+  const {
+    setOrderSummary,
+    orderTotal,
+    shippingFee: storedShippingFee,
+  } = useOrderStore();
 
   // Stable callback — won't cause unnecessary re-renders of ShippingAddress
   const handleAddressSelect = useCallback((id: string, address?: Address) => {
@@ -111,6 +117,8 @@ const Checkout = () => {
 
     createOrder(payload, {
       onSuccess: () => {
+        // Store the order summary before clearing the cart
+        setOrderSummary(totalPrice, shippingFee);
         clearCart();
         setCurrentStep(3);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -198,7 +206,8 @@ const Checkout = () => {
             {currentStep === 3 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                 <OrderConfirmation
-                  total={totalPrice}
+                  total={orderTotal ?? totalPrice}
+                  shippingFee={storedShippingFee ?? shippingFee}
                   paymentMethod={paymentMethod}
                 />
               </div>

@@ -34,20 +34,26 @@ export default function CartDrawer() {
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <span className="text-muted-foreground text-sm">Loading cart...</span>
+              <span className="text-muted-foreground text-sm">
+                Loading cart...
+              </span>
             </div>
           ) : !hasItems ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground">
               <ShoppingBag className="w-16 h-16 opacity-20" />
               <p>Your cart is empty.</p>
-              <Button variant="outline" onClick={() => setIsOpen(false)} asChild>
+              <Button
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                asChild
+              >
                 <Link to="/products">Start Shopping</Link>
               </Button>
             </div>
           ) : (
             <div className="flex flex-col gap-6">
               {cartItems.items.map((item) => (
-                <CartItem key={item._id} item={item} />
+                <CartItem key={item.product._id} item={item} />
               ))}
             </div>
           )}
@@ -63,11 +69,15 @@ export default function CartDrawer() {
               Shipping and taxes calculated at checkout.
             </p>
             <div className="flex flex-col gap-2.5">
-              <Button asChild className="w-full" onClick={() => setIsOpen(false)}>
+              <Button
+                asChild
+                className="w-full"
+                onClick={() => setIsOpen(false)}
+              >
                 <Link to="/checkout">Proceed to Checkout</Link>
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={() => clearCart.mutate()}
                 disabled={clearCart.isPending}

@@ -45,7 +45,7 @@ export const OrderSummary = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="max-h-[300px] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
+            <div className="max-h-75 overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-800">
               {items.length > 0 ? (
                 items.map((item) => <CartItem key={item._id} item={item} />)
               ) : (
@@ -64,11 +64,13 @@ export const OrderSummary = ({
                   ৳{subtotal.toFixed(2)}
                 </span>
               </div>
-              
+
               <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
                 <span className="text-sm">Shipping</span>
                 <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  {shippingFee > 0 ? `৳${shippingFee.toFixed(2)}` : "Calculated at next step"}
+                  {shippingFee > 0
+                    ? `৳${shippingFee.toFixed(2)}`
+                    : "Calculated at next step"}
                 </span>
               </div>
 

@@ -45,7 +45,7 @@ export const PaymentOptions = ({
               title="Card payments are coming soon"
             >
               <div className="flex w-full items-center justify-between">
-                <div className="flex items-center items-start gap-4">
+                <div className="flex items-center gap-4">
                   <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-900">
                     <div className="h-2 w-2 rounded-full bg-neutral-300 dark:bg-neutral-700" />
                   </div>
@@ -126,7 +126,7 @@ export const PaymentOptions = ({
 
           {/* Dynamic Payment Form */}
           <div
-            className={`grid gap-4 overflow-hidden transition-all duration-300 ease-in-out ${paymentMethod === "card" ? "max-h-[500px] mt-2 opacity-100" : "max-h-0 opacity-0"}`}
+            className={`grid gap-4 overflow-hidden transition-all duration-300 ease-in-out ${paymentMethod === "card" ? "max-h-125 mt-2 opacity-100" : "max-h-0 opacity-0"}`}
           >
             <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 p-4 space-y-4">
               <div className="grid gap-2">

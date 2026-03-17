@@ -1,16 +1,37 @@
 import type { AxiosResponse } from "axios";
 import api from "../api";
+import type {
+  OrderFilters,
+  OrderListResponse,
+  Order,
+  ShippingAddress,
+} from "@/types/orderType";
 
 export type CreateOrderPayload = {
-  shippingAddress: {
-    fullName: string;
-    phoneNumber: string;
-    streetAddress: string;
-    city: string;
-    state: string;
-    postalCode: string;
-  };
+  shippingAddress: ShippingAddress;
   paymentMethod: "cash_on_delivery";
+};
+
+export const getOrders = async (
+  filters: OrderFilters,
+): Promise<AxiosResponse<OrderListResponse>> => {
+  const params = new URLSearchParams();
+
+  if (filters.status) params.append("status", filters.status);
+  if (filters.paymentStatus)
+    params.append("paymentStatus", filters.paymentStatus);
+  if (filters.startDate) params.append("startDate", filters.startDate);
+  if (filters.endDate) params.append("endDate", filters.endDate);
+  params.append("page", String(filters.page || 1));
+  params.append("limit", String(filters.limit || 10));
+
+  return api.get(`/orders?${params.toString()}`);
+};
+
+export const getOrderById = async (
+  orderId: string,
+): Promise<AxiosResponse<{ data: Order }>> => {
+  return api.get(`/orders/${orderId}`);
 };
 
 export const createOrder = (
