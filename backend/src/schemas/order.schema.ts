@@ -41,3 +41,9 @@ export const getOrdersSchema = z.object({
     })
     .optional(),
 });
+
+export const cancelOrderSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Order ID is required'),
+  }),
+});

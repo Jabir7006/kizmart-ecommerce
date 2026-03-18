@@ -8,13 +8,48 @@ import Pagination from "@/components/ui/Pagination";
 import { cn } from "@/lib/utils";
 import type { Order } from "@/types/orderType";
 
-const statusTabs: { label: string; value: Order["status"] | undefined }[] = [
-  { label: "All", value: undefined },
-  { label: "Pending", value: "pending" },
-  { label: "Confirmed", value: "confirmed" },
-  { label: "Shipped", value: "shipped" },
-  { label: "Delivered", value: "delivered" },
-  { label: "Cancelled", value: "cancelled" },
+const statusTabs: {
+  label: string;
+  value: Order["status"] | undefined;
+  activeClass: string;
+  inactiveClass: string;
+}[] = [
+  {
+    label: "All",
+    value: undefined,
+    activeClass: "bg-primary text-primary-foreground shadow-sm",
+    inactiveClass: "bg-muted text-muted-foreground hover:bg-accent",
+  },
+  {
+    label: "Pending",
+    value: "pending",
+    activeClass: "bg-amber-500 text-white shadow-sm",
+    inactiveClass: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+  },
+  {
+    label: "Confirmed",
+    value: "confirmed",
+    activeClass: "bg-emerald-500 text-white shadow-sm",
+    inactiveClass: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+  },
+  {
+    label: "Shipped",
+    value: "shipped",
+    activeClass: "bg-blue-500 text-white shadow-sm",
+    inactiveClass: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+  },
+  {
+    label: "Delivered",
+    value: "delivered",
+    activeClass: "bg-green-600 text-white shadow-sm",
+    inactiveClass: "bg-green-50 text-green-700 hover:bg-green-100",
+  },
+  {
+    label: "Cancelled",
+    value: "cancelled",
+    activeClass: "bg-red-500 text-white shadow-sm",
+    inactiveClass: "bg-red-50 text-red-700 hover:bg-red-100",
+  },
 ];
 
 const OrderListPage = () => {
@@ -38,7 +73,7 @@ const OrderListPage = () => {
       </div>
 
       {/* ── Status Tabs ── */}
-      <div className="mb-6 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {statusTabs.map((tab) => {
           const isActive = filters.status === tab.value;
           return (
@@ -47,9 +82,7 @@ const OrderListPage = () => {
               onClick={() => setFilters({ status: tab.value })}
               className={cn(
                 "shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                isActive ? tab.activeClass : tab.inactiveClass,
               )}
             >
               {tab.label}

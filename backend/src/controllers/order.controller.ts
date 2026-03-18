@@ -3,6 +3,7 @@ import {
   createOrder,
   getOrderById,
   getOrders,
+  cancelOrder,
 } from '../services/order.service.js';
 import type { OrderQueryOptions } from '../types/order.types.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -51,5 +52,16 @@ export const handleGetOrders = catchAsync(async (req, res) => {
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
     data: result,
+  });
+});
+
+export const handleCancelOrder = catchAsync(async (req, res) => {
+  const userId = req.user!.userId;
+  const order = await cancelOrder(req.params.id as string, userId);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Order cancelled successfully',
+    data: order,
   });
 });

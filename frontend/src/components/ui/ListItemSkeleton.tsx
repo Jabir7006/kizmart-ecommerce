@@ -17,27 +17,23 @@ const ListItemSkeleton = ({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-xl border bg-card p-4",
+        "flex items-center gap-3 rounded-xl border bg-card px-4 py-3",
         className,
       )}
     >
-      {showImage && <Skeleton className="h-16 w-16 shrink-0 rounded-lg" />}
+      {showImage && <Skeleton className="h-12 w-12 shrink-0 rounded-lg sm:h-14 sm:w-14" />}
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <Skeleton className="h-4 w-40" />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <Skeleton className="h-4 w-32 sm:w-40" />
         {Array.from({ length: descriptionLines }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="h-3"
-            style={{ width: `${70 - i * 15}%` }}
-          />
+          <Skeleton key={i} className="h-3 w-24 sm:w-32" />
         ))}
       </div>
 
       {showMeta && (
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-1.5">
-          <Skeleton className="h-5 w-20 rounded-full" />
-          <Skeleton className="h-4 w-16" />
+        <div className="ml-auto flex shrink-0 flex-col items-end gap-1.5">
+          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-4 w-12" />
         </div>
       )}
     </div>

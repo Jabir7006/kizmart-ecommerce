@@ -7,7 +7,7 @@ function ListItem({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="list-item"
       className={cn(
-        "group/item flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-xl border bg-card p-4 text-card-foreground transition-all duration-200 hover:shadow-md hover:border-primary/20",
+        "group/item flex items-center gap-3 rounded-xl border bg-card px-4 py-3 text-card-foreground transition-all duration-200 hover:shadow-md hover:border-primary/20",
         className,
       )}
       {...props}
@@ -31,7 +31,7 @@ function ListItemImage({
     <div
       data-slot="list-item-image"
       className={cn(
-        "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted",
+        "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-14 sm:w-14",
         className,
       )}
       {...props}
@@ -43,7 +43,7 @@ function ListItemImage({
           <div className="flex h-full w-full items-center justify-center text-muted-foreground/50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -62,12 +62,12 @@ function ListItemImage({
   );
 }
 
-/* ─── Content (main area) ─── */
+/* ─── Content (main area — takes all available space) ─── */
 function ListItemContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="list-item-content"
-      className={cn("flex min-w-0 flex-1 flex-col gap-1", className)}
+      className={cn("flex min-w-0 flex-1 flex-col gap-0.5", className)}
       {...props}
     />
   );
@@ -78,7 +78,10 @@ function ListItemTitle({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
       data-slot="list-item-title"
-      className={cn("truncate text-sm font-semibold leading-tight", className)}
+      className={cn(
+        "truncate text-sm font-semibold leading-snug",
+        className,
+      )}
       {...props}
     />
   );
@@ -93,7 +96,7 @@ function ListItemDescription({
     <p
       data-slot="list-item-description"
       className={cn(
-        "truncate text-xs text-muted-foreground leading-relaxed",
+        "truncate text-xs text-muted-foreground",
         className,
       )}
       {...props}
@@ -101,13 +104,13 @@ function ListItemDescription({
   );
 }
 
-/* ─── Meta (right-side info) ─── */
+/* ─── Meta (right-side info — always right-aligned) ─── */
 function ListItemMeta({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="list-item-meta"
       className={cn(
-        "flex shrink-0 flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-1.5",
+        "ml-auto flex shrink-0 flex-col items-end gap-1",
         className,
       )}
       {...props}
@@ -121,7 +124,7 @@ function ListItemAction({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="list-item-action"
       className={cn(
-        "flex shrink-0 items-center gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover/item:opacity-100",
+        "flex shrink-0 items-center gap-1.5 sm:opacity-0 sm:group-hover/item:opacity-100 transition-opacity",
         className,
       )}
       {...props}

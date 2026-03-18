@@ -5,6 +5,7 @@ import {
   createOrder,
   getOrders,
   getOrderById,
+  cancelOrder,
   type CreateOrderPayload,
 } from "@/services/api/order/orderApi";
 import type { AxiosErrorType } from "@/types/errorType";
@@ -43,6 +44,24 @@ export const useCreateOrder = () => {
     },
     onError: (error: AxiosError<AxiosErrorType>) => {
       toast.error(error?.response?.data?.message || "Failed to place order");
+    },
+  });
+};
+
+export const useCancelOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: string) => cancelOrder(orderId),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      toast.success(
+        response?.data?.message || "Order cancelled successfully",
+      );
+    },
+    onError: (error: AxiosError<AxiosErrorType>) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to cancel order",
+      );
     },
   });
 };

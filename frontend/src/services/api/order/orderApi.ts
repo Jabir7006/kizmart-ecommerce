@@ -37,3 +37,9 @@ export const createOrder = (
 ): Promise<AxiosResponse<any>> => {
   return api.post("/orders", payload);
 };
+
+export const cancelOrder = (
+  orderId: string,
+): Promise<AxiosResponse<{ status: string; message: string }>> => {
+  return api.patch(`/orders/${orderId}/cancel`);
+};

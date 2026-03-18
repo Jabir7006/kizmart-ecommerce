@@ -1,5 +1,6 @@
 import mongoose, { Types } from 'mongoose';
 import Order from '../models/order.model.js';
+import Product from '../models/product.model.js';
 import Payment from '../models/payment.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
@@ -150,4 +151,66 @@ export const getOrders = async (
     metadata: { total, page, totalPages, limit },
     data,
   };
+};
+
+export const cancelOrder = async (orderId: string, userId: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    const result = await session.withTransaction(async () => {
+      const order = await Order.findOne({ _id: orderId, user: userId }).session(
+        session,
+      );
+
+      if (!order) {
+        throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
+      }
+
+      const cancellableStatuses: string[] = [
+        OrderStatus.PENDING,
+        'confirmed',
+      ];
+
+      if (!cancellableStatuses.includes(order.status)) {
+        throw new AppError(
+          `Cannot cancel an order with status "${order.status}"`,
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
+      // 1. Update order status
+      order.status = OrderStatus.CANCELLED;
+      await order.save({ session });
+
+      // 2. Update payment status
+      await Payment.findByIdAndUpdate(
+        order.payment,
+        { status: PaymentStatus.FAILED },
+        { session },
+      );
+
+      // 3. Restore inventory
+      const bulkOps = order.items.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product },
+          update: {
+            $inc: {
+              quantity: item.quantity,
+              sold: -item.quantity,
+            },
+          },
+        },
+      }));
+
+      if (bulkOps.length > 0) {
+        await Product.bulkWrite(bulkOps, { session });
+      }
+
+      return order;
+    });
+
+    return result;
+  } finally {
+    await session.endSession();
+  }
 };
