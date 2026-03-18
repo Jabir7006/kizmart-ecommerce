@@ -1,55 +1,23 @@
 import { useOrders } from "@/hooks/useOrder";
 import { useOrderStore } from "@/store/useOrderStore";
 import OrderListItem from "@/components/order/OrderListItem";
-import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
-import { Package, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import ErrorState from "@/components/ui/ErrorState";
+import { Package } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { Order } from "@/types/orderType";
 
 const statusTabs: {
   label: string;
   value: Order["status"] | undefined;
-  activeClass: string;
-  inactiveClass: string;
 }[] = [
-  {
-    label: "All",
-    value: undefined,
-    activeClass: "bg-primary text-primary-foreground shadow-sm",
-    inactiveClass: "bg-muted text-muted-foreground hover:bg-accent",
-  },
-  {
-    label: "Pending",
-    value: "pending",
-    activeClass: "bg-amber-500 text-white shadow-sm",
-    inactiveClass: "bg-amber-50 text-amber-700 hover:bg-amber-100",
-  },
-  {
-    label: "Confirmed",
-    value: "confirmed",
-    activeClass: "bg-emerald-500 text-white shadow-sm",
-    inactiveClass: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
-  },
-  {
-    label: "Shipped",
-    value: "shipped",
-    activeClass: "bg-blue-500 text-white shadow-sm",
-    inactiveClass: "bg-blue-50 text-blue-700 hover:bg-blue-100",
-  },
-  {
-    label: "Delivered",
-    value: "delivered",
-    activeClass: "bg-green-600 text-white shadow-sm",
-    inactiveClass: "bg-green-50 text-green-700 hover:bg-green-100",
-  },
-  {
-    label: "Cancelled",
-    value: "cancelled",
-    activeClass: "bg-red-500 text-white shadow-sm",
-    inactiveClass: "bg-red-50 text-red-700 hover:bg-red-100",
-  },
+  { label: "All Orders", value: undefined },
+  { label: "Pending", value: "pending" },
+  { label: "Confirmed", value: "confirmed" },
+  { label: "Shipped", value: "shipped" },
+  { label: "Delivered", value: "delivered" },
+  { label: "Cancelled", value: "cancelled" },
 ];
 
 const OrderListPage = () => {
@@ -63,7 +31,7 @@ const OrderListPage = () => {
   const pagination = data?.metadata;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       {/* ── Header ── */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">My Orders</h1>
@@ -73,7 +41,7 @@ const OrderListPage = () => {
       </div>
 
       {/* ── Status Tabs ── */}
-      <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <div className="mb-8 flex gap-2 overflow-x-auto pb-2 scrollbar-none items-center border-b">
         {statusTabs.map((tab) => {
           const isActive = filters.status === tab.value;
           return (
@@ -81,8 +49,10 @@ const OrderListPage = () => {
               key={tab.label}
               onClick={() => setFilters({ status: tab.value })}
               className={cn(
-                "shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer",
-                isActive ? tab.activeClass : tab.inactiveClass,
+                "shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer -mb-px",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground",
               )}
             >
               {tab.label}
@@ -92,30 +62,33 @@ const OrderListPage = () => {
       </div>
 
       {/* ── Content ── */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-6">
         {/* Loading */}
         {isLoading &&
-          Array.from({ length: 5 }).map((_, i) => <ListItemSkeleton key={i} />)}
+          Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col overflow-hidden rounded-xl border bg-card"
+            >
+              <div className="h-16 bg-muted/50 px-6 py-4">
+                <Skeleton className="h-4 w-1/3 mb-2" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+              <div className="p-6">
+                <Skeleton className="h-14 w-full max-w-[300px]" />
+              </div>
+            </div>
+          ))}
 
         {/* Error */}
         {isError && !isLoading && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/5 p-10 text-center">
-            <AlertCircle className="mb-3 h-10 w-10 text-destructive/60" />
-            <h3 className="text-sm font-semibold text-destructive">
-              Failed to load orders
-            </h3>
-            <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-              {error?.message || "Something went wrong. Please try again."}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-4"
-              onClick={() => refetch()}
-            >
-              Try again
-            </Button>
-          </div>
+          <ErrorState
+            title="Failed to load orders"
+            description={
+              error?.message || "Something went wrong. Please try again."
+            }
+            onRetry={() => refetch()}
+          />
         )}
 
         {/* Empty */}
