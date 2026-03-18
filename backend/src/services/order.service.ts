@@ -168,7 +168,7 @@ export const cancelOrder = async (orderId: string, userId: string) => {
 
       const cancellableStatuses: string[] = [
         OrderStatus.PENDING,
-        'confirmed',
+        OrderStatus.CONFIRMED,
       ];
 
       if (!cancellableStatuses.includes(order.status)) {

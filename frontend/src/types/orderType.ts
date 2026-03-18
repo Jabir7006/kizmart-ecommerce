@@ -18,6 +18,13 @@ export interface ShippingAddress {
   postalCode: string;
 }
 
+export interface Payment {
+  _id: string;
+  method: "cash_on_delivery" | "card" | "upi" | "bank_transfer";
+  status: "pending" | "paid" | "failed" | "refunded";
+  amount: number;
+}
+
 export interface Order {
   _id: string;
   user: string;
@@ -26,7 +33,7 @@ export interface Order {
   shippingFee: number;
   total: number;
   shippingAddress: ShippingAddress;
-  payment: string;
+  payment: string | Payment;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
   updatedAt: string;

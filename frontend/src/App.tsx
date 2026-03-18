@@ -17,6 +17,7 @@ const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
 const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const OrderListPage = lazy(() => import("@/pages/OrderListPage"));
+const OrderDetailsPage = lazy(() => import("@/pages/OrderDetailsPage"));
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<OrderListPage />} />
+                <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
               </Route>
             </Route>
 

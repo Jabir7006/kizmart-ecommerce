@@ -6,12 +6,14 @@ interface OrderConfirmationProps {
   total: number;
   shippingFee: number;
   paymentMethod: string;
+  orderId: string | null;
 }
 
 export const OrderConfirmation = ({
   total,
   shippingFee,
   paymentMethod,
+  orderId,
 }: OrderConfirmationProps) => {
   const subtotal = total - shippingFee;
   return (
@@ -59,9 +61,11 @@ export const OrderConfirmation = ({
             Return Home
           </Button>
         </Link>
-        <Button className="w-full h-11 px-6 sm:px-8 rounded-full">
-          View Order Details
-        </Button>
+        <Link to={`/orders/${orderId}`}>
+          <Button className="w-full h-11 px-6 sm:px-8 rounded-full">
+            View Order Details
+          </Button>
+        </Link>
       </div>
     </div>
   );

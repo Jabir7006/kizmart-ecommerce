@@ -42,6 +42,8 @@ const Checkout = () => {
     setOrderSummary,
     orderTotal,
     shippingFee: storedShippingFee,
+    setCurrentOrderId,
+    currentOrderId,
   } = useOrderStore();
 
   // Stable callback — won't cause unnecessary re-renders of ShippingAddress
@@ -116,11 +118,12 @@ const Checkout = () => {
     };
 
     createOrder(payload, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         // Store the order summary before clearing the cart
         setOrderSummary(totalPrice, shippingFee);
         clearCart();
         setCurrentStep(3);
+        setCurrentOrderId(response.data.data._id);
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
     });
@@ -209,6 +212,7 @@ const Checkout = () => {
                   total={orderTotal ?? totalPrice}
                   shippingFee={storedShippingFee ?? shippingFee}
                   paymentMethod={paymentMethod}
+                  orderId={currentOrderId}
                 />
               </div>
             )}

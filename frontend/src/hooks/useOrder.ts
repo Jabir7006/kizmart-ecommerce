@@ -52,16 +52,13 @@ export const useCancelOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (orderId: string) => cancelOrder(orderId),
-    onSuccess: (response) => {
+    onSuccess: (response, orderId) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
-      toast.success(
-        response?.data?.message || "Order cancelled successfully",
-      );
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      toast.success(response?.data?.message || "Order cancelled successfully");
     },
     onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to cancel order",
-      );
+      toast.error(error?.response?.data?.message || "Failed to cancel order");
     },
   });
 };
