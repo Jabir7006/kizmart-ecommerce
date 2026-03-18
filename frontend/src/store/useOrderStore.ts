@@ -17,7 +17,6 @@ interface OrderStore {
 
 const initialFilters: OrderFilters = {
   status: undefined,
-  paymentStatus: undefined,
   startDate: undefined,
   endDate: undefined,
   page: 1,

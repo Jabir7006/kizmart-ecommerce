@@ -1,8 +1,10 @@
-import type { Product, Image } from "./productType";
+import type { Image } from "./productType";
 
 export interface OrderItem {
   _id: string;
-  product: Pick<Product, "_id" | "title" | "price"> & { thumbnail: Image };
+  product: string;
+  title: string;
+  thumbnail: Image;
   quantity: number;
   price: number;
 }
@@ -20,11 +22,12 @@ export interface Order {
   _id: string;
   user: string;
   items: OrderItem[];
-  totalPrice: number;
+  subtotal: number;
+  shippingFee: number;
+  total: number;
   shippingAddress: ShippingAddress;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  paymentMethod: "cod" | "card" | "upi" | "bank_transfer";
+  payment: string;
+  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
   updatedAt: string;
 }
@@ -42,7 +45,6 @@ export interface CreateOrderInput {
 
 export interface OrderFilters {
   status?: Order["status"];
-  paymentStatus?: Order["paymentStatus"];
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -50,14 +52,13 @@ export interface OrderFilters {
 }
 
 export interface OrderListResponse {
-  status: string;
-  data: Order[];
-  pagination: {
-    page: number;
-    limit: number;
+  metadata: {
     total: number;
+    page: number;
     totalPages: number;
+    limit: number;
   };
+  data: Order[];
 }
 
 export interface OrderResponse {

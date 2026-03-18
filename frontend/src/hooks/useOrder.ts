@@ -15,8 +15,9 @@ export const useOrders = (filters: OrderFilters) => {
     queryKey: ["orders", filters],
     queryFn: async () => {
       const { data } = await getOrders(filters);
-      return data;
+      return data.data;
     },
+    placeholderData: (previousData) => previousData,
   });
 };
 

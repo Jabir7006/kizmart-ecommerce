@@ -14,12 +14,10 @@ export type CreateOrderPayload = {
 
 export const getOrders = async (
   filters: OrderFilters,
-): Promise<AxiosResponse<OrderListResponse>> => {
+): Promise<AxiosResponse<{ status: string; data: OrderListResponse }>> => {
   const params = new URLSearchParams();
 
   if (filters.status) params.append("status", filters.status);
-  if (filters.paymentStatus)
-    params.append("paymentStatus", filters.paymentStatus);
   if (filters.startDate) params.append("startDate", filters.startDate);
   if (filters.endDate) params.append("endDate", filters.endDate);
   params.append("page", String(filters.page || 1));
