@@ -2,8 +2,9 @@ import { useOrders } from "@/hooks/useOrder";
 import { useOrderStore } from "@/store/useOrderStore";
 import OrderListItem from "@/components/order/OrderListItem";
 import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
-import { Package, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Package, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Pagination from "@/components/ui/Pagination";
 import { cn } from "@/lib/utils";
 import type { Order } from "@/types/orderType";
 
@@ -108,33 +109,15 @@ const OrderListPage = () => {
       </div>
 
       {/* ── Pagination ── */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">
-            Page {pagination.page} of {pagination.totalPages} ·{" "}
-            {pagination.total} order{pagination.total !== 1 ? "s" : ""}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page <= 1}
-              onClick={() => setPage(pagination.page - 1)}
-            >
-              <ChevronLeft className="mr-1 h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page >= pagination.totalPages}
-              onClick={() => setPage(pagination.page + 1)}
-            >
-              Next
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          onPageChange={setPage}
+          itemLabel="order"
+          className="mt-8"
+        />
       )}
     </div>
   );
