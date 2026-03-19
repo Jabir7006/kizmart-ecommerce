@@ -75,7 +75,7 @@ const OrderListPage = () => {
                 <Skeleton className="h-3 w-1/4" />
               </div>
               <div className="p-6">
-                <Skeleton className="h-14 w-full max-w-[300px]" />
+                <Skeleton className="h-14 w-full max-w-75" />
               </div>
             </div>
           ))}
