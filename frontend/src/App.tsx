@@ -18,6 +18,7 @@ const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const OrderListPage = lazy(() => import("@/pages/OrderListPage"));
 const OrderDetailsPage = lazy(() => import("@/pages/OrderDetailsPage"));
+const AccountPage = lazy(() => import("@/pages/AccountPage"));
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<OrderListPage />} />
                 <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
+                <Route path="/account" element={<AccountPage />} />
               </Route>
             </Route>
 

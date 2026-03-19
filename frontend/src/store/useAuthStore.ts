@@ -1,15 +1,10 @@
+import type { User } from "@/types/userType";
 import { create } from "zustand";
 
 interface AuthState {
-  user: {
-    _id: string;
-    email: string;
-    fullName: string;
-    role: string;
-    verified: boolean;
-  } | null;
+  user: User | null;
   isAuthenticated: boolean;
-  setUser: (user: AuthState["user"]) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
 }
 

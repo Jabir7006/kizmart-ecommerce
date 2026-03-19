@@ -1,18 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { MapPin, Plus, Check, Edit2, Trash2, Loader2 } from "lucide-react";
-import { useForm, FormProvider } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { AxiosResponse } from "axios";
+import { FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { ShippingAddressForm } from "@/components/checkout/ShippingAddressForm";
-import type { Address, AddressFormData } from "@/types/addressType";
-import { addressSchema } from "@/schemas/addressSchema";
-import {
-  useAddressesQuery,
-  useCreateAddress,
-  useUpdateAddress,
-  useDeleteAddress,
-} from "@/hooks/useAddress";
+import type { Address } from "@/types/addressType";
+import { useAddressesQuery, useDeleteAddress } from "@/hooks/useAddress";
+import { useAddressForm } from "@/hooks/useAddressForm";
 
 type AddressSelectHandler = (id: string, address?: Address) => void;
 
@@ -22,9 +15,14 @@ export const ShippingAddress = ({
   onAddressSelect?: AddressSelectHandler;
 }) => {
   const { data: addresses = [], isLoading } = useAddressesQuery();
-  const { mutate: createAddress, isPending: isCreating } = useCreateAddress();
-  const { mutate: updateAddress, isPending: isUpdating } = useUpdateAddress();
   const { mutate: deleteAddress } = useDeleteAddress();
+  const {
+    form: formMethods,
+    resetForNew,
+    resetForEdit,
+    buildSubmitHandler,
+    isSubmitting,
+  } = useAddressForm();
 
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [showForm, setShowForm] = useState(false);
@@ -44,52 +42,23 @@ export const ShippingAddress = ({
     }
   }, [activeAddressId, derivedAddress, onAddressSelect]);
 
-  const formMethods = useForm<AddressFormData>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: {
-      fullName: "",
-      phoneNumber: "",
-      streetAddress: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      isDefault: false,
-    },
-  });
-
   const handleSelectAddress = useCallback((id: string) => {
     setSelectedAddressId(id);
   }, []);
 
   const handleAddNew = useCallback(() => {
-    formMethods.reset({
-      fullName: "",
-      phoneNumber: "",
-      streetAddress: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      isDefault: false,
-    });
+    resetForNew();
     setEditingId(null);
     setShowForm(true);
-  }, [formMethods]);
+  }, [resetForNew]);
 
   const handleEdit = useCallback(
     (address: Address) => {
-      formMethods.reset({
-        fullName: address.fullName,
-        phoneNumber: address.phoneNumber,
-        streetAddress: address.streetAddress,
-        city: address.city,
-        state: address.state,
-        postalCode: address.postalCode,
-        isDefault: address.isDefault,
-      });
+      resetForEdit(address);
       setEditingId(address._id);
       setShowForm(true);
     },
-    [formMethods],
+    [resetForEdit],
   );
 
   const handleRemove = useCallback(
@@ -104,29 +73,7 @@ export const ShippingAddress = ({
     [deleteAddress],
   );
 
-  const onSubmit = (data: AddressFormData) => {
-    if (editingId) {
-      updateAddress(
-        { id: editingId, data },
-        {
-          onSuccess: () => setShowForm(false),
-        },
-      );
-    } else {
-      createAddress(data, {
-        onSuccess: (res: AxiosResponse) => {
-          setShowForm(false);
-          const createdAddress =
-            (res?.data?.data as Address | undefined) ?? null;
-          const newId =
-            createdAddress?._id ?? (res?.data?.id as string | undefined);
-          if (newId) {
-            setSelectedAddressId(newId);
-          }
-        },
-      });
-    }
-  };
+  const onSubmit = buildSubmitHandler(editingId, () => setShowForm(false));
 
   if (isLoading) {
     return (
@@ -143,7 +90,7 @@ export const ShippingAddress = ({
           editingId={editingId}
           onSubmit={onSubmit}
           onCancel={() => setShowForm(false)}
-          isSubmitting={isCreating || isUpdating}
+          isSubmitting={isSubmitting}
         />
       </FormProvider>
     );
