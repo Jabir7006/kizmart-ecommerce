@@ -19,6 +19,9 @@ const Checkout = lazy(() => import("@/pages/Checkout"));
 const OrderListPage = lazy(() => import("@/pages/OrderListPage"));
 const OrderDetailsPage = lazy(() => import("@/pages/OrderDetailsPage"));
 const AccountPage = lazy(() => import("@/pages/AccountPage"));
+const AdminDashboardPage = lazy(
+  () => import("@/pages/admin/AdminDashboardPage"),
+);
 
 const App = () => {
   return (
@@ -46,6 +49,11 @@ const App = () => {
                 <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
                 <Route path="/account" element={<AccountPage />} />
               </Route>
+            </Route>
+
+            {/* Admin routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/admin" element={<AdminDashboardPage />} />
             </Route>
 
             {/* Guest-only routes (no header) */}
