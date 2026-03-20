@@ -12,7 +12,7 @@ interface ProductInfoProps {
 const ProductInfo = ({ product }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  
+
   const setIsOpen = useCartStore((state) => state.setIsOpen);
   const addToCart = useAddToCart();
 
@@ -33,7 +33,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const productDiscount = (product as any).discountPercentage;
   const productOriginalPrice = (product as any).originalPrice;
 
-  const badge = productBadge; 
+  const badge = productBadge;
   const discountPercentage = productDiscount || 25;
   const originalPrice = productOriginalPrice || Math.round(price * 1.33);
 
@@ -95,12 +95,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
       <div className="flex items-end gap-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
         <p className="font-bold text-4xl lg:text-5xl text-orange-500 tracking-tight">
-          ₹{price}
+          ৳{price}
         </p>
         {discountPercentage && (
           <div className="flex flex-col mb-1.5 border-l-2 border-gray-200 pl-3 ml-1">
             <p className="text-gray-400 line-through text-base leading-none mb-1 text-left">
-              ₹{originalPrice}
+              ৳{originalPrice}
             </p>
             <p className="text-green-600 font-bold text-sm leading-none bg-green-100 px-2 py-0.5 rounded-sm inline-flex items-center">
               {discountPercentage}% OFF
@@ -159,7 +159,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
                   onSuccess: () => {
                     setIsOpen(true);
                   },
-                }
+                },
               );
             }}
           >

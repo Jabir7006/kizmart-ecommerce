@@ -16,8 +16,15 @@ const QuickViewDialog = () => {
 
   if (!selectedProduct) return null;
 
-  const { title, shortDescription, thumbnail, price, ratings, numReviews, _id } =
-    selectedProduct;
+  const {
+    title,
+    shortDescription,
+    thumbnail,
+    price,
+    ratings,
+    numReviews,
+    _id,
+  } = selectedProduct;
 
   const productBadge = (selectedProduct as any).badge;
   const productDiscount = (selectedProduct as any).discountPercentage;
@@ -77,11 +84,11 @@ const QuickViewDialog = () => {
             </div>
 
             <div className="flex items-end gap-3 mb-6">
-              <p className="font-bold text-4xl text-orange-500">₹{price}</p>
+              <p className="font-bold text-4xl text-orange-500">৳{price}</p>
               {discountPercentage && (
                 <div className="flex flex-col mb-1">
                   <p className="text-gray-400 line-through text-sm leading-none mb-1 text-left">
-                    ₹{originalPrice}
+                    ৳{originalPrice}
                   </p>
                   <p className="text-green-600 font-bold text-sm leading-none">
                     {discountPercentage}% OFF
@@ -107,7 +114,7 @@ const QuickViewDialog = () => {
                       setSelectedProduct(null);
                       setIsOpen(true);
                     },
-                  }
+                  },
                 );
               }}
               disabled={addToCart.isPending}

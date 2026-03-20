@@ -22,6 +22,9 @@ const AccountPage = lazy(() => import("@/pages/AccountPage"));
 const AdminDashboardPage = lazy(
   () => import("@/pages/admin/AdminDashboardPage"),
 );
+const AdminProductListPage = lazy(
+  () => import("@/pages/admin/AdminProductListPage"),
+);
 
 const App = () => {
   return (
@@ -54,6 +57,10 @@ const App = () => {
             {/* Admin routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route
+                path="/admin/products"
+                element={<AdminProductListPage />}
+              />
             </Route>
 
             {/* Guest-only routes (no header) */}

@@ -53,7 +53,7 @@ const OrderListItem = ({ order }: { order: Order }) => {
               Order #{order._id.slice(-8).toUpperCase()}
             </h3>
             <p className="text-xs text-primary-foreground/80">
-              Placed {formattedDate} <span className="mx-1">|</span> Total: ₹
+              Placed {formattedDate} <span className="mx-1">|</span> Total: ৳
               {order.total.toLocaleString()}
             </p>
           </div>
@@ -92,7 +92,7 @@ const OrderListItem = ({ order }: { order: Order }) => {
                     Qty: {item.quantity}
                   </p>
                   <p className="text-sm font-semibold mt-1">
-                    ₹{item.price.toLocaleString()}
+                    ৳{item.price.toLocaleString()}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { Plus, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShippingAddressForm } from "@/components/checkout/ShippingAddressForm";
 import AddressCard from "@/components/account/AddressCard";
@@ -49,7 +50,10 @@ const AddressManager = () => {
     form.reset();
   };
 
-  const handleSubmit = buildSubmitHandler(editingAddress?._id ?? null, handleCancel);
+  const handleSubmit = buildSubmitHandler(
+    editingAddress?._id ?? null,
+    handleCancel,
+  );
 
   const handleDeleteConfirm = async () => {
     if (!deletingAddress) return;
@@ -103,21 +107,23 @@ const AddressManager = () => {
       )}
 
       {!isLoading && !isError && addresses?.length === 0 && !isFormOpen && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed p-10 text-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <MapPin className="h-5 w-5 text-muted-foreground/50" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">No addresses saved</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Add a delivery address to get started
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleAddClick} className="gap-1.5">
-            <Plus className="h-4 w-4" />
-            Add Address
-          </Button>
-        </div>
+        <EmptyState
+          icon={<MapPin className="h-5 w-5 text-muted-foreground/50" />}
+          title="No addresses saved"
+          description="Add a delivery address to get started"
+          action={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleAddClick}
+              className="gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              Add Address
+            </Button>
+          }
+          className="p-10"
+        />
       )}
 
       {!isLoading && !isError && (addresses?.length ?? 0) > 0 && (

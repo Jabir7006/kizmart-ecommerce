@@ -2,6 +2,13 @@ import { useOrders } from "@/hooks/useOrder";
 import { useOrderStore } from "@/store/useOrderStore";
 import OrderListItem from "@/components/order/OrderListItem";
 import ErrorState from "@/components/ui/ErrorState";
+import EmptyState from "@/components/ui/EmptyState";
+import {
+  PageHeader,
+  PageHeaderInfo,
+  PageHeaderTitle,
+  PageHeaderDescription,
+} from "@/components/ui/PageHeader";
 import { Package } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,15 +37,21 @@ const OrderListPage = () => {
   const orders = data?.data ?? [];
   const pagination = data?.metadata;
 
+  const emptyDescription = filters.status
+    ? `You don't have any ${filters.status} orders.`
+    : "When you place an order, it will appear here.";
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       {/* ── Header ── */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">My Orders</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Track and manage your orders
-        </p>
-      </div>
+      <PageHeader className="mb-6">
+        <PageHeaderInfo>
+          <PageHeaderTitle>My Orders</PageHeaderTitle>
+          <PageHeaderDescription>
+            Track and manage your orders
+          </PageHeaderDescription>
+        </PageHeaderInfo>
+      </PageHeader>
 
       {/* ── Status Tabs ── */}
       <div className="mb-8 flex gap-2 overflow-x-auto pb-2 scrollbar-none items-center border-b">
@@ -93,17 +106,11 @@ const OrderListPage = () => {
 
         {/* Empty */}
         {!isLoading && !isError && orders.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed p-14 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <Package className="h-8 w-8 text-muted-foreground/50" />
-            </div>
-            <h3 className="text-sm font-semibold">No orders yet</h3>
-            <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-              {filters.status
-                ? `You don't have any ${filters.status} orders.`
-                : "When you place an order, it will appear here."}
-            </p>
-          </div>
+          <EmptyState
+            icon={<Package className="h-8 w-8 text-muted-foreground/50" />}
+            title="No orders yet"
+            description={emptyDescription}
+          />
         )}
 
         {/* Orders */}

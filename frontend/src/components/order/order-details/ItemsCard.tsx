@@ -58,7 +58,7 @@ const ItemsCard = ({
                       Unit Price
                     </span>
                     <span className="font-bold tabular-nums">
-                      ₹{item.price.toLocaleString()}
+                      ৳{item.price.toLocaleString()}
                     </span>
                   </div>
                 </div>

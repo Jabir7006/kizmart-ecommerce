@@ -37,7 +37,7 @@ const ProductCard = ({ product }: { product: Product | any }) => {
         onSuccess: () => {
           setIsOpen(true);
         },
-      }
+      },
     );
   };
 
@@ -82,11 +82,11 @@ const ProductCard = ({ product }: { product: Product | any }) => {
           <div className="mt-1 flex items-center justify-between">
             <div className="flex flex-col">
               <p className="font-bold text-xs xs:text-[13px] sm:text-base text-orange-500">
-                ₹{price}
+                ৳{price}
               </p>
               {discountPercentage && (
                 <p className="text-[10px] xs:text-xs text-gray-500">
-                  <span className="line-through">₹{originalPrice}</span>
+                  <span className="line-through">৳{originalPrice}</span>
                   <span className="ml-1 text-green-600">
                     -{discountPercentage}%
                   </span>

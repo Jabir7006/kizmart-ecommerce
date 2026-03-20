@@ -1,6 +1,10 @@
 import slugify from 'slugify';
 import { Types } from 'mongoose';
-import type { PaginatedResult, ProductInput, ProductQueryOptions } from '../types/product.types.js';
+import type {
+  PaginatedResult,
+  ProductInput,
+  ProductQueryOptions,
+} from '../types/product.types.js';
 import Product from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
@@ -81,6 +85,8 @@ export const getAllProducts = async (
       gallery: 1,
       price: 1,
       status: 1,
+      quantity: 1,
+      sold: 1,
       ratings: 1,
       numReviews: 1,
       isFeatured: 1,
@@ -98,10 +104,6 @@ export const getAllProducts = async (
   const limit = options.limit || 10;
   const page = options.page || 1;
   const totalPages = Math.ceil(total / limit);
-
-  if (!data || data.length === 0) {
-    throw new AppError('No products found', HTTP_STATUS.NOT_FOUND);
-  }
 
   return {
     metadata: { total, page, totalPages, limit },
