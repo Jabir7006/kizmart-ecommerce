@@ -11,6 +11,7 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const setUser = useAuthStore((state) => state.setUser);
   const logout = useAuthStore((state) => state.logout);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["auth", "me"],
@@ -22,13 +23,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     if (data?.data?.data) {
       setUser(data.data.data);
-    }
-    if (isError) {
+    } else if (isError || (data && !data?.data?.data)) {
       logout();
     }
   }, [data, isError, setUser, logout]);
 
-  if (isLoading) {
+  if (isLoading || !isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-svh">
         <LoadingSpinner size={32} className="text-primary" />
