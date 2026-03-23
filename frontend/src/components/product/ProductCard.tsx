@@ -48,6 +48,7 @@ const ProductCard = ({ product }: { product: Product | any }) => {
           <img
             src={imageSrc || "/placeholder.svg"}
             alt={title}
+            loading="lazy"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
