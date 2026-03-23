@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Package, Plus } from "lucide-react";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
-import AdminProductListItem from "@/components/admin/AdminProductListItem";
+import AdminProductListItem from "@/components/admin/product/AdminProductListItem";
 import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
 import ErrorState from "@/components/ui/ErrorState";
 import EmptyState from "@/components/ui/EmptyState";

@@ -25,6 +25,9 @@ const AdminDashboardPage = lazy(
 const AdminProductListPage = lazy(
   () => import("@/pages/admin/AdminProductListPage"),
 );
+const AdminProductAddPage = lazy(
+  () => import("@/pages/admin/AdminProductAddPage"),
+);
 
 const App = () => {
   return (
@@ -60,6 +63,10 @@ const App = () => {
               <Route
                 path="/admin/products"
                 element={<AdminProductListPage />}
+              />
+              <Route
+                path="/admin/products/new"
+                element={<AdminProductAddPage />}
               />
             </Route>
 

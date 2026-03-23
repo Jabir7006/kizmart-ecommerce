@@ -53,7 +53,7 @@ export default function CartDrawer() {
           ) : (
             <div className="flex flex-col gap-6">
               {cartItems.items.map((item) => (
-                <CartItem key={item.product._id} item={item} />
+                <CartItem key={item?.product?._id} item={item} />
               ))}
             </div>
           )}

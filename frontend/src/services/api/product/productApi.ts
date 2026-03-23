@@ -1,5 +1,6 @@
 import type { ProductFilters } from "@/types/productType";
 import api from "../api";
+import type { ProductInput } from "@/schemas/productSchema";
 
 export const getAllProducts = async (filters: ProductFilters) => {
   const params: Record<string, string | number> = {
@@ -18,4 +19,8 @@ export const getAllProducts = async (filters: ProductFilters) => {
   return api.get("/products", { params });
 };
 
-export const getProductBySlug = async (slug: string) => api.get(`/products/${slug}`);
+export const getProductBySlug = async (slug: string) =>
+  api.get(`/products/${slug}`);
+
+export const createProduct = async (data: ProductInput) =>
+  api.post("/products/create", data);
