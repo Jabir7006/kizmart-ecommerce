@@ -52,6 +52,7 @@ export const handleGetAllProducts = catchAsync(async (req, res) => {
     sortOrder: req.query.sortOrder as 'asc' | 'desc',
     page: req.query.page ? Math.max(1, Number(req.query.page)) : 1,
     limit: req.query.limit ? Math.max(1, Number(req.query.limit)) : 10,
+    status: req.query.status as string,
   };
 
   const paginatedResults = await getAllProducts(options);

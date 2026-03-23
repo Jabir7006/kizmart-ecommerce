@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Package, Plus } from "lucide-react";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
 import useProduct from "@/hooks/useProduct";
 import type { Product } from "@/types/productType";
 
-const statusTabs: { label: string; value: Product["status"] | undefined }[] = [
-  { label: "All", value: undefined },
+const statusTabs: { label: string; value: string }[] = [
+  { label: "All", value: "all" },
   { label: "Active", value: "active" },
   { label: "Draft", value: "draft" },
   { label: "Archived", value: "archived" },
@@ -31,9 +31,12 @@ const AdminProductListPage = () => {
   const { products, metadata, productsQuery, filters, setFilters, setPage } =
     useProduct();
 
-  const [activeStatus, setActiveStatus] = useState<
-    Product["status"] | undefined
-  >(undefined);
+  useEffect(() => {
+    setFilters({ status: "all" });
+    return () => setFilters({ status: undefined });
+  }, [setFilters]);
+
+  const activeStatus = filters.status || "all";
 
   const { isLoading, isError, error, refetch } = productsQuery;
 
@@ -42,10 +45,8 @@ const AdminProductListPage = () => {
     setFilters({ search: value || undefined });
   };
 
-  const handleStatusTab = (status: Product["status"] | undefined) => {
-    setActiveStatus(status);
-    // NOTE: extend ProductFilters with a `status` field on the backend when ready.
-    // For now we filter client-side as a graceful fallback.
+  const handleStatusTab = (status: string) => {
+    setFilters({ status });
   };
 
   const handleDelete = (product: Product) => {
@@ -53,22 +54,16 @@ const AdminProductListPage = () => {
     console.log("Delete product:", product._id);
   };
 
-  /* ── Client-side status filter (until API supports it) ── */
-  const visibleProducts =
-    activeStatus === undefined
-      ? products
-      : products.filter((p) => p.status === activeStatus);
-
   /* ── Empty state helpers ── */
   const emptyTitle = filters.search
     ? `No results for "${filters.search}"`
-    : activeStatus
+    : activeStatus !== "all"
       ? `No ${activeStatus} products yet`
       : "No products found";
 
   const emptyDescription = filters.search
     ? "Try a different search term."
-    : activeStatus
+    : activeStatus !== "all"
       ? `You don't have any ${activeStatus} products.`
       : "Add your first product to get started.";
 
@@ -150,13 +145,13 @@ const AdminProductListPage = () => {
           )}
 
           {/* Empty state */}
-          {!isLoading && !isError && visibleProducts.length === 0 && (
+          {!isLoading && !isError && products.length === 0 && (
             <EmptyState
               icon={<Package className="h-8 w-8 text-muted-foreground/50" />}
               title={emptyTitle}
               description={emptyDescription}
               action={
-                !filters.search && !activeStatus ? (
+                !filters.search && activeStatus === "all" ? (
                   <Button asChild size="sm">
                     <Link to="/admin/products/new">
                       <Plus className="mr-1.5 h-4 w-4" />
@@ -171,7 +166,7 @@ const AdminProductListPage = () => {
           {/* Product items */}
           {!isLoading &&
             !isError &&
-            visibleProducts.map((product) => (
+            products.map((product) => (
               <AdminProductListItem
                 key={product._id}
                 product={product}

@@ -15,6 +15,7 @@ export const getAllProducts = async (filters: ProductFilters) => {
   if (filters.maxPrice !== undefined) params.maxPrice = filters.maxPrice;
   if (filters.sortBy) params.sortBy = filters.sortBy;
   if (filters.sortOrder) params.sortOrder = filters.sortOrder;
+  if (filters.status) params.status = filters.status;
 
   return api.get("/products", { params });
 };

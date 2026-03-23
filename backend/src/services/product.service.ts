@@ -56,7 +56,13 @@ export const getAllProducts = async (
     brandId = brand._id;
   }
 
-  const baseMatch: Record<string, any> = { status: 'active' };
+  const baseMatch: Record<string, any> = {};
+
+  if (options.status && options.status !== 'all') {
+    baseMatch.status = options.status;
+  } else if (!options.status) {
+    baseMatch.status = 'active';
+  }
 
   if (categoryId) baseMatch.category = categoryId;
   if (brandId) baseMatch.brand = brandId;

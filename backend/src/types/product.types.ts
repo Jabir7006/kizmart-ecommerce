@@ -28,6 +28,7 @@ export interface ProductQueryOptions {
   sortOrder?: 'asc' | 'desc' | undefined;
   page?: number | undefined;
   limit?: number | undefined;
+  status?: string | undefined;
 }
 
 export interface PaginatedResult<T> {

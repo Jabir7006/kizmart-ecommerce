@@ -23,6 +23,7 @@ const initialFilters: ProductFilters = {
   sortOrder: undefined,
   page: 1,
   limit: 10,
+  status: undefined,
 };
 
 export const useProductStore = create<ProductStore>((set) => ({

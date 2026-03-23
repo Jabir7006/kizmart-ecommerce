@@ -44,6 +44,7 @@ export interface ProductFilters {
   sortOrder?: "asc" | "desc";
   page: number;
   limit: number;
+  status?: string;
 }
 
 export interface PaginationMeta {
