@@ -5,7 +5,7 @@ import type {
   ProductInput,
   ProductQueryOptions,
 } from '../types/product.types.js';
-import Product from '../models/product.model.js';
+import Product, { type IImage } from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
 import Category from '../models/category.model.js';
@@ -126,4 +126,26 @@ export const getProductBySlug = async (slug: string) => {
     throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
   }
   return product;
+};
+
+import { UploadService } from './upload.service.js';
+
+export const deleteProduct = async (id: string) => {
+  const product = await Product.findByIdAndDelete(id);
+  if (!product) {
+    throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  // Delete associated images from Cloudinary
+  if (product.thumbnail && product.thumbnail.publicId) {
+    await UploadService.deleteImage(product.thumbnail.publicId);
+  }
+
+  if (product.gallery && product.gallery.length > 0) {
+    const deletePromises = product.gallery
+      .filter((img: IImage) => img && img.publicId)
+      .map((img: IImage) => UploadService.deleteImage(img.publicId));
+
+    await Promise.allSettled(deletePromises);
+  }
 };

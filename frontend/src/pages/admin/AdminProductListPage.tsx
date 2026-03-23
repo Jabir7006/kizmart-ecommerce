@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Package, Plus } from "lucide-react";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import AdminProductListItem from "@/components/admin/product/AdminProductListItem";
 import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
 import ErrorState from "@/components/ui/ErrorState";
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useProduct from "@/hooks/useProduct";
 import type { Product } from "@/types/productType";
+import { toast } from "sonner";
 
 const statusTabs: { label: string; value: string }[] = [
   { label: "All", value: "all" },
@@ -28,8 +30,15 @@ const statusTabs: { label: string; value: string }[] = [
 ];
 
 const AdminProductListPage = () => {
-  const { products, metadata, productsQuery, filters, setFilters, setPage } =
-    useProduct();
+  const {
+    products,
+    metadata,
+    productsQuery,
+    filters,
+    setFilters,
+    setPage,
+    deleteProductMutation,
+  } = useProduct();
 
   useEffect(() => {
     setFilters({ status: "all" });
@@ -39,6 +48,8 @@ const AdminProductListPage = () => {
   const activeStatus = filters.status || "all";
 
   const { isLoading, isError, error, refetch } = productsQuery;
+
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   /* ── Handlers ── */
   const handleSearch = (value: string) => {
@@ -50,8 +61,14 @@ const AdminProductListPage = () => {
   };
 
   const handleDelete = (product: Product) => {
-    // Placeholder — wire up a delete mutation when the API endpoint is ready.
-    console.log("Delete product:", product._id);
+    setProductToDelete(product);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+    await deleteProductMutation.mutateAsync(productToDelete._id);
+    toast.success("Product deleted successfully");
+    setProductToDelete(null);
   };
 
   /* ── Empty state helpers ── */
@@ -187,6 +204,16 @@ const AdminProductListPage = () => {
           />
         )}
       </div>
+
+      <ConfirmModal
+        open={!!productToDelete}
+        onOpenChange={(open) => !open && setProductToDelete(null)}
+        title="Delete Product"
+        description={`Are you sure you want to delete "${productToDelete?.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+      />
     </AdminLayout>
   );
 };

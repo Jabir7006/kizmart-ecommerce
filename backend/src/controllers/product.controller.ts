@@ -1,5 +1,10 @@
 import { HTTP_STATUS } from '../constants/http.js';
-import { createProduct, getAllProducts, getProductBySlug } from '../services/product.service.js';
+import {
+  createProduct,
+  getAllProducts,
+  getProductBySlug,
+  deleteProduct,
+} from '../services/product.service.js';
 import type { ProductQueryOptions } from '../types/product.types.js';
 import catchAsync from '../utils/catchAsync.js';
 
@@ -72,4 +77,17 @@ export const handleGetSinleProduct = catchAsync(async (req, res) => {
     status: 'success',
     data: product,
   });
-})
+});
+
+// update product ( do it later )
+
+export const handleDeleteProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  await deleteProduct(id as string);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Product deleted successfully',
+  });
+});

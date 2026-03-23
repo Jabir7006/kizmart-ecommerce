@@ -3,6 +3,7 @@ import {
   getAllProducts,
   getProductBySlug,
   createProduct,
+  deleteProduct,
 } from "@/services/api/product/productApi";
 import {
   uploadSingleImage,
@@ -80,6 +81,15 @@ const useProduct = () => {
 
     // Mutations
     createProductMutation,
+    deleteProductMutation: useMutation({
+      mutationFn: async (id: string) => {
+        const response = await deleteProduct(id);
+        return response.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
+    }),
 
     // Actions
     filters,
