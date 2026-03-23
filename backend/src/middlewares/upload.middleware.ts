@@ -1,5 +1,7 @@
 import multer from 'multer';
 import type { Request } from 'express';
+import { HTTP_STATUS } from '../constants/http.js';
+import AppError from '../utils/AppError.js';
 
 const storage = multer.memoryStorage();
 
@@ -18,7 +20,7 @@ const fileFilter = (
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, and WEBP are allowed.'));
+    cb(new AppError('Invalid file type. Only JPEG, PNG, and WEBP are allowed.', HTTP_STATUS.BAD_REQUEST));
   }
 };
 
