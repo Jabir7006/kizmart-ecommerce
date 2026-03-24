@@ -8,13 +8,14 @@ import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
 import { Button } from "@/components/ui/button";
 import { useCategory } from "@/hooks/useCategory";
 import type { Category } from "@/types/categoryType";
-import { toast } from "sonner";
 
 const CategoryListPage = () => {
   const { categories, categoriesQuery, deleteCategoryMutation } = useCategory();
   const { isLoading, isError, error, refetch } = categoriesQuery;
 
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   /* ── Handlers ── */
@@ -28,14 +29,18 @@ const CategoryListPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!categoryToDelete) return;
-    await deleteCategoryMutation.mutateAsync(categoryToDelete._id);
-    toast.success("Category deleted successfully");
-    setCategoryToDelete(null);
+    try {
+      await deleteCategoryMutation.mutateAsync(categoryToDelete._id);
+    } catch {
+      // Error handled by the hook
+    } finally {
+      setCategoryToDelete(null);
+    }
   };
 
   // Client-side filtering as categories are likely fully loaded
   const filteredCategories = categories.filter((cat: Category) =>
-    cat.title.toLowerCase().includes(searchQuery.toLowerCase())
+    cat.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   /* ── Empty state helpers ── */
@@ -110,4 +115,3 @@ const CategoryListPage = () => {
 };
 
 export default CategoryListPage;
-

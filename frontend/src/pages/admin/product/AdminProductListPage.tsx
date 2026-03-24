@@ -8,7 +8,6 @@ import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
 import { Button } from "@/components/ui/button";
 import useProduct from "@/hooks/useProduct";
 import type { Product } from "@/types/productType";
-import { toast } from "sonner";
 
 const statusTabs: { label: string; value: string }[] = [
   { label: "All", value: "all" },
@@ -52,9 +51,13 @@ const AdminProductListPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!productToDelete) return;
-    await deleteProductMutation.mutateAsync(productToDelete._id);
-    toast.success("Product deleted successfully");
-    setProductToDelete(null);
+    try {
+      await deleteProductMutation.mutateAsync(productToDelete._id);
+    } catch {
+      // Error handled by the hook
+    } finally {
+      setProductToDelete(null);
+    }
   };
 
   /* ── Empty state helpers ── */

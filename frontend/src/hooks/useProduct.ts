@@ -7,12 +7,14 @@ import {
   deleteProduct,
 } from "@/services/api/product/productApi";
 import { useProductStore } from "@/store/useProductStore";
-import type { Product, PaginatedProducts } from "@/types/productType";
+import type { Product, PaginatedProducts, Image } from "@/types/productType";
 import type {
   ProductEditFormOutput,
   ProductInput,
 } from "@/schemas/productSchema";
 import { processProductImages } from "@/utils/productImageUtils";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 const useProduct = () => {
   const queryClient = useQueryClient();
@@ -37,8 +39,8 @@ const useProduct = () => {
   const createProductMutation = useMutation({
     mutationFn: async (data: ProductEditFormOutput) => {
       const { thumbnailData, galleryData } = await processProductImages({
-        thumbnail: data.thumbnail as any,
-        gallery: data.gallery as any[],
+        thumbnail: data.thumbnail as File | Image,
+        gallery: data.gallery as (File | Image)[],
       });
 
       const payload: ProductInput = {
@@ -60,6 +62,13 @@ const useProduct = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Product created successfully");
+    },
+    onError: (error) => {
+      const message = isAxiosError(error)
+        ? error.response?.data?.message || "Failed to create product"
+        : "Something went wrong";
+      toast.error(message);
     },
   });
 
@@ -73,8 +82,8 @@ const useProduct = () => {
       data: ProductEditFormOutput;
     }) => {
       const { thumbnailData, galleryData } = await processProductImages({
-        thumbnail: data.thumbnail as any,
-        gallery: data.gallery as any[],
+        thumbnail: data.thumbnail as File | Image,
+        gallery: data.gallery as (File | Image)[],
       });
 
       const payload: Partial<ProductInput> = {
@@ -97,6 +106,13 @@ const useProduct = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
+      toast.success("Product updated successfully");
+    },
+    onError: (error) => {
+      const message = isAxiosError(error)
+        ? error.response?.data?.message || "Failed to update product"
+        : "Something went wrong";
+      toast.error(message);
     },
   });
 
@@ -116,6 +132,13 @@ const useProduct = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["products"] });
+        toast.success("Product deleted successfully");
+      },
+      onError: (error) => {
+        const message = isAxiosError(error)
+          ? error.response?.data?.message || "Failed to delete product"
+          : "Something went wrong";
+        toast.error(message);
       },
     }),
 
@@ -141,3 +164,4 @@ export const useSingleProduct = (slug: string) => {
     staleTime: 5 * 60 * 1000,
   });
 };
+

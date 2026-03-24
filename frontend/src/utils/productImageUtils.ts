@@ -2,23 +2,22 @@ import {
   uploadSingleImage,
   uploadMultipleImage,
 } from "@/services/api/upload/uploadApi";
-
-type ImageObject = { publicId: string; secureUrl: string };
+import type { Image } from "@/types/productType";
 
 export const processProductImages = async ({
   thumbnail,
   gallery = [],
 }: {
-  thumbnail: File | ImageObject | undefined;
-  gallery?: (File | ImageObject)[];
+  thumbnail: File | Image | undefined;
+  gallery?: (File | Image)[];
 }): Promise<{
-  thumbnailData: ImageObject;
-  galleryData: ImageObject[];
+  thumbnailData: Image;
+  galleryData: Image[];
 }> => {
   // ─── Thumbnail ─────────────────────────────────────────────────────────────
   if (!thumbnail) throw new Error("Thumbnail is required");
 
-  let thumbnailData: ImageObject;
+  let thumbnailData: Image;
   if (thumbnail instanceof File) {
     const res = await uploadSingleImage(thumbnail, "thumbnails");
     thumbnailData = res.data.data;
@@ -30,9 +29,9 @@ export const processProductImages = async ({
   const newFiles = gallery.filter((item) => item instanceof File) as File[];
   const existingImages = gallery.filter(
     (item) => !(item instanceof File),
-  ) as ImageObject[];
+  ) as Image[];
 
-  let galleryData: ImageObject[] = existingImages;
+  let galleryData: Image[] = existingImages;
   if (newFiles.length > 0) {
     const res = await uploadMultipleImage(newFiles, "galleries");
     galleryData = [...existingImages, ...res.data.data];
@@ -40,3 +39,4 @@ export const processProductImages = async ({
 
   return { thumbnailData, galleryData };
 };
+
