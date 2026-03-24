@@ -23,15 +23,14 @@ const AdminDashboardPage = lazy(
   () => import("@/pages/admin/AdminDashboardPage"),
 );
 const AdminProductListPage = lazy(
-  () => import("@/pages/admin/AdminProductListPage"),
+  () => import("@/pages/admin/product/AdminProductListPage"),
 );
 const AdminProductAddPage = lazy(
-  () => import("@/pages/admin/AdminProductAddPage"),
+  () => import("@/pages/admin/product/AdminProductAddPage"),
 );
 const AdminProductEditPage = lazy(
-  () => import("@/pages/admin/AdminProductEditPage"),
+  () => import("@/pages/admin/product/AdminProductEditPage"),
 );
-
 
 const App = () => {
   return (
@@ -76,7 +75,6 @@ const App = () => {
                 path="/admin/products/:slug/edit"
                 element={<AdminProductEditPage />}
               />
-
             </Route>
 
             {/* Guest-only routes (no header) */}
