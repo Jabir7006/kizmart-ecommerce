@@ -1,4 +1,10 @@
-import { LayoutDashboard, Package, ShoppingCart, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  LogOut,
+  Layout,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface NavItemConfig {
@@ -20,6 +26,12 @@ export const navItems: NavItemConfig[] = [
     icon: Package,
     label: "Products",
     href: "/admin/products",
+  },
+  {
+    id: "categories",
+    icon: Layout,
+    label: "Categories",
+    href: "/admin/categories",
   },
   {
     id: "orders",
