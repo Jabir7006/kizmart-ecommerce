@@ -5,7 +5,6 @@ export const NAV_LINKS = [
   { label: "Products", href: "/products" },
   { label: "Categories", href: "/categories" },
   { label: "Deals", href: "/deals" },
-  { label: "Admin", href: "/admin" },
 ] as const;
 
 interface NavLinksProps {

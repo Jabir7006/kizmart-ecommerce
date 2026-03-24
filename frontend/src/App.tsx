@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import AuthProvider from "@/components/providers/AuthProvider";
 import ProtectedRoute from "@/components/routes/ProtectedRoute";
+import AdminRoute from "@/components/routes/AdminRoute";
 import GuestRoute from "@/components/routes/GuestRoute";
 import VerifyEmailRoute from "@/components/routes/VerifyEmailRoute";
 import MainLayout from "@/components/layouts/MainLayout";
@@ -64,7 +65,7 @@ const App = () => {
             </Route>
 
             {/* Admin routes */}
-            <Route element={<ProtectedRoute />}>
+            <Route element={<AdminRoute />}>
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route
                 path="/admin/products"
