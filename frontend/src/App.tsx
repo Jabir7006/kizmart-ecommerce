@@ -31,6 +31,9 @@ const AdminProductAddPage = lazy(
 const AdminProductEditPage = lazy(
   () => import("@/pages/admin/product/AdminProductEditPage"),
 );
+const CategoryListPage = lazy(
+  () => import("@/pages/admin/category/CategoryListPage"),
+);
 
 const App = () => {
   return (
@@ -75,6 +78,7 @@ const App = () => {
                 path="/admin/products/:slug/edit"
                 element={<AdminProductEditPage />}
               />
+              <Route path="/admin/categories" element={<CategoryListPage />} />
             </Route>
 
             {/* Guest-only routes (no header) */}
