@@ -3,15 +3,16 @@ import {
   getAllProducts,
   getProductBySlug,
   createProduct,
+  updateProduct,
   deleteProduct,
 } from "@/services/api/product/productApi";
-import {
-  uploadSingleImage,
-  uploadMultipleImage,
-} from "@/services/api/upload/uploadApi";
 import { useProductStore } from "@/store/useProductStore";
 import type { Product, PaginatedProducts } from "@/types/productType";
-import type { ProductFormOutput, ProductInput } from "@/schemas/productSchema";
+import type {
+  ProductEditFormOutput,
+  ProductInput,
+} from "@/schemas/productSchema";
+import { processProductImages } from "@/utils/productImageUtils";
 
 const useProduct = () => {
   const queryClient = useQueryClient();
@@ -32,26 +33,15 @@ const useProduct = () => {
     placeholderData: (previousData) => previousData,
   });
 
+  // ─── CREATE ─────────────────────────────────────────────────────────────────
   const createProductMutation = useMutation({
-    mutationFn: async (data: ProductFormOutput) => {
-      let thumbnailData = null;
-      if (data.thumbnail instanceof File) {
-        const thumbRes = await uploadSingleImage(data.thumbnail, "thumbnails");
-        thumbnailData = thumbRes.data.data;
-      } else {
-        throw new Error("Thumbnail is required");
-      }
+    mutationFn: async (data: ProductEditFormOutput) => {
+      const { thumbnailData, galleryData } = await processProductImages({
+        thumbnail: data.thumbnail as any,
+        gallery: data.gallery as any[],
+      });
 
-      let galleryData: { publicId: string; secureUrl: string }[] = [];
-      if (data.gallery && data.gallery.length > 0) {
-        const validFiles = data.gallery.filter((f) => f instanceof File);
-        if (validFiles.length > 0) {
-          const galleryRes = await uploadMultipleImage(validFiles, "galleries");
-          galleryData = galleryRes.data.data;
-        }
-      }
-
-      const productPayload: ProductInput = {
+      const payload: ProductInput = {
         title: data.title,
         shortDescription: data.shortDescription,
         longDescription: data.longDescription,
@@ -65,11 +55,48 @@ const useProduct = () => {
         gallery: galleryData.length > 0 ? galleryData : undefined,
       };
 
-      const response = await createProduct(productPayload);
+      const response = await createProduct(payload);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+
+  // ─── UPDATE ─────────────────────────────────────────────────────────────────
+  const updateProductMutation = useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: ProductEditFormOutput;
+    }) => {
+      const { thumbnailData, galleryData } = await processProductImages({
+        thumbnail: data.thumbnail as any,
+        gallery: data.gallery as any[],
+      });
+
+      const payload: Partial<ProductInput> = {
+        title: data.title,
+        shortDescription: data.shortDescription,
+        longDescription: data.longDescription,
+        price: data.price,
+        quantity: data.quantity,
+        category: data.category,
+        brand: data.brand || undefined,
+        status: data.status,
+        isFeatured: data.isFeatured,
+        thumbnail: thumbnailData,
+        gallery: galleryData,
+      };
+
+      const response = await updateProduct(id, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 
@@ -81,6 +108,7 @@ const useProduct = () => {
 
     // Mutations
     createProductMutation,
+    updateProductMutation,
     deleteProductMutation: useMutation({
       mutationFn: async (id: string) => {
         const response = await deleteProduct(id);

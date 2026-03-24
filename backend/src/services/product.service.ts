@@ -130,6 +130,56 @@ export const getProductBySlug = async (slug: string) => {
 
 import { UploadService } from './upload.service.js';
 
+export const updateProduct = async (
+  id: string,
+  data: Partial<ProductInput>,
+) => {
+  const existing = await Product.findById(id);
+  if (!existing) {
+    throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  // Re-slugify only when title actually changes
+  const updates: Record<string, any> = { ...data };
+  if (data.title && data.title !== existing.title) {
+    // @ts-expect-error slugify types are not compatible with typescript
+    updates.slug = slugify(data.title, { lower: true });
+  }
+
+  // Delete old thumbnail from Cloudinary only when a new one is supplied
+  if (
+    data.thumbnail &&
+    existing.thumbnail?.publicId &&
+    data.thumbnail.publicId !== existing.thumbnail.publicId
+  ) {
+    await UploadService.deleteImage(existing.thumbnail.publicId).catch(
+      () => {/* non-fatal */},
+    );
+  }
+
+  // Delete orphaned gallery images that were removed in the update
+  if (data.gallery && existing.gallery && existing.gallery.length > 0) {
+    const newPublicIds = new Set(data.gallery.map((img: IImage) => img.publicId));
+    const orphans = existing.gallery.filter(
+      (img: IImage) => img.publicId && !newPublicIds.has(img.publicId),
+    );
+    await Promise.allSettled(
+      orphans.map((img: IImage) => UploadService.deleteImage(img.publicId)),
+    );
+  }
+
+  const updated = await Product.findByIdAndUpdate(
+    id,
+    { $set: updates },
+    { new: true, runValidators: true },
+  )
+    .populate('category', 'title slug')
+    .populate('brand', 'title slug')
+    .lean();
+
+  return updated;
+};
+
 export const deleteProduct = async (id: string) => {
   const product = await Product.findByIdAndDelete(id);
   if (!product) {

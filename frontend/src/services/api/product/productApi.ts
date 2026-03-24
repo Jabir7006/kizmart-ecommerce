@@ -26,5 +26,9 @@ export const getProductBySlug = async (slug: string) =>
 export const createProduct = async (data: ProductInput) =>
   api.post("/products/create", data);
 
+export const updateProduct = async (id: string, data: Partial<ProductInput>) =>
+  api.patch(`/products/${id}`, data);
+
 export const deleteProduct = async (id: string) =>
   api.delete(`/products/${id}`);
+

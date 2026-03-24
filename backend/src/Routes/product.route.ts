@@ -4,8 +4,12 @@ import {
   handleDeleteProduct,
   handleGetAllProducts,
   handleGetSinleProduct,
+  handleUpdateProduct,
 } from '../controllers/product.controller.js';
-import { createProductSchema } from '../schemas/product.schema.js';
+import {
+  createProductSchema,
+  updateProductSchema,
+} from '../schemas/product.schema.js';
 import validate from '../middlewares/validate.middleware.js';
 import {
   protect,
@@ -25,6 +29,14 @@ productRoute.post(
 );
 productRoute.get('/', handleGetAllProducts);
 productRoute.get('/:slug', handleGetSinleProduct);
+productRoute.patch(
+  '/:id',
+  validate(updateProductSchema),
+  protect,
+  requireVerification,
+  restrictTo('admin', 'manager'),
+  handleUpdateProduct,
+);
 productRoute.delete(
   '/:id',
   protect,

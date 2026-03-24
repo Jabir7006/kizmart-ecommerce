@@ -3,6 +3,7 @@ import {
   createProduct,
   getAllProducts,
   getProductBySlug,
+  updateProduct,
   deleteProduct,
 } from '../services/product.service.js';
 import type { ProductQueryOptions } from '../types/product.types.js';
@@ -79,7 +80,45 @@ export const handleGetSinleProduct = catchAsync(async (req, res) => {
   });
 });
 
-// update product ( do it later )
+export const handleUpdateProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const {
+    title,
+    shortDescription,
+    longDescription,
+    thumbnail,
+    gallery,
+    price,
+    quantity,
+    category,
+    brand,
+    status,
+    isFeatured,
+  } = req.body;
+
+  // Build a partial update — only include fields that were explicitly sent
+  const data: Record<string, unknown> = {};
+  if (title !== undefined) data.title = title;
+  if (shortDescription !== undefined) data.shortDescription = shortDescription;
+  if (longDescription !== undefined) data.longDescription = longDescription;
+  if (thumbnail !== undefined) data.thumbnail = thumbnail;
+  if (gallery !== undefined) data.gallery = gallery;
+  if (price !== undefined) data.price = price;
+  if (quantity !== undefined) data.quantity = quantity;
+  if (category !== undefined) data.category = category;
+  if (brand !== undefined) data.brand = brand;
+  if (status !== undefined) data.status = status;
+  if (isFeatured !== undefined) data.isFeatured = isFeatured;
+
+  const product = await updateProduct(id as string, data as any);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    message: 'Product updated successfully',
+    data: product,
+  });
+});
 
 export const handleDeleteProduct = catchAsync(async (req, res) => {
   const { id } = req.params;

@@ -1,7 +1,16 @@
 import { z } from "zod";
 import type { Control } from "react-hook-form";
 
-export const productSchema = z.object({
+// ─── Shared image shape (already-uploaded Cloudinary record) ───────────────
+const existingImageSchema = z.object({
+  publicId: z.string(),
+  secureUrl: z.string(),
+  mobileUrl: z.string().optional(),
+  altText: z.string().optional(),
+});
+
+// ─── Base schema (Shared text, number, and enum fields) ────────────────────
+const baseProductSchema = z.object({
   title: z.string().min(1, "Title is required").max(160, "Max 160 characters"),
   shortDescription: z.string().min(1, "Short description is required"),
   longDescription: z.string().min(1, "Long description is required"),
@@ -17,13 +26,29 @@ export const productSchema = z.object({
   brand: z.string().optional(),
   status: z.enum(["draft", "active", "archived"]),
   isFeatured: z.boolean().default(false),
+});
+
+// ─── Create schema (new product – thumbnail is mandatory File) ─────────────
+export const productSchema = baseProductSchema.extend({
   thumbnail: z.instanceof(File, { message: "Thumbnail is required" }),
   gallery: z.array(z.instanceof(File)).default([]),
 });
 
+// ─── Edit schema (thumbnail / gallery can be existing OR a new File) ────────
+export const editProductSchema = baseProductSchema.extend({
+  thumbnail: z.union([z.instanceof(File), existingImageSchema]),
+  gallery: z
+    .array(z.union([z.instanceof(File), existingImageSchema]))
+    .default([]),
+});
+
+// ─── Types ─────────────────────────────────────────────────────────────────
 export type ProductFormInput = z.input<typeof productSchema>;
 export type ProductFormOutput = z.output<typeof productSchema>;
 export type ProductFormValues = ProductFormOutput;
+
+export type ProductEditFormInput = z.input<typeof editProductSchema>;
+export type ProductEditFormOutput = z.output<typeof editProductSchema>;
 
 export interface ProductInput {
   title: string;
@@ -40,5 +65,5 @@ export interface ProductInput {
 }
 
 export interface ProductFormSectionProps {
-  control: Control<ProductFormInput, any>;
+  control: Control<any>;
 }

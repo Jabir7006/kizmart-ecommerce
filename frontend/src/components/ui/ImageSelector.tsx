@@ -10,6 +10,22 @@ interface ImageSelectorProps<T extends FieldValues> {
   multiple?: boolean;
 }
 
+/** Discriminate between an existing saved image and a newly selected File */
+function isExistingImage(
+  value: unknown,
+): value is { publicId: string; secureUrl: string } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "secureUrl" in value &&
+    typeof (value as any).secureUrl === "string"
+  );
+}
+
+function getPreviewUrl(item: File | { secureUrl: string }): string {
+  return item instanceof File ? URL.createObjectURL(item) : item.secureUrl;
+}
+
 export const ImageSelector = <T extends FieldValues>({
   name,
   control,
@@ -21,32 +37,31 @@ export const ImageSelector = <T extends FieldValues>({
       name={name}
       control={control}
       render={({ field: { onChange, value }, fieldState }) => {
-        // Safe check for value being an array or single file
-        const files: File[] = multiple
-          ? Array.isArray(value)
-            ? value
-            : []
-          : value
-            ? [value as File]
-            : [];
+        // Normalise to an array for uniform rendering
+        const items: (File | { publicId: string; secureUrl: string })[] =
+          multiple
+            ? Array.isArray(value)
+              ? value
+              : []
+            : value
+              ? [value]
+              : [];
 
         const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           if (e.target.files && e.target.files.length > 0) {
             if (multiple) {
               const newFiles = Array.from(e.target.files);
-              onChange([...files, ...newFiles]);
+              onChange([...items, ...newFiles]);
             } else {
               onChange(e.target.files[0]);
             }
           }
-          // Reset value to allow selecting same file again if removed
           e.target.value = "";
         };
 
-        const removeFile = (indexToRemove: number) => {
+        const removeItem = (indexToRemove: number) => {
           if (multiple) {
-            const newFiles = files.filter((_, i) => i !== indexToRemove);
-            onChange(newFiles);
+            onChange(items.filter((_, i) => i !== indexToRemove));
           } else {
             onChange(undefined);
           }
@@ -91,7 +106,9 @@ export const ImageSelector = <T extends FieldValues>({
                 </svg>
                 <div className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
                   <span className="text-primary hover:underline font-semibold">
-                    Click to upload
+                    {items.length > 0 && !multiple
+                      ? "Click to replace"
+                      : "Click to upload"}
                   </span>{" "}
                   or drag and drop
                 </div>
@@ -99,42 +116,54 @@ export const ImageSelector = <T extends FieldValues>({
               </div>
             </div>
 
-            {files.length > 0 && (
+            {items.length > 0 && (
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {files.map((file, idx) => (
-                  <div
-                    key={`${file.name}-${idx}`}
-                    className="relative group overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800 aspect-square"
-                  >
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button
-                        type="button"
-                        onClick={() => removeFile(idx)}
-                        className="bg-destructive text-destructive-foreground p-1.5 rounded-full hover:bg-destructive/90 transition-colors"
-                        title="Remove image"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                {items.map((item, idx) => {
+                  const previewUrl = getPreviewUrl(item);
+                  const key = isExistingImage(item)
+                    ? item.publicId
+                    : `file-${idx}-${(item as File).name}`;
+
+                  return (
+                    <div
+                      key={key}
+                      className="relative group overflow-hidden rounded-md border border-neutral-200 dark:border-neutral-800 aspect-square"
+                    >
+                      <img
+                        src={previewUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      {isExistingImage(item) && (
+                        <div className="absolute top-1 left-1 bg-black/60 text-white text-[9px] font-medium px-1.5 py-0.5 rounded">
+                          saved
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => removeItem(idx)}
+                          className="bg-destructive text-destructive-foreground p-1.5 rounded-full hover:bg-destructive/90 transition-colors"
+                          title="Remove image"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
