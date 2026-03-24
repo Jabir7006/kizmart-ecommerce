@@ -35,6 +35,12 @@ const AdminProductEditPage = lazy(
 const CategoryListPage = lazy(
   () => import("@/pages/admin/category/CategoryListPage"),
 );
+const CategoryAddPage = lazy(
+  () => import("@/pages/admin/category/CategoryAddPage"),
+);
+const CategoryEditPage = lazy(
+  () => import("@/pages/admin/category/CategoryEditPage"),
+);
 
 const App = () => {
   return (
@@ -80,6 +86,14 @@ const App = () => {
                 element={<AdminProductEditPage />}
               />
               <Route path="/admin/categories" element={<CategoryListPage />} />
+              <Route
+                path="/admin/categories/new"
+                element={<CategoryAddPage />}
+              />
+              <Route
+                path="/admin/categories/:id/edit"
+                element={<CategoryEditPage />}
+              />
             </Route>
 
             {/* Guest-only routes (no header) */}

@@ -52,7 +52,7 @@ const AdminCategoryListItem = ({
           className="h-8 w-8 text-muted-foreground hover:text-foreground"
           title="Edit category"
         >
-          <Link to={`/admin/categories/${category.slug}/edit`}>
+          <Link to={`/admin/categories/${category._id}/edit`}>
             <Edit className="h-4 w-4" />
           </Link>
         </Button>

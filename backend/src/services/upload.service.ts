@@ -11,27 +11,55 @@ const CLOUDINARY_ROOT_FOLDER = 'kizmart';
 
 const BASE_UPLOAD_OPTIONS: UploadApiOptions = {
   resource_type: 'image',
-  format: 'webp',
   quality: 'auto',
+  fetch_format: 'auto',
   crop: 'limit',
+  flags: 'progressive',
 };
 
 const CATEGORY_CONFIGS: Record<string, UploadApiOptions> = {
   banners: {
     width: 1920,
-    eager: [{ width: 768, crop: 'limit', format: 'webp', quality: 'auto' }],
+    quality: 'auto:good',
+    eager: [{ width: 768, crop: 'limit' }],
   },
+
   hero: {
     width: 1920,
-    eager: [{ width: 768, crop: 'limit', format: 'webp', quality: 'auto' }],
+    quality: 'auto:good',
+    eager: [{ width: 768, crop: 'limit' }],
   },
-  avatars: { width: 250 },
-  thumbnails: { width: 400 },
-  galleries: { width: 1000 },
-  products: { width: 1000 },
+
+  avatars: {
+    width: 250,
+    height: 250,
+    crop: 'fill',
+    gravity: 'face',
+  },
+
+  thumbnails: {
+    width: 400,
+    height: 400,
+    crop: 'fill',
+  },
+
+  products: {
+    width: 1000,
+    crop: 'limit',
+    quality: 'auto:good',
+    eager: [{ width: 500, crop: 'limit' }],
+  },
+
+  galleries: {
+    width: 1400,
+    crop: 'limit',
+    quality: 'auto:eco',
+  },
 };
 
-const DEFAULT_CONFIG: UploadApiOptions = { width: 800 };
+const DEFAULT_CONFIG: UploadApiOptions = {
+  width: 800,
+};
 
 export class UploadService {
   static async uploadImage(

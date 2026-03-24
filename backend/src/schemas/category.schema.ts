@@ -9,6 +9,11 @@ const categoryCoreSchema = z.object({
   thumbnail: optional(imageSchema),
 });
 
+// For updates, thumbnail can be null (explicit removal) or an image object
+const categoryUpdateCoreSchema = categoryCoreSchema.extend({
+  thumbnail: imageSchema.nullish(),
+});
+
 export const createCategorySchema = z.object({
   body: categoryCoreSchema,
 });
@@ -17,5 +22,5 @@ export const updateCategorySchema = z.object({
   params: z.object({
     id: z.string({ error: 'Category ID is required' }),
   }),
-  body: categoryCoreSchema.partial(),
+  body: categoryUpdateCoreSchema.partial(),
 });
