@@ -2,6 +2,7 @@ import { BannerModel, type BannerStatus, type BannerType } from '../models/banne
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
 import type { IImage } from '../models/product.model.js';
+import { UploadService } from './upload.service.js';
 
 export const createBanner = async (data: {
   image: IImage;
@@ -19,9 +20,6 @@ export const createBanner = async (data: {
 export const getAllBanners = async (filter?: Record<string, any>) => {
   const query = filter || {};
   const banners = await BannerModel.find(query).sort({ displayOrder: 1, createdAt: -1 });
-  if (!banners || banners.length === 0) {
-    throw new AppError('No banners found', HTTP_STATUS.NOT_FOUND);
-  }
   return banners;
 };
 
@@ -45,6 +43,16 @@ export const updateBanner = async (
     endDate: Date;
   }>,
 ) => {
+  const existing = await BannerModel.findById(id);
+  if (!existing) {
+    throw new AppError('Banner not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  // If a new image is provided, delete the old one from Cloudinary
+  if (data.image && data.image.publicId && data.image.publicId !== existing.image.publicId) {
+    await UploadService.deleteImage(existing.image.publicId);
+  }
+
   const banner = await BannerModel.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
@@ -60,5 +68,12 @@ export const deleteBanner = async (id: string) => {
   if (!banner) {
     throw new AppError('Banner not found', HTTP_STATUS.NOT_FOUND);
   }
+
+  // Clean up image from Cloudinary
+  if (banner.image?.publicId) {
+    await UploadService.deleteImage(banner.image.publicId);
+  }
+
   return banner;
 };
+

@@ -41,6 +41,15 @@ const CategoryAddPage = lazy(
 const CategoryEditPage = lazy(
   () => import("@/pages/admin/category/CategoryEditPage"),
 );
+const BannerListPage = lazy(
+  () => import("@/pages/admin/banner/BannerListPage"),
+);
+const BannerAddPage = lazy(
+  () => import("@/pages/admin/banner/BannerAddPage"),
+);
+const BannerEditPage = lazy(
+  () => import("@/pages/admin/banner/BannerEditPage"),
+);
 
 const App = () => {
   return (
@@ -93,6 +102,12 @@ const App = () => {
               <Route
                 path="/admin/categories/:id/edit"
                 element={<CategoryEditPage />}
+              />
+              <Route path="/admin/banners" element={<BannerListPage />} />
+              <Route path="/admin/banners/new" element={<BannerAddPage />} />
+              <Route
+                path="/admin/banners/:id/edit"
+                element={<BannerEditPage />}
               />
             </Route>
 
