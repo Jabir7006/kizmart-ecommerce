@@ -1,30 +1,32 @@
-import type { Image } from '@/types/productType';
+import type { Image } from "@/types/productType";
 
-type ImageVariant = 'thumbnail' | 'mobile' | 'full';
+type ImageVariant = "thumbnail" | "mobile" | "full";
 
-/**
- * Returns the best image URL for the given display context.
- *
- * - 'thumbnail' → ~200px  (product card, admin list row)
- * - 'mobile'    → ~500px  (medium displays, gallery thumbs)
- * - 'full'      → up to 1000px (main product image, zoom)
- *
- * Falls back gracefully for images uploaded before thumbnailUrl existed.
- */
+function withCloudinaryOptimizations(url: string): string {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  if (url.includes("f_auto") || url.includes("q_auto")) return url; // already optimized
+  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}
+
 export function getImageUrl(
   image: Image | undefined | null,
   variant: ImageVariant,
-  fallback = '/placeholder.svg',
+  fallback = "/placeholder.svg",
 ): string {
   if (!image) return fallback;
 
+  let url: string;
   switch (variant) {
-    case 'thumbnail':
-      return image.thumbnailUrl ?? image.mobileUrl ?? image.secureUrl;
-    case 'mobile':
-      return image.mobileUrl ?? image.secureUrl;
-    case 'full':
+    case "thumbnail":
+      url = image.thumbnailUrl ?? image.mobileUrl ?? image.secureUrl;
+      break;
+    case "mobile":
+      url = image.mobileUrl ?? image.secureUrl;
+      break;
+    case "full":
     default:
-      return image.secureUrl;
+      url = image.secureUrl;
   }
+
+  return withCloudinaryOptimizations(url);
 }
