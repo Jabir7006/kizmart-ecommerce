@@ -1,9 +1,19 @@
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
+import type { Image } from "@/types/productType";
+import { getImageUrl } from "@/lib/getImageUrl";
 
-const ZoomableImage = ({ src, alt }: { src: string; alt: string }) => {
+interface ZoomableImageProps {
+  image: Image;
+  alt: string;
+}
+
+const ZoomableImage = ({ image, alt }: ZoomableImageProps) => {
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const [isHovering, setIsHovering] = useState(false);
+
+  const mobileSrc = getImageUrl(image, "mobile");
+  const fullSrc = getImageUrl(image, "full");
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } =
@@ -21,8 +31,12 @@ const ZoomableImage = ({ src, alt }: { src: string; alt: string }) => {
       onMouseMove={handleMouseMove}
     >
       <img
-        src={src}
+        srcSet={`${mobileSrc} 800w, ${fullSrc} 1200w`}
+        sizes="(max-width: 640px) 100vw, 50vw"
+        src={fullSrc}
         alt={alt}
+        width={800}
+        height={800}
         style={{
           transformOrigin: `${position.x}% ${position.y}%`,
           transform: isHovering ? "scale(2)" : "scale(1)",

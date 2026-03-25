@@ -116,6 +116,24 @@ const useProduct = () => {
     },
   });
 
+  // ─── DELETE ─────────────────────────────────────────────────────────────────
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await deleteProduct(id);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Product deleted successfully");
+    },
+    onError: (error) => {
+      const message = isAxiosError(error)
+        ? error.response?.data?.message || "Failed to delete product"
+        : "Something went wrong";
+      toast.error(message);
+    },
+  });
+
   return {
     // Query
     productsQuery,
@@ -125,22 +143,7 @@ const useProduct = () => {
     // Mutations
     createProductMutation,
     updateProductMutation,
-    deleteProductMutation: useMutation({
-      mutationFn: async (id: string) => {
-        const response = await deleteProduct(id);
-        return response.data;
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        toast.success("Product deleted successfully");
-      },
-      onError: (error) => {
-        const message = isAxiosError(error)
-          ? error.response?.data?.message || "Failed to delete product"
-          : "Something went wrong";
-        toast.error(message);
-      },
-    }),
+    deleteProductMutation,
 
     // Actions
     filters,

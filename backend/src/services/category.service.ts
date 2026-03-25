@@ -24,9 +24,6 @@ export const createCategory = async (data: {
 
 export const getAllCategories = async () => {
   const categories = await Category.find();
-  if (!categories || categories.length === 0) {
-    throw new AppError('No categories found', HTTP_STATUS.NOT_FOUND);
-  }
   return categories;
 };
 

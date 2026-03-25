@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Image } from "@/types/productType";
 import ZoomableImage from "./ZoomableImage";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface ProductGalleryProps {
   thumbnail: Image;
@@ -60,7 +61,7 @@ const ProductGallery = ({ thumbnail, gallery, title }: ProductGalleryProps) => {
               <CarouselItem key={index}>
                 <div className="flex items-center justify-center min-h-[300px] md:min-h-[500px] p-4 sm:p-8">
                   <ZoomableImage
-                    src={image.secureUrl || "/placeholder.svg"}
+                    image={image}
                     alt={image.altText || `${title} - Image ${index + 1}`}
                   />
                 </div>
@@ -93,7 +94,7 @@ const ProductGallery = ({ thumbnail, gallery, title }: ProductGalleryProps) => {
               )}
             >
               <img
-                src={image.secureUrl || "/placeholder.svg"}
+                src={getImageUrl(image, "thumbnail")}
                 alt={image.altText || `Thumbnail ${index + 1}`}
                 className="w-full h-full object-contain p-2 mix-blend-multiply"
               />

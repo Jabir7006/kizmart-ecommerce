@@ -8,6 +8,7 @@ import { useProductStore } from "@/store/useProductStore";
 import { Star } from "lucide-react";
 import { useAddToCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/useCartStore";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 const QuickViewDialog = () => {
   const { selectedProduct, setSelectedProduct } = useProductStore();
@@ -47,7 +48,7 @@ const QuickViewDialog = () => {
           {/* Image Section */}
           <div className="bg-gray-50 p-4 sm:p-8 flex items-center justify-center min-h-[250px] md:min-h-[450px]">
             <img
-              src={thumbnail?.secureUrl || "/placeholder.svg"}
+              src={getImageUrl(thumbnail, "mobile", "/placeholder.svg")}
               alt={title}
               className="w-full h-auto object-contain max-h-[220px] md:max-h-[350px] mix-blend-multiply transition-transform hover:scale-105 duration-500 rounded-md"
             />

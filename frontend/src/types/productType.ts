@@ -2,6 +2,7 @@ export interface Image {
   publicId: string;
   secureUrl: string;
   mobileUrl?: string;
+  thumbnailUrl?: string;
   altText?: string;
 }
 

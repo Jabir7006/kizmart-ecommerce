@@ -4,6 +4,7 @@ export interface IImage {
   publicId: string;
   secureUrl: string;
   mobileUrl?: string;
+  thumbnailUrl?: string;
   altText?: string;
 }
 
@@ -12,6 +13,7 @@ export const ImageSchema = new Schema(
     publicId: { type: String, required: true },
     secureUrl: { type: String, required: true },
     mobileUrl: { type: String, required: false },
+    thumbnailUrl: { type: String, required: false },
     altText: { type: String, default: '' },
   },
   { _id: false },

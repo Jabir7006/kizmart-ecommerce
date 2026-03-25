@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/productType";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 /* ─── Status badge styles ─── */
 const statusStyles: Record<Product["status"], string> = {
@@ -40,8 +41,8 @@ const AdminProductListItem = ({
     <ListItem>
       {/* Thumbnail */}
       <ListItemImage
-        src={product.thumbnail?.secureUrl}
-        alt={product.thumbnail.altText || product.title}
+        src={getImageUrl(product.thumbnail, "thumbnail")}
+        alt={product.thumbnail?.altText || product.title}
       />
 
       {/* Main content */}

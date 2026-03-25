@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/ListItem";
 import { Button } from "@/components/ui/button";
 import type { Category } from "@/types/categoryType";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface AdminCategoryListItemProps {
   category: Category;
@@ -23,17 +24,10 @@ const AdminCategoryListItem = ({
   return (
     <ListItem>
       {/* Thumbnail */}
-      {category.thumbnail?.secureUrl ? (
-        <ListItemImage
-          src={category.thumbnail.secureUrl}
-          alt={category.thumbnail.altText || category.title}
-        />
-      ) : (
-        <ListItemImage
-          src=""
-          alt={category.title}
-        />
-      )}
+      <ListItemImage
+        src={getImageUrl(category.thumbnail, "thumbnail")}
+        alt={category.thumbnail?.altText || category.title}
+      />
 
       {/* Main content */}
       <ListItemContent>

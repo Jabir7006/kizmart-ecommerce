@@ -7,9 +7,11 @@ import { AlertCircle } from "lucide-react";
 const ProductList = ({
   products,
   productsQuery,
+  prioritizeFirst = false,
 }: {
   products: Product[];
   productsQuery?: UseQueryResult<PaginatedProducts, Error>;
+  prioritizeFirst?: boolean;
 }) => {
   if (productsQuery?.isLoading) {
     return (
@@ -51,8 +53,12 @@ const ProductList = ({
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-      {products.map((product) => (
-        <ProductCard key={product._id} product={product} />
+      {products.map((product, index) => (
+        <ProductCard
+          key={product._id}
+          product={product}
+          priority={prioritizeFirst && index === 0}
+        />
       ))}
     </div>
   );

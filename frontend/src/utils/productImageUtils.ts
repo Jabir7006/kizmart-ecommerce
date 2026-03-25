@@ -19,7 +19,7 @@ export const processProductImages = async ({
 
   let thumbnailData: Image;
   if (thumbnail instanceof File) {
-    const res = await uploadSingleImage(thumbnail, "thumbnails");
+    const res = await uploadSingleImage(thumbnail, "products");
     thumbnailData = res.data.data;
   } else {
     thumbnailData = thumbnail;
@@ -39,4 +39,3 @@ export const processProductImages = async ({
 
   return { thumbnailData, galleryData };
 };
-

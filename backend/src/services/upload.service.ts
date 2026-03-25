@@ -17,7 +17,7 @@ const BASE_UPLOAD_OPTIONS: UploadApiOptions = {
   flags: 'progressive',
 };
 
-const CATEGORY_CONFIGS: Record<string, UploadApiOptions> = {
+const FOLDER_CONFIGS: Record<string, UploadApiOptions> = {
   banners: {
     width: 1920,
     quality: 'auto:good',
@@ -44,10 +44,13 @@ const CATEGORY_CONFIGS: Record<string, UploadApiOptions> = {
   },
 
   products: {
-    width: 1000,
+    width: 1200,
     crop: 'limit',
     quality: 'auto:good',
-    eager: [{ width: 500, crop: 'limit' }],
+    eager: [
+      { width: 800, crop: 'limit' },
+      { width: 400, crop: 'limit' },
+    ],
   },
 
   galleries: {
@@ -61,6 +64,14 @@ const DEFAULT_CONFIG: UploadApiOptions = {
   width: 800,
 };
 
+function sanitizeAltText(filename: string): string {
+  return filename
+    .replace(/\.[^/.]+$/, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export class UploadService {
   static async uploadImage(
     fileBuffer: Buffer,
@@ -68,11 +79,11 @@ export class UploadService {
     originalName?: string,
   ): Promise<IImage> {
     return new Promise((resolve, reject) => {
-      const categoryConfig = CATEGORY_CONFIGS[folderName] || DEFAULT_CONFIG;
+      const folderConfig = FOLDER_CONFIGS[folderName] || DEFAULT_CONFIG;
 
       const options: UploadApiOptions = {
         ...BASE_UPLOAD_OPTIONS,
-        ...categoryConfig,
+        ...folderConfig,
         folder: `${CLOUDINARY_ROOT_FOLDER}/${folderName}`,
       };
 
@@ -98,7 +109,13 @@ export class UploadService {
               result.eager && result.eager.length > 0
                 ? result.eager[0].secure_url
                 : undefined,
-            altText: originalName?.split('.')[0] || 'Uploaded image',
+            thumbnailUrl:
+              result.eager && result.eager.length > 1
+                ? result.eager[1].secure_url
+                : undefined,
+            altText: originalName
+              ? sanitizeAltText(originalName)
+              : 'Uploaded image',
           });
         },
       );
