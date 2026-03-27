@@ -9,6 +9,10 @@ const brandCoreSchema = z.object({
   logo: optional(imageSchema),
 });
 
+const brandUpdateCoreSchema = brandCoreSchema.extend({
+  logo: imageSchema.nullish(),
+});
+
 export const createBrandSchema = z.object({
   body: brandCoreSchema,
 });
@@ -17,5 +21,5 @@ export const updateBrandSchema = z.object({
   params: z.object({
     id: z.string({ error: 'Brand ID is required' }),
   }),
-  body: brandCoreSchema.partial(),
+  body: brandUpdateCoreSchema.partial(),
 });

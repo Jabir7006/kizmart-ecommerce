@@ -1,5 +1,4 @@
 import type { Image } from "./productType";
-import type { BaseResource } from "./baseType";
 
 export interface BrandInput {
   title: string;
@@ -7,4 +6,8 @@ export interface BrandInput {
   logo?: Image;
 }
 
-export interface Brand extends BrandInput, Omit<BaseResource, "thumbnail"> {}
+export interface Brand extends BrandInput {
+  _id: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

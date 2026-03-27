@@ -44,12 +44,13 @@ const CategoryEditPage = lazy(
 const BannerListPage = lazy(
   () => import("@/pages/admin/banner/BannerListPage"),
 );
-const BannerAddPage = lazy(
-  () => import("@/pages/admin/banner/BannerAddPage"),
-);
+const BannerAddPage = lazy(() => import("@/pages/admin/banner/BannerAddPage"));
 const BannerEditPage = lazy(
   () => import("@/pages/admin/banner/BannerEditPage"),
 );
+const BrandListPage = lazy(() => import("@/pages/admin/brand/BrandListPage"));
+const BrandAddPage = lazy(() => import("@/pages/admin/brand/BrandAddPage"));
+const BrandEditPage = lazy(() => import("@/pages/admin/brand/BrandEditPage"));
 
 const App = () => {
   return (
@@ -108,6 +109,15 @@ const App = () => {
               <Route
                 path="/admin/banners/:id/edit"
                 element={<BannerEditPage />}
+              />
+              <Route path="/admin/brands" element={<BrandListPage />} />
+              <Route
+                path="/admin/brands/new"
+                element={<BrandAddPage />}
+              />
+              <Route
+                path="/admin/brands/:id/edit"
+                element={<BrandEditPage />}
               />
             </Route>
 
