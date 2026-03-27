@@ -1,13 +1,6 @@
-import type { Image } from "./productType";
+import type { BaseResource, BaseResourceInput } from "./baseType";
 
-export interface CategoryInput {
-  title: string;
-  slug: string;
-  thumbnail?: Image;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CategoryInput extends BaseResourceInput {}
 
-export interface Category extends CategoryInput {
-  _id: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export interface Category extends CategoryInput, BaseResource {}

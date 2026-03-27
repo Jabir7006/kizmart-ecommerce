@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { LogOut, User, Package, Heart } from "lucide-react";
+import { LogOut, User, Package, Heart, LayoutDashboard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -73,6 +73,15 @@ const UserMenu = () => {
             Wishlist
           </Link>
         </DropdownMenuItem>
+
+        {user.role === "admin" && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin" className="cursor-pointer">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Admin Dashboard
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

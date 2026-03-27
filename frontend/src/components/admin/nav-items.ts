@@ -5,7 +5,8 @@ import {
   LogOut,
   Layout,
   Image,
-} from 'lucide-react';
+  Tag,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface NavItemConfig {
@@ -45,6 +46,12 @@ export const navItems: NavItemConfig[] = [
     icon: ShoppingCart,
     label: "Orders",
     href: "/admin/orders",
+  },
+  {
+    id: "brands",
+    icon: Tag,
+    label: "Brands",
+    href: "/admin/brands",
   },
 ];
 

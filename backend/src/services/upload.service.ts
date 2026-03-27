@@ -58,6 +58,15 @@ const FOLDER_CONFIGS: Record<string, UploadApiOptions> = {
     crop: 'limit',
     quality: 'auto:eco',
   },
+
+  brand_logos: {
+    width: 400,
+    height: 400,
+    crop: 'lpad',
+    background: 'transparent',
+    quality: 'auto:good',
+    fetch_format: 'auto',
+  },
 };
 
 const DEFAULT_CONFIG: UploadApiOptions = {
