@@ -2,6 +2,7 @@ import mongoose, { Types } from 'mongoose';
 import Order from '../models/order.model.js';
 import Product from '../models/product.model.js';
 import Payment from '../models/payment.model.js';
+import User from '../models/user.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
 import { QueryBuilder } from '../utils/queryBuilder.js';
@@ -151,6 +152,149 @@ export const getOrders = async (
     metadata: { total, page, totalPages, limit },
     data,
   };
+};
+
+export const getAllOrders = async (
+  options: OrderQueryOptions,
+): Promise<PaginatedResult<unknown>> => {
+  const baseMatch: Record<
+    string,
+    Types.ObjectId | string | { $gte?: Date; $lte?: Date }
+  > = {};
+
+  if (options.status) {
+    baseMatch.status = options.status;
+  }
+  if (options.startDate != null || options.endDate != null) {
+    const dateRange: { $gte?: Date; $lte?: Date } = {};
+    if (options.startDate != null) dateRange.$gte = options.startDate;
+    if (options.endDate != null) dateRange.$lte = options.endDate;
+    baseMatch.createdAt = dateRange;
+  }
+
+  const queryBuilder = new QueryBuilder({
+    options: {
+      sortBy: options.sortBy ?? 'createdAt',
+      sortOrder: options.sortOrder ?? 'desc',
+      page: options.page ?? 1,
+      limit: options.limit ?? 10,
+    },
+    baseMatch,
+  });
+
+  const pipeline = queryBuilder.buildPipeline();
+
+  const customStages: any[] = [];
+  if (options.search) {
+    const users = await User.find({ email: { $regex: options.search, $options: 'i' } })
+      .select('_id')
+      .lean();
+    const userIds = users.map((u) => u._id);
+
+    customStages.push({
+      $match: {
+        $expr: {
+          $or: [
+            {
+              $regexMatch: {
+                input: { $toString: '$_id' },
+                regex: options.search,
+                options: 'i',
+              },
+            },
+            { $in: ['$user', userIds] },
+          ],
+        },
+      },
+    });
+  }
+
+  customStages.push(
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'userDetails',
+      },
+    },
+    {
+      $unwind: {
+        path: '$userDetails',
+        preserveNullAndEmptyArrays: true,
+      },
+    }
+  );
+
+  pipeline.splice(pipeline.length - 1, 0, ...customStages);
+
+  const result = await Order.aggregate(pipeline);
+
+  const data = result[0]?.data ?? [];
+  const total = result[0]?.metadata?.[0]?.total ?? 0;
+  const limit = options.limit ?? 10;
+  const page = options.page ?? 1;
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    metadata: { total, page, totalPages, limit },
+    data,
+  };
+};
+
+export const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+  const session = await mongoose.startSession();
+
+  try {
+    const result = await session.withTransaction(async () => {
+      const order = await Order.findById(orderId).session(session);
+
+      if (!order) {
+        throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
+      }
+
+      if (order.status === status) return order;
+
+      if (
+        status === OrderStatus.CANCELLED &&
+        order.status !== OrderStatus.CANCELLED
+      ) {
+        order.status = OrderStatus.CANCELLED;
+        await order.save({ session });
+
+        await Payment.findByIdAndUpdate(
+          order.payment,
+          { status: PaymentStatus.FAILED },
+          { session },
+        );
+
+        const bulkOps = order.items.map((item) => ({
+          updateOne: {
+            filter: { _id: item.product },
+            update: {
+              $inc: {
+                quantity: item.quantity,
+                sold: -item.quantity,
+              },
+            },
+          },
+        }));
+
+        if (bulkOps.length > 0) {
+          await Product.bulkWrite(bulkOps, { session });
+        }
+      } else {
+        order.status = status;
+        await order.save({ session });
+      }
+
+      return order;
+    });
+
+    return result;
+  } finally {
+    await session.endSession();
+  }
 };
 
 export const cancelOrder = async (orderId: string, userId: string) => {

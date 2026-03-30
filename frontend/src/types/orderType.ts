@@ -37,6 +37,9 @@ export interface Order {
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
   updatedAt: string;
+  userDetails?: {
+    email: string;
+  };
 }
 
 export interface OrderItemInput {
@@ -51,6 +54,7 @@ export interface CreateOrderInput {
 }
 
 export interface OrderFilters {
+  search?: string;
   status?: Order["status"];
   startDate?: string;
   endDate?: string;

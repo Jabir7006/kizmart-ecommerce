@@ -6,8 +6,11 @@ import {
   getOrders,
   getOrderById,
   cancelOrder,
+  getAllOrders,
+  updateOrderStatus,
   type CreateOrderPayload,
 } from "@/services/api/order/orderApi";
+import type { Order } from "@/types/orderType";
 import type { AxiosErrorType } from "@/types/errorType";
 import type { OrderFilters } from "@/types/orderType";
 
@@ -16,6 +19,17 @@ export const useOrders = (filters: OrderFilters) => {
     queryKey: ["orders", filters],
     queryFn: async () => {
       const { data } = await getOrders(filters);
+      return data.data;
+    },
+    placeholderData: (previousData) => previousData,
+  });
+};
+
+export const useAdminOrders = (filters: OrderFilters) => {
+  return useQuery({
+    queryKey: ["admin_orders", filters],
+    queryFn: async () => {
+      const { data } = await getAllOrders(filters);
       return data.data;
     },
     placeholderData: (previousData) => previousData,
@@ -59,6 +73,23 @@ export const useCancelOrder = () => {
     },
     onError: (error: AxiosError<AxiosErrorType>) => {
       toast.error(error?.response?.data?.message || "Failed to cancel order");
+    },
+  });
+};
+
+export const useUpdateOrderStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, status }: { orderId: string; status: Order["status"] }) =>
+      updateOrderStatus(orderId, status),
+    onSuccess: (response, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin_orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      toast.success(response?.data?.message || "Order status updated successfully");
+    },
+    onError: (error: AxiosError<AxiosErrorType>) => {
+      toast.error(error?.response?.data?.message || "Failed to update order status");
     },
   });
 };

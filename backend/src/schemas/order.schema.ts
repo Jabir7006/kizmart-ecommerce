@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { OrderStatus } from '../constants/status.js';
 
 const shippingSnapshotSchema = z.object({
   fullName: z
@@ -32,6 +33,7 @@ export const getOrdersSchema = z.object({
   query: z
     .object({
       status: z.string().optional(),
+      search: z.string().optional(),
       sortBy: z.string().optional(),
       sortOrder: z.enum(['asc', 'desc']).optional(),
       startDate: z.coerce.date().optional(),
@@ -45,5 +47,16 @@ export const getOrdersSchema = z.object({
 export const cancelOrderSchema = z.object({
   params: z.object({
     id: z.string().min(1, 'Order ID is required'),
+  }),
+});
+
+export const updateOrderStatusSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Order ID is required'),
+  }),
+  body: z.object({
+    status: z.enum(OrderStatus, {
+      message: 'Invalid status',
+    }),
   }),
 });
