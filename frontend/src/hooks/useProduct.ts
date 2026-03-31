@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   getAllProducts,
   getProductBySlug,
@@ -6,8 +8,8 @@ import {
   updateProduct,
   deleteProduct,
 } from "@/services/api/product/productApi";
-import { useProductStore } from "@/store/useProductStore";
 import type { Product, PaginatedProducts, Image } from "@/types/productType";
+import type { ProductFilters } from "@/types/productType";
 import type {
   ProductEditFormOutput,
   ProductInput,
@@ -16,18 +18,97 @@ import { processProductImages } from "@/utils/productImageUtils";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
 
-const useProduct = () => {
+// ─── Shared error handler ────────────────────────────────────────────────────
+const handleMutationError = (error: unknown, defaultMessage: string) => {
+  const message = isAxiosError(error)
+    ? error.response?.data?.message || error.message || defaultMessage
+    : error instanceof Error
+      ? error.message
+      : "Something went wrong";
+  toast.error(message);
+};
+
+// ─── Shared query-key factory ────────────────────────────────────────────────
+export const productKeys = {
+  all: ["products"] as const,
+  lists: () => [...productKeys.all, "list"] as const,
+  list: (filters: object) => [...productKeys.lists(), filters] as const,
+  search: (q: string) => [...productKeys.all, "search", q] as const,
+  detail: (slug: string) => ["product", slug] as const,
+};
+
+// ─── Admin product list hook (URL-driven, per-page filters) ─────────────────
+
+const ADMIN_PARAM_KEYS = {
+  search: "q",
+  status: "status",
+  page: "page",
+} as const;
+
+const ADMIN_DEFAULT_LIMIT = 10;
+
+function parseAdminFilters(searchParams: URLSearchParams): ProductFilters {
+  const search = searchParams.get(ADMIN_PARAM_KEYS.search) || undefined;
+  const status = searchParams.get(ADMIN_PARAM_KEYS.status) || undefined;
+  const rawPage = searchParams.get(ADMIN_PARAM_KEYS.page);
+  const page = rawPage ? Math.max(1, Number(rawPage)) : 1;
+  return { search, status, page, limit: ADMIN_DEFAULT_LIMIT };
+}
+
+function adminFiltersToParams(filters: ProductFilters): URLSearchParams {
+  const params = new URLSearchParams();
+  if (filters.search) params.set(ADMIN_PARAM_KEYS.search, filters.search);
+  if (filters.status && filters.status !== "all")
+    params.set(ADMIN_PARAM_KEYS.status, filters.status);
+  if (filters.page && filters.page > 1)
+    params.set(ADMIN_PARAM_KEYS.page, String(filters.page));
+  return params;
+}
+
+export function useAdminProducts() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  const filters = useProductStore((state) => state.filters);
-  const setFilters = useProductStore((state) => state.setFilters);
-  const resetFilters = useProductStore((state) => state.resetFilters);
-  const setPage = useProductStore((state) => state.setPage);
-  const setSelectedProduct = useProductStore(
-    (state) => state.setSelectedProduct,
+
+  const filters = useMemo(
+    () => parseAdminFilters(searchParams),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchParams.toString()],
+  );
+
+  const setFilters = useCallback(
+    (incoming: Partial<ProductFilters>) => {
+      setSearchParams(
+        (prev) => {
+          const current = parseAdminFilters(prev);
+          const merged: ProductFilters = {
+            ...current,
+            ...incoming,
+            page: "page" in incoming ? (incoming.page ?? 1) : 1,
+            limit: ADMIN_DEFAULT_LIMIT,
+          };
+          return adminFiltersToParams(merged);
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const setPage = useCallback(
+    (page: number) => {
+      setSearchParams(
+        (prev) => {
+          const current = parseAdminFilters(prev);
+          return adminFiltersToParams({ ...current, page });
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
   );
 
   const productsQuery = useQuery<PaginatedProducts>({
-    queryKey: ["products", filters],
+    queryKey: productKeys.list({ context: "admin", ...filters }),
     queryFn: async () => {
       const response = await getAllProducts(filters);
       return response.data.data;
@@ -35,7 +116,40 @@ const useProduct = () => {
     placeholderData: (previousData) => previousData,
   });
 
-  // ─── CREATE ─────────────────────────────────────────────────────────────────
+  // ── DELETE (kept here so the admin list page is self-contained) ──────────
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await deleteProduct(id);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      toast.success("Product deleted successfully");
+    },
+    onError: (error) => handleMutationError(error, "Failed to delete product"),
+  });
+
+  return {
+    // Query
+    productsQuery,
+    products: productsQuery.data?.data ?? [],
+    metadata: productsQuery.data?.metadata,
+
+    // Filter state (URL-driven)
+    filters,
+    setFilters,
+    setPage,
+
+    // Mutation
+    deleteProductMutation,
+  };
+}
+
+// ─── Mutations-only hook (Create / Update / Delete) ──────────────────────────
+const useProduct = () => {
+  const queryClient = useQueryClient();
+
+  // ── CREATE ──────────────────────────────────────────────────────────────
   const createProductMutation = useMutation({
     mutationFn: async (data: ProductEditFormOutput) => {
       const { thumbnailData, galleryData } = await processProductImages({
@@ -61,18 +175,13 @@ const useProduct = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
       toast.success("Product created successfully");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to create product"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to create product"),
   });
 
-  // ─── UPDATE ─────────────────────────────────────────────────────────────────
+  // ── UPDATE ──────────────────────────────────────────────────────────────
   const updateProductMutation = useMutation({
     mutationFn: async ({
       id,
@@ -104,61 +213,39 @@ const useProduct = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
       queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("Product updated successfully");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to update product"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to update product"),
   });
 
-  // ─── DELETE ─────────────────────────────────────────────────────────────────
+  // ── DELETE ──────────────────────────────────────────────────────────────
   const deleteProductMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await deleteProduct(id);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
       toast.success("Product deleted successfully");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to delete product"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to delete product"),
   });
 
   return {
-    // Query
-    productsQuery,
-    products: productsQuery.data?.data ?? [],
-    metadata: productsQuery.data?.metadata,
-
-    // Mutations
     createProductMutation,
     updateProductMutation,
     deleteProductMutation,
-
-    // Actions
-    filters,
-    setFilters,
-    resetFilters,
-    setPage,
-    setSelectedProduct,
   };
 };
 
 export default useProduct;
 
+// ─── Single product by slug ──────────────────────────────────────────────────
 export const useSingleProduct = (slug: string) => {
   return useQuery<Product>({
-    queryKey: ["product", slug],
+    queryKey: productKeys.detail(slug),
     queryFn: async () => {
       const response = await getProductBySlug(slug);
       return response.data.data;
@@ -168,3 +255,37 @@ export const useSingleProduct = (slug: string) => {
   });
 };
 
+// ─── Dropdown / header search ────────────────────────────────────────────────
+export const useSearchProducts = (searchQuery: string) => {
+  return useQuery<PaginatedProducts>({
+    queryKey: productKeys.search(searchQuery),
+    queryFn: async () => {
+      const response = await getAllProducts({
+        search: searchQuery,
+        limit: 5,
+        page: 1,
+      });
+      return response.data.data;
+    },
+    enabled: !!searchQuery,
+    staleTime: 60 * 1000,
+  });
+};
+
+// ─── New arrivals section ────────────────────────────────────────────────────
+export const useNewArrivalsProducts = () => {
+  const filters = {
+    sortBy: "createdAt",
+    sortOrder: "desc" as const,
+    limit: 10,
+    page: 1,
+  };
+  return useQuery<PaginatedProducts>({
+    queryKey: productKeys.list(filters),
+    queryFn: async () => {
+      const response = await getAllProducts(filters);
+      return response.data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+};

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Package, Plus } from "lucide-react";
 import { AdminListTemplate } from "@/components/ui/AdminListTemplate";
@@ -6,7 +6,7 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 import AdminProductListItem from "@/components/admin/product/AdminProductListItem";
 import ListItemSkeleton from "@/components/ui/ListItemSkeleton";
 import { Button } from "@/components/ui/button";
-import useProduct from "@/hooks/useProduct";
+import { useAdminProducts } from "@/hooks/useProduct";
 import type { Product } from "@/types/productType";
 
 const statusTabs: { label: string; value: string }[] = [
@@ -25,12 +25,8 @@ const AdminProductListPage = () => {
     setFilters,
     setPage,
     deleteProductMutation,
-  } = useProduct();
+  } = useAdminProducts();
 
-  useEffect(() => {
-    setFilters({ status: "all" });
-    return () => setFilters({ status: undefined });
-  }, [setFilters]);
 
   const activeStatus = filters.status || "all";
   const { isLoading, isError, error, refetch } = productsQuery;
