@@ -62,7 +62,7 @@ const QuickViewDialog = () => {
               </span>
             )}
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-3 line-clamp-2">
               {title}
             </h2>
 
