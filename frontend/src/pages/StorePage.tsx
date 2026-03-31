@@ -14,8 +14,8 @@ const StorePage = () => {
   const q = filters.search;
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8 relative flex flex-col md:flex-row gap-8 min-h-[calc(100vh-200px)]">
-      {/* Sidebar Filters */}
+    <main className="max-w-7xl mx-auto px-4 py-8 relative flex flex-col md:flex-row gap-6 min-h-[calc(100vh-200px)]">
+      {/* Desktop sidebar / Mobile sheet trigger */}
       <StoreFilter
         filters={filters}
         setFilters={setFilters}
@@ -26,16 +26,19 @@ const StorePage = () => {
       />
 
       {/* Main Content */}
-      <section className="flex-1">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {q ? `Search Results for "${q}"` : "All Products"}
-          </h1>
-          {q && (
-            <p className="text-muted-foreground mt-1">
-              Showing matching items from our store catalog.
-            </p>
-          )}
+      <section className="flex-1 min-w-0">
+       
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {q ? `Results for "${q}"` : "All Products"}
+            </h1>
+            {q && (
+              <p className="text-muted-foreground text-sm mt-1">
+                Showing matching items from our store catalog.
+              </p>
+            )}
+          </div>
         </div>
 
         <ProductList products={products} productsQuery={productsQuery} />

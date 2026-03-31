@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import FilterPanelBody from "./FilterPanelBody";
 import type { ProductFilters } from "@/types/productType";
 import type { Category } from "@/types/categoryType";
 import type { Brand } from "@/types/brandType";
+import { SlidersHorizontal, X } from "lucide-react";
 
 interface StoreFilterProps {
   filters: ProductFilters;
@@ -15,6 +23,21 @@ interface StoreFilterProps {
   onClear: () => void;
 }
 
+function countActiveFilters(filters: ProductFilters): number {
+  let count = 0;
+  if (filters.categorySlug) count++;
+  if (filters.brandSlug) count++;
+  if (filters.minPrice != null) count++;
+  if (filters.maxPrice != null) count++;
+  if (
+    filters.sortBy &&
+    filters.sortOrder &&
+    !(filters.sortBy === "createdAt" && filters.sortOrder === "desc")
+  )
+    count++;
+  return count;
+}
+
 const StoreFilter = ({
   filters,
   setFilters,
@@ -23,129 +46,146 @@ const StoreFilter = ({
   totalProducts,
   onClear,
 }: StoreFilterProps) => {
-  const [minPrice, setMinPrice] = useState<string>(filters.minPrice?.toString() || "");
-  const [maxPrice, setMaxPrice] = useState<string>(filters.maxPrice?.toString() || "");
+  const [minPrice, setMinPrice] = useState(filters.minPrice?.toString() ?? "");
+  const [maxPrice, setMaxPrice] = useState(filters.maxPrice?.toString() ?? "");
   const [prevFilters, setPrevFilters] = useState({
     min: filters.minPrice,
     max: filters.maxPrice,
   });
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Track prop changes directly during render (React-recommended pattern)
-  if (filters.minPrice !== prevFilters.min || filters.maxPrice !== prevFilters.max) {
+  // Sync local price inputs when filters reset externally (e.g. "Clear All")
+  if (
+    filters.minPrice !== prevFilters.min ||
+    filters.maxPrice !== prevFilters.max
+  ) {
     setPrevFilters({ min: filters.minPrice, max: filters.maxPrice });
-    setMinPrice(filters.minPrice?.toString() || "");
-    setMaxPrice(filters.maxPrice?.toString() || "");
+    setMinPrice(filters.minPrice?.toString() ?? "");
+    setMaxPrice(filters.maxPrice?.toString() ?? "");
   }
 
-  const handleApplyPrice = () => {
+  const handleApplyPrice = () =>
     setFilters({
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
     });
+
+  const handleClear = () => {
+    onClear();
+    setMobileOpen(false);
   };
+
+  const activeCount = countActiveFilters(filters);
+
+  const panelProps = {
+    filters,
+    setFilters,
+    categories,
+    brands,
+    minPrice,
+    maxPrice,
+    onMinPriceChange: setMinPrice,
+    onMaxPriceChange: setMaxPrice,
+    onApplyPrice: handleApplyPrice,
+  };
+
+  const productLabel = `${totalProducts} product${totalProducts !== 1 ? "s" : ""}`;
+
+  // ─── Desktop sidebar ───────────────────────────────────────────────────────
   return (
-    <aside className="w-full md:w-64 shrink-0 space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold mb-4 border-b pb-2">Filters</h2>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-muted-foreground">{totalProducts} Products</span>
-          <button 
-            onClick={onClear}
-            className="text-sm text-primary hover:underline"
-          >
-            Clear
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {/* Sort */}
-          <div className="space-y-2">
-            <Label>Sort By</Label>
-            <select
-              value={filters.sortBy && filters.sortOrder ? `${filters.sortBy}-${filters.sortOrder}` : "createdAt-desc"}
-              onChange={(e) => {
-                const [sortBy, sortOrder] = e.target.value.split("-");
-                setFilters({ sortBy, sortOrder: sortOrder as "asc" | "desc" });
-              }}
-              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="createdAt-desc">Newest First</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="title-asc">Name: A to Z</option>
-            </select>
-          </div>
-
-          {/* Category */}
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <select
-              value={filters.categorySlug || "all"}
-              onChange={(e) => setFilters({ categorySlug: e.target.value === "all" ? undefined : e.target.value })}
-              className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="all">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.slug!}>
-                  {cat.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Brand */}
-          {brands && brands.length > 0 && (
-            <div className="space-y-2">
-              <Label>Brand</Label>
-              <select
-                value={filters.brandSlug || "all"}
-                onChange={(e) => setFilters({ brandSlug: e.target.value === "all" ? undefined : e.target.value })}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="all">All Brands</option>
-                {brands.map((b) => (
-                  <option key={b._id} value={b.slug}>
-                    {b.title}
-                  </option>
-                ))}
-              </select>
+    <>
+      <aside className="hidden md:block w-64 shrink-0 self-start sticky top-24">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-5 space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="size-4 text-primary" />
+              <h2 className="font-semibold text-base">Filters</h2>
+              {activeCount > 0 && (
+                <Badge className="h-5 min-w-5 rounded-full px-1.5 text-[10px]">
+                  {activeCount}
+                </Badge>
+              )}
             </div>
+            {activeCount > 0 && (
+              <button
+                onClick={handleClear}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <X className="size-3" />
+                Clear
+              </button>
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground -mt-2">{productLabel}</p>
+
+          <div className="border-t border-border/60" />
+
+          <FilterPanelBody {...panelProps} />
+        </div>
+      </aside>
+
+      {/* ─── Mobile trigger + Sheet ────────────────────────────────────────── */}
+      <div className="md:hidden">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setMobileOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <SlidersHorizontal className="size-4" />
+          Filters
+          {activeCount > 0 && (
+            <Badge className="h-4 min-w-4 rounded-full px-1 text-[10px] leading-none">
+              {activeCount}
+            </Badge>
           )}
+        </Button>
 
-          {/* Price Range */}
-          <div className="space-y-2">
-            <Label>Price Range (৳)</Label>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  placeholder="Min"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  className="w-full"
-                />
-                <span className="text-muted-foreground">-</span>
-                <Input
-                  type="number"
-                  placeholder="Max"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleApplyPrice}
-                className="w-full"
-              >
-                Apply
-              </Button>
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetContent side="left" className="w-80 p-0 flex flex-col">
+            <SheetHeader className="px-5 pt-5 pb-3 border-b border-border/60">
+              <SheetTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="size-4 text-primary" />
+                Filters
+                {activeCount > 0 && (
+                  <Badge className="h-5 min-w-5 rounded-full px-1.5 text-[10px]">
+                    {activeCount}
+                  </Badge>
+                )}
+              </SheetTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {productLabel}
+              </p>
+            </SheetHeader>
+
+            <div className="flex-1 overflow-y-auto px-5 py-5">
+              <FilterPanelBody {...panelProps} />
             </div>
-          </div>
-        </div>
+
+            <SheetFooter className="px-5 py-4 border-t border-border/60 flex-row gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClear}
+                className="flex-1"
+                disabled={activeCount === 0}
+              >
+                <X className="size-3.5 mr-1" />
+                Clear All
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1"
+              >
+                Show Results
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
       </div>
-    </aside>
+    </>
   );
 };
 
