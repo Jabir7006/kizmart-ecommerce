@@ -3,15 +3,18 @@ import ProductCard from "./ProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ProductList = ({
   products,
   productsQuery,
   prioritizeFirst = false,
+  className,
 }: {
   products: Product[];
   productsQuery?: UseQueryResult<PaginatedProducts, Error>;
   prioritizeFirst?: boolean;
+  className?: string;
 }) => {
   if (productsQuery?.isLoading) {
     return (
@@ -52,7 +55,12 @@ const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4",
+        className,
+      )}
+    >
       {products.map((product, index) => (
         <ProductCard
           key={product._id}

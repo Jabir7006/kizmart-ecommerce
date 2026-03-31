@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Products", href: "/products" },
+  { label: "Store", href: "/store" },
   { label: "Categories", href: "/categories" },
   { label: "Deals", href: "/deals" },
 ] as const;
