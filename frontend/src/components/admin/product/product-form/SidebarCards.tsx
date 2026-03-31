@@ -6,8 +6,11 @@ import { useCategory } from "@/hooks/useCategory";
 import { useBrand } from "@/hooks/useBrand";
 
 export const SidebarCards = ({ control }: ProductFormSectionProps) => {
-  const { categories, isLoading: isCategoriesLoading } = useCategory();
-  const { brands, isLoading: isBrandsLoading } = useBrand();
+  const { categories, categoriesQuery } = useCategory();
+  const { brands, brandsQuery } = useBrand();
+
+  const isCategoriesLoading = categoriesQuery.isLoading;
+  const isBrandsLoading = brandsQuery.isLoading;
 
   const categoryOptions = categories.map((cat: any) => ({
     label: cat.title,

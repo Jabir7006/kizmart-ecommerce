@@ -11,6 +11,7 @@ const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
 const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));
 const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
+const StorePage = lazy(() => import("@/pages/StorePage"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const OrderListPage = lazy(() => import("@/pages/OrderListPage"));
 const OrderDetailsPage = lazy(() => import("@/pages/OrderDetailsPage"));
@@ -21,6 +22,7 @@ export const publicRoutes = [
     element: <MainLayout />,
     children: [
       { path: "/", element: <Home /> },
+      { path: "/store", element: <StorePage /> },
       { path: "/product/:slug", element: <ProductDetails /> },
       {
         element: <ProtectedRoute />,
