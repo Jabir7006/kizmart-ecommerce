@@ -74,11 +74,10 @@ const HeroSlider = () => {
     Autoplay({ delay: AUTO_SLIDE_INTERVAL, stopOnInteraction: true }),
   );
 
-  const { banners, bannersQuery } = useBanner();
+  const { banners, bannersQuery } = useBanner({ type: "banner" });
 
-  // Only show active banners sorted by displayOrder
   const activeBanners: Banner[] = banners.filter(
-    (b: Banner) => b.status === "active",
+    (b: Banner) => b.status === "active" && b.type === "banner",
   );
 
   if (bannersQuery.isLoading) return <HeroSkeleton />;

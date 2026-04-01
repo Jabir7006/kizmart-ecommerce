@@ -15,12 +15,18 @@ const fileFilter = (
     'image/png',
     'image/webp',
     'image/jpg',
+    'image/avif',
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new AppError('Invalid file type. Only JPEG, PNG, and WEBP are allowed.', HTTP_STATUS.BAD_REQUEST));
+    cb(
+      new AppError(
+        'Invalid file type. Only JPEG, PNG, and WEBP are allowed.',
+        HTTP_STATUS.BAD_REQUEST,
+      ),
+    );
   }
 };
 

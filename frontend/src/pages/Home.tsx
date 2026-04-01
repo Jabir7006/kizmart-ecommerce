@@ -4,6 +4,7 @@ import CategoryGrid from "@/components/home/CategoryGrid";
 import BrandGrid from "@/components/home/BrandGrid";
 import SectionHeader from "@/components/home/SectionHeader";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import PromoBanners from "@/components/home/PromoBanners";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
 import { useNewArrivalsProducts } from "@/hooks/useProduct";
 import ProductList from "@/components/product/ProductList";
@@ -27,6 +28,9 @@ const Home = () => {
       {/* Featured Products */}
       <FeaturedProducts />
 
+      {/* Promo Banners — exclusive collections */}
+      <PromoBanners type="promo" title="Exclusive Collections" subtitle="Curated picks from top collections" />
+
       {/* New Arrivals */}
       <section className="max-w-7xl mx-auto px-4 py-8 sm:py-10">
         <SectionHeader
@@ -45,6 +49,9 @@ const Home = () => {
 
       {/* Shop by Brand */}
       <BrandGrid />
+
+      {/* Offer Banners — unlimited offers */}
+      <PromoBanners type="offer" title="Unlimited Offers" subtitle="Don't miss out on these limited-time deals" />
 
       {/* Newsletter CTA */}
       <NewsletterBanner />
