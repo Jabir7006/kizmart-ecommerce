@@ -1,6 +1,7 @@
 import HeroSlider from "@/components/home/carousel/HeroSlider";
 import ServiceFeatures from "@/components/home/ServiceFeatures";
 import CategoryGrid from "@/components/home/CategoryGrid";
+import BrandGrid from "@/components/home/BrandGrid";
 import SectionHeader from "@/components/home/SectionHeader";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
@@ -41,6 +42,9 @@ const Home = () => {
           className="grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
         />
       </section>
+
+      {/* Shop by Brand */}
+      <BrandGrid />
 
       {/* Newsletter CTA */}
       <NewsletterBanner />
