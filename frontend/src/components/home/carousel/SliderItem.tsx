@@ -14,21 +14,24 @@ const SliderItem = ({ banner, index }: SliderItemProps) => {
   const fullSrc = getImageUrl(banner.image, "full", bannerFallback);
 
   const content = (
-    <div className="relative h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px]">
+    <div className="relative w-full aspect-video sm:aspect-16/7 lg:aspect-21/7">
       <img
         srcSet={`${mobileSrc} 768w, ${fullSrc} 1920w`}
         sizes="100vw"
         src={fullSrc}
         alt={banner.image?.altText || "Banner"}
         width={1920}
-        height={540}
+        height={640}
         fetchPriority={index === 0 ? "high" : "auto"}
         loading={index === 0 ? "eager" : "lazy"}
-        className="absolute inset-0 w-full h-full object-cover object-top"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).src = bannerFallback;
         }}
       />
+      {/* Bottom gradient for dot/arrow contrast */}
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/30 to-transparent pointer-events-none" />
     </div>
   );
 

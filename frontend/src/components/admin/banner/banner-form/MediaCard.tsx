@@ -11,7 +11,7 @@ export const MediaCard = ({ control }: BannerFormSectionProps) => (
       <ImageSelector
         control={control}
         name="image"
-        label="Banner Image (Required — 1920×auto recommended)"
+        label="Banner Image *"
         multiple={false}
       />
     </CardContent>

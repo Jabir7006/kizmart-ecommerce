@@ -55,14 +55,14 @@ const CarouselDots = ({
   );
 };
 
-/* ── Skeleton placeholder while loading ─────────────────────────────────── */
+/* ── Skeleton placeholder while loading ─────────────────────────────────────── */
 const HeroSkeleton = () => (
-  <div className="w-full h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px] bg-gray-200 animate-pulse" />
+  <div className="w-full aspect-video sm:aspect-16/7 lg:aspect-21/7 bg-gray-200 animate-pulse" />
 );
 
 /* ── Empty state when no active banners ─────────────────────────────────── */
 const HeroEmpty = () => (
-  <div className="w-full h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px] bg-gray-100 flex items-center justify-center">
+  <div className="w-full aspect-video sm:aspect-16/7 lg:aspect-21/7 bg-gray-100 flex items-center justify-center">
     <p className="text-gray-400 text-sm">No banners available</p>
   </div>
 );
@@ -101,8 +101,9 @@ const HeroSlider = () => {
 
         {activeBanners.length > 1 && (
           <>
-            <CarouselPrevious className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white border-transparent transition-all hover:bg-white/40 hover:scale-110 opacity-0 group-hover:opacity-100 cursor-pointer" />
-            <CarouselNext className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white border-transparent transition-all hover:bg-white/40 hover:scale-110 opacity-0 group-hover:opacity-100 cursor-pointer" />
+            {/* Always visible on mobile, hover-only on desktop */}
+            <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white border-transparent transition-all hover:bg-black/50 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer" />
+            <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white border-transparent transition-all hover:bg-black/50 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer" />
           </>
         )}
       </Carousel>

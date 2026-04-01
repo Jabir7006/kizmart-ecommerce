@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import { useBanner } from '@/hooks/useBanner';
-import BannerForm from '@/components/admin/banner/BannerForm';
-import type { BannerFormOutput } from '@/schemas/bannerSchema';
+import { useNavigate } from "react-router-dom";
+import { useBanner } from "@/hooks/useBanner";
+import BannerForm from "@/components/admin/banner/BannerForm";
+import type { BannerFormOutput } from "@/schemas/bannerSchema";
 
 const BannerAddPage = () => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const BannerAddPage = () => {
   const onSubmit = async (data: BannerFormOutput) => {
     try {
       await createBannerMutation.mutateAsync(data);
-      navigate('/admin/banners');
+      navigate("/admin/banners");
     } catch {
       // Error handled by hook
     }
@@ -21,7 +21,8 @@ const BannerAddPage = () => {
       <div className="pb-4 border-b border-border">
         <h1 className="text-3xl font-bold tracking-tight">Add New Banner</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Upload a banner image (1920×auto recommended for best quality).
+          Select the banner type to see the recommended image size for that
+          placement.
         </p>
       </div>
       <BannerForm
