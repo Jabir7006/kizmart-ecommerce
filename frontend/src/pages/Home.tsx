@@ -2,6 +2,7 @@ import HeroSlider from "@/components/home/carousel/HeroSlider";
 import ServiceFeatures from "@/components/home/ServiceFeatures";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import SectionHeader from "@/components/home/SectionHeader";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
 import { useNewArrivalsProducts } from "@/hooks/useProduct";
 import ProductList from "@/components/product/ProductList";
@@ -21,6 +22,9 @@ const Home = () => {
 
       {/* Featured Categories */}
       <CategoryGrid />
+
+      {/* Featured Products */}
+      <FeaturedProducts />
 
       {/* New Arrivals */}
       <section className="max-w-7xl mx-auto px-4 py-8 sm:py-10">

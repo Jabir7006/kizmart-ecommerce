@@ -1,0 +1,114 @@
+import { Link } from "react-router-dom";
+import { useFeaturedProducts } from "@/hooks/useProduct";
+import SectionHeader from "./SectionHeader";
+import { getImageUrl } from "@/lib/getImageUrl";
+import placeholderSvg from "@/assets/product-placeholder.svg";
+import type { Product } from "@/types/productType";
+
+const FeaturedCard = ({
+  product,
+  isLarge = false,
+}: {
+  product: Product;
+  isLarge?: boolean;
+}) => {
+  const imgSrc = getImageUrl(
+    product.thumbnail,
+    isLarge ? "full" : "mobile",
+    placeholderSvg,
+  );
+
+  return (
+    <Link
+      to={`/product/${product.slug}`}
+      className={`group relative overflow-hidden rounded-2xl bg-muted outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+        isLarge ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
+      }`}
+    >
+      <img
+        src={imgSrc}
+        alt={product.thumbnail?.altText || product.title}
+        loading="lazy"
+        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 group-hover:from-black" />
+
+      {/* Content wrapper */}
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 lg:p-6 flex flex-col justify-end">
+        {product.brand?.title && (
+          <span className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white/80 drop-shadow-md">
+            {product.brand.title}
+          </span>
+        )}
+        <h3
+          className={`font-semibold text-white line-clamp-2 leading-tight drop-shadow-md ${
+            isLarge
+              ? "text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2"
+              : "text-sm sm:text-base mb-1"
+          }`}
+        >
+          {product.title}
+        </h3>
+        <div>
+          <p
+            className={`text-white font-bold drop-shadow-md ${isLarge ? "text-lg sm:text-xl" : "text-sm sm:text-base"}`}
+          >
+            ৳{product.price}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+const FeaturedProductsSkeleton = () => {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-[160px] xs:auto-rows-[200px] sm:auto-rows-[250px] lg:auto-rows-[300px]">
+      <div className="col-span-2 row-span-2 rounded-2xl bg-muted animate-pulse" />
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div
+          key={i}
+          className="col-span-1 row-span-1 rounded-2xl bg-muted animate-pulse"
+        />
+      ))}
+    </div>
+  );
+};
+
+const FeaturedProducts = () => {
+  const { data: result, isLoading, isError } = useFeaturedProducts();
+  const products = result?.data || [];
+
+  if (isLoading) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 py-8 sm:py-10">
+        <SectionHeader title="Featured Collections" />
+        <FeaturedProductsSkeleton />
+      </section>
+    );
+  }
+
+  if (isError || products.length === 0) return null;
+
+  return (
+    <section className="max-w-7xl mx-auto px-4 py-8 sm:py-10">
+      <SectionHeader
+        title="Featured Collections"
+        subtitle="Hand-picked products just for you"
+        linkText="Shop All"
+        linkHref="/store"
+      />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 auto-rows-[160px] xs:auto-rows-[200px] sm:auto-rows-[250px] lg:auto-rows-[300px]">
+        {products[0] && <FeaturedCard product={products[0]} isLarge={true} />}
+        {products.slice(1, 5).map((product) => (
+          <FeaturedCard key={product._id} product={product} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default FeaturedProducts;

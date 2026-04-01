@@ -29,6 +29,7 @@ export interface ProductQueryOptions {
   page?: number | undefined;
   limit?: number | undefined;
   status?: string | undefined;
+  isFeatured?: boolean | string | undefined;
 }
 
 export interface PaginatedResult<T> {

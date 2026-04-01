@@ -66,6 +66,9 @@ export const getAllProducts = async (
 
   if (categoryId) baseMatch.category = categoryId;
   if (brandId) baseMatch.brand = brandId;
+  if (options.isFeatured === 'true' || options.isFeatured === true) {
+    baseMatch.isFeatured = true;
+  }
 
   if (options.minPrice !== undefined || options.maxPrice !== undefined) {
     const price: { $gte?: number; $lte?: number } = {};
@@ -88,11 +91,9 @@ export const getAllProducts = async (
       slug: 1,
       shortDescription: 1,
       thumbnail: 1,
-      gallery: 1,
       price: 1,
       status: 1,
       quantity: 1,
-      sold: 1,
       ratings: 1,
       numReviews: 1,
       isFeatured: 1,
@@ -152,14 +153,16 @@ export const updateProduct = async (
     existing.thumbnail?.publicId &&
     data.thumbnail.publicId !== existing.thumbnail.publicId
   ) {
-    await UploadService.deleteImage(existing.thumbnail.publicId).catch(
-      () => {/* non-fatal */},
-    );
+    await UploadService.deleteImage(existing.thumbnail.publicId).catch(() => {
+      /* non-fatal */
+    });
   }
 
   // Delete orphaned gallery images that were removed in the update
   if (data.gallery && existing.gallery && existing.gallery.length > 0) {
-    const newPublicIds = new Set(data.gallery.map((img: IImage) => img.publicId));
+    const newPublicIds = new Set(
+      data.gallery.map((img: IImage) => img.publicId),
+    );
     const orphans = existing.gallery.filter(
       (img: IImage) => img.publicId && !newPublicIds.has(img.publicId),
     );

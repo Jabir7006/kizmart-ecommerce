@@ -59,6 +59,7 @@ export const handleGetAllProducts = catchAsync(async (req, res) => {
     page: req.query.page ? Math.max(1, Number(req.query.page)) : 1,
     limit: req.query.limit ? Math.max(1, Number(req.query.limit)) : 10,
     status: req.query.status as string,
+    isFeatured: req.query.isFeatured as string,
   };
 
   const paginatedResults = await getAllProducts(options);

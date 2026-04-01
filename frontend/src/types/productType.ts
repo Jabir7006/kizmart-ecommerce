@@ -46,6 +46,7 @@ export interface ProductFilters {
   page: number;
   limit: number;
   status?: string;
+  isFeatured?: boolean | string;
 }
 
 export interface PaginationMeta {

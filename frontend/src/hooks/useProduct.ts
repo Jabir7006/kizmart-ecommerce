@@ -289,3 +289,21 @@ export const useNewArrivalsProducts = () => {
     staleTime: 5 * 60 * 1000,
   });
 };
+
+// ─── Featured products section ───────────────────────────────────────────────
+export const useFeaturedProducts = () => {
+  const filters = {
+    isFeatured: true,
+    sortBy: "createdAt",
+    limit: 5,
+    page: 1,
+  };
+  return useQuery<PaginatedProducts>({
+    queryKey: productKeys.list(filters),
+    queryFn: async () => {
+      const response = await getAllProducts(filters);
+      return response.data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+};
