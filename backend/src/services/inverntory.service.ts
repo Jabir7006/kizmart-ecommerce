@@ -12,7 +12,7 @@ export const fetchProductMap = async (
   const productIds = cartItems.map((i) => i.product);
   const products = await Product.find(
     { _id: { $in: productIds } },
-    { price: 1, quantity: 1, title: 1, thumbnail: 1 },
+    { price: 1, salePrice: 1, quantity: 1, title: 1, thumbnail: 1 },
   )
     .session(session)
     .lean();

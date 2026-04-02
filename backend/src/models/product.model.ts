@@ -29,6 +29,8 @@ export interface IProduct extends Document {
   price: number;
   quantity: number;
   sold: number;
+  salePrice: number;
+  activeDiscount: Types.ObjectId | null;
   category: Types.ObjectId;
   brand: Types.ObjectId;
   status: 'draft' | 'active' | 'archived';
@@ -66,6 +68,17 @@ const ProductSchema = new Schema<IProduct>(
       min: [0, 'Quantity cannot be negative'],
     },
     sold: { type: Number, default: 0 },
+    salePrice: {
+      type: Number,
+      default: function (this: IProduct) {
+        return this.price;
+      },
+    },
+    activeDiscount: {
+      type: Schema.Types.ObjectId,
+      ref: 'Discount',
+      default: null,
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
@@ -92,6 +105,7 @@ ProductSchema.index({ status: 1 });
 ProductSchema.index({ category: 1 });
 ProductSchema.index({ brand: 1 });
 ProductSchema.index({ price: 1 });
+ProductSchema.index({ salePrice: 1 });
 
 const Product = model<IProduct>('Product', ProductSchema);
 export default Product;

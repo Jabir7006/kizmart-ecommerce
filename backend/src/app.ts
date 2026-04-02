@@ -7,7 +7,7 @@ import {
   notFoundHandler,
 } from './middlewares/error.middleware.js';
 import authRoute from './Routes/auth.route.js';
-import { protect } from './middlewares/auth.middleware.js';
+import { protect, restrictTo } from './middlewares/auth.middleware.js';
 import userRoute from './Routes/user.route.js';
 import productRoute from './Routes/product.route.js';
 import categoryRoute from './Routes/category.route.js';
@@ -18,6 +18,7 @@ import orderRoute from './Routes/order.route.js';
 import paymentRoute from './Routes/payment.route.js';
 import uploadRoute from './Routes/upload.route.js';
 import bannerRoute from './Routes/banner.route.js';
+import discountRoute from './Routes/discount.route.js';
 
 const app = express();
 
@@ -49,7 +50,7 @@ app.use('/api/v1/orders', protect, orderRoute);
 app.use('/api/v1/payments', protect, paymentRoute);
 app.use('/api/v1/upload', protect, uploadRoute);
 app.use('/api/v1/banners', bannerRoute);
-
+app.use('/api/v1/discounts', protect, restrictTo('admin'), discountRoute);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

@@ -92,6 +92,8 @@ export const getAllProducts = async (
       shortDescription: 1,
       thumbnail: 1,
       price: 1,
+      salePrice: 1,
+      activeDiscount: 1,
       status: 1,
       quantity: 1,
       ratings: 1,

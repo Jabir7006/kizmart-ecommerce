@@ -17,14 +17,15 @@ export function prepareOrderData(
       throw new AppError('Product missing', HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 
-    subtotal += product.price * i.quantity;
+    const effectivePrice = product.salePrice ?? product.price;
+    subtotal += effectivePrice * i.quantity;
 
     return {
       product: i.product,
       title: product.title,
       thumbnail: product.thumbnail,
       quantity: i.quantity,
-      price: product.price,
+      price: effectivePrice,
     };
   });
 

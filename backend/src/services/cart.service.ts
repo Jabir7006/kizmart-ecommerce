@@ -17,8 +17,10 @@ export const addToCart = async ({
   productId,
   quantity,
 }: AddToCartService) => {
-  const product = await Product.findById(productId).select('price');
+  const product = await Product.findById(productId).select('price salePrice');
   if (!product) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+
+  const effectivePrice = product.salePrice ?? product.price;
 
   let cart = await Cart.findOneAndUpdate(
     {
@@ -28,7 +30,7 @@ export const addToCart = async ({
     },
     {
       $inc: { 'items.$.quantity': quantity },
-      $set: { 'items.$.price': product.price },
+      $set: { 'items.$.price': effectivePrice },
     },
     { new: true },
   );
@@ -38,7 +40,7 @@ export const addToCart = async ({
       { user: userId, status: CartStatus.ACTIVE },
       {
         $push: {
-          items: { product: productId, quantity, price: product.price },
+          items: { product: productId, quantity, price: effectivePrice },
         },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true },
@@ -50,7 +52,7 @@ export const addToCart = async ({
 
 export const getCart = async (userId: string) => {
   const cart = await Cart.findOne({ user: userId, status: CartStatus.ACTIVE })
-    .populate('items.product', 'title price thumbnail')
+    .populate('items.product', 'title price salePrice thumbnail')
     .select('-__v')
     .lean();
   return cart;
