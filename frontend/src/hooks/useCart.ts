@@ -7,10 +7,9 @@ import {
   clearCart,
 } from "../services/api/cart/cartApi";
 import { useAuthStore } from "@/store/useAuthStore";
+import { handleMutationError } from "@/utils/errorUtils";
 import { toast } from "sonner";
 import type { Cart } from "@/types/cartType";
-import type { AxiosError } from "axios";
-import type { AxiosErrorType } from "@/types/errorType";
 
 export const useCartQuery = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -33,9 +32,7 @@ export const useAddToCart = () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       toast.success("Product added to cart");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to add to cart");
-    },
+    onError: (error) => handleMutationError(error, "Failed to add to cart"),
   });
 };
 
@@ -47,11 +44,7 @@ export const useUpdateCartQuantity = () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       toast.success("Quantity updated");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to update quantity",
-      );
-    },
+    onError: (error) => handleMutationError(error, "Failed to update quantity"),
   });
 };
 
@@ -63,9 +56,7 @@ export const useRemoveFromCart = () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       toast.success("Product removed from cart");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to remove product");
-    },
+    onError: (error) => handleMutationError(error, "Failed to remove product"),
   });
 };
 
@@ -76,8 +67,6 @@ export const useClearCart = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to clear cart");
-    },
+    onError: (error) => handleMutationError(error, "Failed to clear cart"),
   });
 };

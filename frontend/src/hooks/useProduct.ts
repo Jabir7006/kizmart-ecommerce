@@ -15,18 +15,9 @@ import type {
   ProductInput,
 } from "@/schemas/productSchema";
 import { processProductImages } from "@/utils/productImageUtils";
+import { handleMutationError } from "@/utils/errorUtils";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
 
-// ─── Shared error handler ────────────────────────────────────────────────────
-const handleMutationError = (error: unknown, defaultMessage: string) => {
-  const message = isAxiosError(error)
-    ? error.response?.data?.message || error.message || defaultMessage
-    : error instanceof Error
-      ? error.message
-      : "Something went wrong";
-  toast.error(message);
-};
 
 // ─── Shared query-key factory ────────────────────────────────────────────────
 export const productKeys = {

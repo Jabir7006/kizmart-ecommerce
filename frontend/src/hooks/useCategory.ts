@@ -7,8 +7,8 @@ import {
   deleteCategory,
 } from "@/services/api/category/categoryApi";
 import { uploadSingleImage } from "@/services/api/upload/uploadApi";
+import { handleMutationError } from "@/utils/errorUtils";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
 
 export const useCategory = () => {
   const queryClient = useQueryClient();
@@ -39,7 +39,9 @@ export const useCategory = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category created successfully");
     },
+    onError: (error) => handleMutationError(error, "Failed to create category"),
   });
 
   const updateCategoryMutation = useMutation({
@@ -61,7 +63,9 @@ export const useCategory = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["category", id] });
+      toast.success("Category updated successfully");
     },
+    onError: (error) => handleMutationError(error, "Failed to update category"),
   });
 
   const deleteCategoryMutation = useMutation({
@@ -71,13 +75,9 @@ export const useCategory = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category deleted successfully");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to delete category"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to delete category"),
   });
 
   return {

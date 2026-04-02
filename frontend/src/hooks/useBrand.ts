@@ -7,8 +7,8 @@ import {
   deleteBrand,
 } from "@/services/api/brand/brandApi";
 import { uploadSingleImage } from "@/services/api/upload/uploadApi";
+import { handleMutationError } from "@/utils/errorUtils";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
 
 export const useBrand = () => {
   const queryClient = useQueryClient();
@@ -39,7 +39,9 @@ export const useBrand = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
+      toast.success("Brand created successfully");
     },
+    onError: (error) => handleMutationError(error, "Failed to create brand"),
   });
 
   const updateBrandMutation = useMutation({
@@ -61,7 +63,9 @@ export const useBrand = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["brand", id] });
+      toast.success("Brand updated successfully");
     },
+    onError: (error) => handleMutationError(error, "Failed to update brand"),
   });
 
   const deleteBrandMutation = useMutation({
@@ -71,13 +75,9 @@ export const useBrand = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brands"] });
+      toast.success("Brand deleted successfully");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to delete brand"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to delete brand"),
   });
 
   return {

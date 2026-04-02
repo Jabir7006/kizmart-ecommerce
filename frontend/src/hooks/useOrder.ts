@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AxiosError } from "axios";
+import { handleMutationError } from "@/utils/errorUtils";
 import {
   createOrder,
   getOrders,
@@ -11,7 +11,6 @@ import {
   type CreateOrderPayload,
 } from "@/services/api/order/orderApi";
 import type { Order } from "@/types/orderType";
-import type { AxiosErrorType } from "@/types/errorType";
 import type { OrderFilters } from "@/types/orderType";
 
 export const useOrders = (filters: OrderFilters) => {
@@ -56,9 +55,7 @@ export const useCreateOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       toast.success(response?.data?.message || "Order placed successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to place order");
-    },
+    onError: (error) => handleMutationError(error, "Failed to place order"),
   });
 };
 
@@ -71,9 +68,7 @@ export const useCancelOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       toast.success(response?.data?.message || "Order cancelled successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to cancel order");
-    },
+    onError: (error) => handleMutationError(error, "Failed to cancel order"),
   });
 };
 
@@ -88,8 +83,6 @@ export const useUpdateOrderStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       toast.success(response?.data?.message || "Order status updated successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to update order status");
-    },
+    onError: (error) => handleMutationError(error, "Failed to update order status"),
   });
 };

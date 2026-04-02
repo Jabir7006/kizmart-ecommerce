@@ -11,22 +11,8 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
+import { handleMutationError } from "@/utils/errorUtils";
 
-interface ApiErrorResponse {
-  success: boolean;
-  message: string;
-}
-
-const getErrorMessage = (error: unknown): string => {
-  if (error instanceof AxiosError && error.response?.data) {
-    return (
-      (error.response.data as ApiErrorResponse).message ||
-      "Something went wrong"
-    );
-  }
-  return "An unexpected error occurred. Please try again.";
-};
 
 const useAuth = () => {
   const setUser = useAuthStore((state) => state.setUser);
@@ -42,7 +28,7 @@ const useAuth = () => {
     },
     onError: (error) => {
       logout();
-      toast.error(getErrorMessage(error));
+      handleMutationError(error, "Login failed");
     },
   });
 
@@ -53,9 +39,7 @@ const useAuth = () => {
       toast.success(response.data.message || "Account created successfully!");
       navigate("/verify-email");
     },
-    onError: (error) => {
-      toast.error(getErrorMessage(error));
-    },
+    onError: (error) => handleMutationError(error, "Signup failed"),
   });
 
   const verifyEmailMutation = useMutation({
@@ -65,9 +49,7 @@ const useAuth = () => {
       toast.success(response.data.message || "Email verified successfully!");
       navigate("/");
     },
-    onError: (error) => {
-      toast.error(getErrorMessage(error));
-    },
+    onError: (error) => handleMutationError(error, "Email verification failed"),
   });
 
   const resendVerificationMutation = useMutation({
@@ -77,9 +59,7 @@ const useAuth = () => {
         response.data.message || "Verification email resent successfully!",
       );
     },
-    onError: (error) => {
-      toast.error(getErrorMessage(error));
-    },
+    onError: (error) => handleMutationError(error, "Failed to resend verification email"),
   });
 
   const signOutMutation = useMutation({
@@ -89,9 +69,7 @@ const useAuth = () => {
       toast.success("Signed out successfully");
       navigate("/");
     },
-    onError: () => {
-      toast.error("Failed to sign out");
-    },
+    onError: (error) => handleMutationError(error, "Failed to sign out"),
   });
 
   return {

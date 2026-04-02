@@ -7,8 +7,8 @@ import {
   deleteBanner,
 } from "@/services/api/banner/bannerApi";
 import { uploadSingleImage } from "@/services/api/upload/uploadApi";
+import { handleMutationError } from "@/utils/errorUtils";
 import { toast } from "sonner";
-import { isAxiosError } from "axios";
 
 export const useBanner = (params?: { type?: string; status?: string }) => {
   const queryClient = useQueryClient();
@@ -38,12 +38,7 @@ export const useBanner = (params?: { type?: string; status?: string }) => {
       queryClient.invalidateQueries({ queryKey: ["banners"] });
       toast.success("Banner created successfully!");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to create banner"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to create banner"),
   });
 
   const updateBannerMutation = useMutation({
@@ -62,12 +57,7 @@ export const useBanner = (params?: { type?: string; status?: string }) => {
       queryClient.invalidateQueries({ queryKey: ["banner", id] });
       toast.success("Banner updated successfully!");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to update banner"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to update banner"),
   });
 
   const deleteBannerMutation = useMutation({
@@ -79,12 +69,7 @@ export const useBanner = (params?: { type?: string; status?: string }) => {
       queryClient.invalidateQueries({ queryKey: ["banners"] });
       toast.success("Banner deleted successfully!");
     },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || "Failed to delete banner"
-        : "Something went wrong";
-      toast.error(message);
-    },
+    onError: (error) => handleMutationError(error, "Failed to delete banner"),
   });
 
   return {

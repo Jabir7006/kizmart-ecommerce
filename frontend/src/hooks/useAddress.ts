@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { handleMutationError } from "@/utils/errorUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getAddresses,
@@ -9,7 +9,6 @@ import {
 } from "../services/api/address/addressApi";
 import { toast } from "sonner";
 import type { Address, AddressFormData } from "@/types/addressType";
-import type { AxiosErrorType } from "@/types/errorType";
 
 export const addressKeys = {
   all: ["addresses"] as const,
@@ -45,9 +44,7 @@ export const useCreateAddress = () => {
       queryClient.invalidateQueries({ queryKey: addressKeys.all });
       toast.success("Address created successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to create address");
-    },
+    onError: (error) => handleMutationError(error, "Failed to create address"),
   });
 };
 
@@ -63,9 +60,7 @@ export const useUpdateAddress = () => {
       });
       toast.success("Address updated successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to update address");
-    },
+    onError: (error) => handleMutationError(error, "Failed to update address"),
   });
 };
 
@@ -77,8 +72,6 @@ export const useDeleteAddress = () => {
       queryClient.invalidateQueries({ queryKey: addressKeys.all });
       toast.success("Address deleted successfully");
     },
-    onError: (error: AxiosError<AxiosErrorType>) => {
-      toast.error(error?.response?.data?.message || "Failed to delete address");
-    },
+    onError: (error) => handleMutationError(error, "Failed to delete address"),
   });
 };
