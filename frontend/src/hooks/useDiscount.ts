@@ -9,7 +9,7 @@ import {
   deleteDiscount,
   toggleDiscountStatus,
 } from "@/services/api/discount/discountApi";
-import type { DiscountFormInput } from "@/schemas/discountSchema";
+import type { DiscountFormOutput } from "@/schemas/discountSchema";
 import type {
   Discount,
   DiscountFilters,
@@ -173,7 +173,7 @@ export const useDiscount = () => {
   const queryClient = useQueryClient();
 
   const createDiscountMutation = useMutation({
-    mutationFn: async (data: DiscountFormInput) => {
+    mutationFn: async (data: DiscountFormOutput) => {
       const response = await createDiscount(data);
       return response.data;
     },
@@ -185,7 +185,13 @@ export const useDiscount = () => {
   });
 
   const updateDiscountMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<DiscountFormInput> }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<DiscountFormOutput>;
+    }) => {
       const response = await updateDiscount(id, data);
       return response.data;
     },

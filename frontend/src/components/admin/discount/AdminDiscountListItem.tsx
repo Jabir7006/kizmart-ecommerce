@@ -13,12 +13,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Discount } from "@/types/discountType";
 
-const statusStyles: Record<Discount["status"], string> = {
+const statusStyles = {
   active: "bg-emerald-100 text-emerald-800 border-emerald-200",
   inactive: "bg-slate-100 text-slate-700 border-slate-200",
   upcoming: "bg-amber-100 text-amber-800 border-amber-200",
   expired: "bg-rose-100 text-rose-800 border-rose-200",
-};
+} satisfies Record<NonNullable<Discount["status"]>, string>;
 
 const typeStyles: Record<Discount["discountType"], string> = {
   percentage: "bg-blue-100 text-blue-800 border-blue-200",
@@ -72,6 +72,8 @@ const AdminDiscountListItem = ({
   onDelete,
   isToggling = false,
 }: AdminDiscountListItemProps) => {
+  const status = discount.status ?? (discount.isActive ? "active" : "inactive");
+
   return (
     <ListItem>
       <ListItemContent>
@@ -105,11 +107,11 @@ const AdminDiscountListItem = ({
         <Badge
           className={cn(
             "border text-[11px] font-medium capitalize",
-            statusStyles[discount.status],
+            statusStyles[status],
           )}
           variant="outline"
         >
-          {discount.status}
+          {status}
         </Badge>
       </ListItemMeta>
 

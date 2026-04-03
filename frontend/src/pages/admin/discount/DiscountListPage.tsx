@@ -54,7 +54,7 @@ const FilterSelect = ({
     className="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
   >
     {options.map((option) => (
-      <option key={option.value || "all"} value={option.value}>
+      <option key={`${ariaLabel}-${option.value || "empty"}`} value={option.value}>
         {option.label}
       </option>
     ))}

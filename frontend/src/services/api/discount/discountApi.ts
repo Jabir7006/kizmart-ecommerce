@@ -1,4 +1,4 @@
-import type { DiscountFormInput } from "@/schemas/discountSchema";
+import type { DiscountFormOutput } from "@/schemas/discountSchema";
 import type { DiscountFilters } from "@/types/discountType";
 import api from "../api";
 
@@ -18,12 +18,12 @@ export const getDiscounts = async (filters: DiscountFilters) => {
 
 export const getDiscount = async (id: string) => api.get(`/discounts/${id}`);
 
-export const createDiscount = async (data: DiscountFormInput) =>
+export const createDiscount = async (data: DiscountFormOutput) =>
   api.post("/discounts", data);
 
 export const updateDiscount = async (
   id: string,
-  data: Partial<DiscountFormInput>,
+  data: Partial<DiscountFormOutput>,
 ) => api.patch(`/discounts/${id}`, data);
 
 export const deleteDiscount = async (id: string) =>

@@ -26,7 +26,7 @@ export interface Discount {
   startDate: string;
   endDate: string;
   isActive: boolean;
-  status: DiscountStatus;
+  status?: DiscountStatus;
   createdAt?: string;
   updatedAt?: string;
 }
