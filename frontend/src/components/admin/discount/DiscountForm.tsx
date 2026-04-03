@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
@@ -41,6 +45,7 @@ const EMPTY_DEFAULTS: DiscountFormInput = {
   isActive: true,
 };
 const EMPTY_SELECTION: string[] = [];
+const EMPTY_PRODUCTS: Product[] = [];
 
 interface DiscountFormProps {
   initialData?: Partial<DiscountFormInput>;
@@ -243,9 +248,9 @@ const DiscountForm = ({
       });
       return response.data.data.data as Product[];
     },
+    placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
   });
-
   useEffect(() => {
     if (initialData) {
       reset({ ...EMPTY_DEFAULTS, ...initialData });
@@ -269,49 +274,63 @@ const DiscountForm = ({
     }
   }, [setValue, targetType]);
 
-  const knownProducts = useMemo(() => {
-    const productMap = new Map<
-      string,
-      Pick<Product, "_id" | "title" | "price">
-    >();
+  const knownProductsMap = new Map<
+    string,
+    Pick<Product, "_id" | "title" | "price">
+  >();
 
-    initialSelectedProducts.forEach((product) => {
-      productMap.set(product._id, {
-        _id: product._id,
-        title: product.title,
-        price: productMap.get(product._id)?.price ?? 0,
-      });
+  initialSelectedProducts.forEach((product) => {
+    knownProductsMap.set(product._id, {
+      _id: product._id,
+      title: product.title,
+      price: knownProductsMap.get(product._id)?.price ?? 0,
     });
+  });
 
-    queryClient
-      .getQueriesData<Product[]>({
-        queryKey: ["discount-form-products"],
-      })
-      .forEach(([, products]) => {
-        products?.forEach((product) => {
-          productMap.set(product._id, {
-            _id: product._id,
-            title: product.title,
-            price: product.price,
-          });
+  queryClient
+    .getQueriesData<Product[]>({
+      queryKey: ["discount-form-products"],
+    })
+    .forEach(([, products]) => {
+      products?.forEach((product) => {
+        knownProductsMap.set(product._id, {
+          _id: product._id,
+          title: product.title,
+          price: product.price,
         });
       });
-
-    return Array.from(productMap.values());
-  }, [initialSelectedProducts, queryClient]);
-
-  const selectedProducts = useMemo(() => {
-    const products: Pick<Product, "_id" | "title">[] = [];
-
-    selectedProductIds.forEach((productId) => {
-      const product = knownProducts.find((item) => item._id === productId);
-      if (product) {
-        products.push({ _id: product._id, title: product.title });
-      }
     });
 
-    return products;
-  }, [knownProducts, selectedProductIds]);
+  const availableProductsMap = new Map<
+    string,
+    Pick<Product, "_id" | "title" | "price">
+  >();
+
+  (productsQuery.data ?? EMPTY_PRODUCTS).forEach((product) => {
+    availableProductsMap.set(product._id, {
+      _id: product._id,
+      title: product.title,
+      price: product.price,
+    });
+  });
+
+  selectedProductIds.forEach((productId) => {
+    const selectedProduct = knownProductsMap.get(productId);
+    if (selectedProduct && !availableProductsMap.has(productId)) {
+      availableProductsMap.set(productId, selectedProduct);
+    }
+  });
+
+  const availableProducts = Array.from(availableProductsMap.values());
+
+  const selectedProducts: Pick<Product, "_id" | "title">[] = selectedProductIds
+    .map((productId) => knownProductsMap.get(productId))
+    .filter(
+      (
+        product,
+      ): product is Pick<Product, "_id" | "title" | "price"> => Boolean(product),
+    )
+    .map((product) => ({ _id: product._id, title: product.title }));
 
   const toggleArrayValue = (
     fieldName: "targetProducts" | "targetCategories",
@@ -414,7 +433,7 @@ const DiscountForm = ({
                     <ProductSelector
                       selectedIds={selectedProductIds}
                       selectedProducts={selectedProducts}
-                      availableProducts={knownProducts}
+                      availableProducts={availableProducts}
                       isLoading={productsQuery.isLoading}
                       searchValue={productSearch}
                       onSearchChange={setProductSearch}
