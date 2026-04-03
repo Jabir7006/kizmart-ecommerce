@@ -186,7 +186,9 @@ export const getAllOrders = async (
 
   const customStages: any[] = [];
   if (options.search) {
-    const users = await User.find({ email: { $regex: options.search, $options: 'i' } })
+    const users = await User.find({
+      email: { $regex: options.search, $options: 'i' },
+    })
       .select('_id')
       .lean();
     const userIds = users.map((u) => u._id);
@@ -223,7 +225,7 @@ export const getAllOrders = async (
         path: '$userDetails',
         preserveNullAndEmptyArrays: true,
       },
-    }
+    },
   );
 
   pipeline.splice(pipeline.length - 1, 0, ...customStages);
@@ -242,7 +244,10 @@ export const getAllOrders = async (
   };
 };
 
-export const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+export const updateOrderStatus = async (
+  orderId: string,
+  status: OrderStatus,
+) => {
   const session = await mongoose.startSession();
 
   try {
@@ -253,21 +258,30 @@ export const updateOrderStatus = async (orderId: string, status: OrderStatus) =>
         throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
       }
 
+      // If the status is already what they requested, do nothing
       if (order.status === status) return order;
 
-      if (
-        status === OrderStatus.CANCELLED &&
-        order.status !== OrderStatus.CANCELLED
-      ) {
+      // Prevent modifying an already cancelled order
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new AppError(
+          'Cannot change the status of a cancelled order.',
+          HTTP_STATUS.BAD_REQUEST,
+        );
+      }
+
+      // HANDLE NEW CANCELLATION
+      if (status === OrderStatus.CANCELLED) {
         order.status = OrderStatus.CANCELLED;
         await order.save({ session });
 
+        // Fail the payment
         await Payment.findByIdAndUpdate(
           order.payment,
           { status: PaymentStatus.FAILED },
           { session },
         );
 
+        // Restore the inventory
         const bulkOps = order.items.map((item) => ({
           updateOne: {
             filter: { _id: item.product },
@@ -283,7 +297,9 @@ export const updateOrderStatus = async (orderId: string, status: OrderStatus) =>
         if (bulkOps.length > 0) {
           await Product.bulkWrite(bulkOps, { session });
         }
-      } else {
+      }
+      // HANDLE NORMAL STATUS UPDATES (e.g., PENDING -> CONFIRMED)
+      else {
         order.status = status;
         await order.save({ session });
       }
