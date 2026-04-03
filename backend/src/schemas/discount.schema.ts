@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+const discountListStatusSchema = z.enum([
+  'active',
+  'inactive',
+  'upcoming',
+  'expired',
+]);
+
 const discountCoreSchema = z.object({
   name: z.string({ error: 'Discount name is required' }).min(1),
   discountType: z.enum(['percentage', 'fixed'], {
@@ -19,15 +26,20 @@ const discountCoreSchema = z.object({
 });
 
 export const createDiscountSchema = z.object({
-  body: discountCoreSchema.refine(
-    (data) => {
-      if (data.discountType === 'percentage' && data.value > 100) {
-        return false;
-      }
-      return true;
-    },
-    { message: 'Percentage discount cannot exceed 100%' },
-  ),
+  body: discountCoreSchema
+    .refine(
+      (data) => {
+        if (data.discountType === 'percentage' && data.value > 100) {
+          return false;
+        }
+        return true;
+      },
+      { message: 'Percentage discount cannot exceed 100%', path: ['value'] },
+    )
+    .refine((data) => new Date(data.startDate) < new Date(data.endDate), {
+      message: 'Start date must be before end date',
+      path: ['endDate'],
+    }),
 });
 
 export const updateDiscountSchema = z.object({
@@ -35,4 +47,25 @@ export const updateDiscountSchema = z.object({
     id: z.string({ error: 'Discount ID is required' }),
   }),
   body: discountCoreSchema.partial(),
+});
+
+export const getDiscountsQuerySchema = z.object({
+  query: z.object({
+    q: z.string().trim().optional(),
+    discountType: z.enum(['percentage', 'fixed']).optional(),
+    targetType: z.enum(['product', 'category', 'all']).optional(),
+    isActive: z
+      .enum(['true', 'false'])
+      .optional()
+      .transform((value) =>
+        value === undefined ? undefined : value === 'true',
+      ),
+    status: discountListStatusSchema.optional(),
+    sortBy: z
+      .enum(['createdAt', 'updatedAt', 'startDate', 'endDate', 'name', 'value'])
+      .optional(),
+    sortOrder: z.enum(['asc', 'desc']).optional(),
+    page: z.coerce.number().int().min(1).optional(),
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+  }),
 });

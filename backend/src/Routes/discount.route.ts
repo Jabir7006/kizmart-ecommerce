@@ -9,6 +9,7 @@ import {
 } from '../controllers/discount.controller.js';
 import {
   createDiscountSchema,
+  getDiscountsQuerySchema,
   updateDiscountSchema,
 } from '../schemas/discount.schema.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -16,7 +17,7 @@ import validate from '../middlewares/validate.middleware.js';
 const discountRoute = express.Router();
 
 discountRoute.post('/', validate(createDiscountSchema), handleCreateDiscount);
-discountRoute.get('/', handleGetAllDiscounts);
+discountRoute.get('/', validate(getDiscountsQuerySchema), handleGetAllDiscounts);
 discountRoute.get('/:id', handleGetDiscountById);
 discountRoute.patch(
   '/:id',

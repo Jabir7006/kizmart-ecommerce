@@ -6,6 +6,7 @@ import {
   Layout,
   Image,
   Tag,
+  Percent,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -52,6 +53,12 @@ export const navItems: NavItemConfig[] = [
     icon: Tag,
     label: "Brands",
     href: "/admin/brands",
+  },
+  {
+    id: "discounts",
+    icon: Percent,
+    label: "Discounts",
+    href: "/admin/discounts",
   },
 ];
 

@@ -1,6 +1,3 @@
-// KizmartLogo.jsx
-import React from "react";
-
 const KizmartLogo = ({ className = "w-10 h-10 md:w-12 md:h-12" }) => {
   return (
     <a href="/" className="inline-flex items-center space-x-2 flex-shrink-0">

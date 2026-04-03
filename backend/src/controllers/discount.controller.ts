@@ -7,7 +7,39 @@ import {
   deleteDiscount,
   toggleDiscountStatus,
 } from '../services/discount.service.js';
+import type { Request } from 'express';
 import catchAsync from '../utils/catchAsync.js';
+import type { DiscountQueryOptions } from '../types/discount.types.js';
+
+const extractDiscountQueryOptions = (req: Request): DiscountQueryOptions => {
+  const options: DiscountQueryOptions = {};
+
+  if (req.query.q) options.search = req.query.q as string;
+  if (req.query.discountType) {
+    options.discountType = req.query.discountType as 'percentage' | 'fixed';
+  }
+  if (req.query.targetType) {
+    options.targetType = req.query.targetType as 'product' | 'category' | 'all';
+  }
+  if (req.query.isActive !== undefined) {
+    options.isActive = req.query.isActive === 'true';
+  }
+  if (req.query.status) {
+    options.status = req.query.status as DiscountQueryOptions['status'];
+  }
+  if (req.query.sortBy) {
+    options.sortBy = req.query.sortBy as DiscountQueryOptions['sortBy'];
+  }
+  if (req.query.sortOrder) {
+    options.sortOrder = req.query.sortOrder as 'asc' | 'desc';
+  }
+  if (req.query.page) options.page = Math.max(1, Number(req.query.page));
+  if (req.query.limit) {
+    options.limit = Math.min(100, Math.max(1, Number(req.query.limit)));
+  }
+
+  return options;
+};
 
 export const handleCreateDiscount = catchAsync(async (req, res) => {
   const { discount, syncedCount } = await createDiscount(req.body);
@@ -19,8 +51,9 @@ export const handleCreateDiscount = catchAsync(async (req, res) => {
   });
 });
 
-export const handleGetAllDiscounts = catchAsync(async (_req, res) => {
-  const discounts = await getAllDiscounts();
+export const handleGetAllDiscounts = catchAsync(async (req, res) => {
+  const options = extractDiscountQueryOptions(req);
+  const discounts = await getAllDiscounts(options);
 
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',

@@ -3,6 +3,10 @@ import Discount, { type IDiscount } from '../models/discount.model.js';
 import Product from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
 import AppError from '../utils/AppError.js';
+import type {
+  DiscountQueryOptions,
+  PaginatedDiscountResult,
+} from '../types/discount.types.js';
 
 // ─── Price Calculation ───────────────────────────────────────────────────────
 
@@ -132,13 +136,128 @@ export const createDiscount = async (data: Partial<IDiscount>) => {
   return { discount, syncedCount: synced };
 };
 
-export const getAllDiscounts = async () => {
-  const discounts = await Discount.find()
-    .sort({ createdAt: -1 })
-    .populate('targetProducts', 'title slug price')
-    .populate('targetCategories', 'title slug')
-    .lean();
-  return discounts;
+const buildStatusMatch = (status?: DiscountQueryOptions['status']) => {
+  if (!status) return null;
+
+  const now = new Date();
+
+  switch (status) {
+    case 'active':
+      return {
+        isActive: true,
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+      };
+    case 'inactive':
+      return {
+        isActive: false,
+      };
+    case 'upcoming':
+      return {
+        isActive: true,
+        startDate: { $gt: now },
+      };
+    case 'expired':
+      return {
+        isActive: true,
+        endDate: { $lt: now },
+      };
+    default:
+      return null;
+  }
+};
+
+export const getAllDiscounts = async (
+  options: DiscountQueryOptions = {},
+): Promise<PaginatedDiscountResult<unknown>> => {
+  const page = options.page ?? 1;
+  const limit = options.limit ?? 10;
+  const sortBy = options.sortBy ?? 'createdAt';
+  const sortOrder = options.sortOrder === 'asc' ? 1 : -1;
+
+  const matchStage: Record<string, any> = {};
+
+  if (options.search) {
+    matchStage.name = { $regex: new RegExp(options.search, 'i') };
+  }
+  if (options.discountType) {
+    matchStage.discountType = options.discountType;
+  }
+  if (options.targetType) {
+    matchStage.targetType = options.targetType;
+  }
+  if (options.isActive !== undefined) {
+    matchStage.isActive = options.isActive;
+  }
+
+  const statusMatch = buildStatusMatch(options.status);
+  if (statusMatch) {
+    Object.assign(matchStage, statusMatch);
+  }
+
+  const result = await Discount.aggregate([
+    { $match: matchStage },
+    { $sort: { [sortBy]: sortOrder } },
+    {
+      $facet: {
+        metadata: [{ $count: 'total' }],
+        data: [
+          { $skip: (page - 1) * limit },
+          { $limit: limit },
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'targetProducts',
+              foreignField: '_id',
+              as: 'targetProducts',
+              pipeline: [{ $project: { title: 1, slug: 1, price: 1 } }],
+            },
+          },
+          {
+            $lookup: {
+              from: 'categories',
+              localField: 'targetCategories',
+              foreignField: '_id',
+              as: 'targetCategories',
+              pipeline: [{ $project: { title: 1, slug: 1 } }],
+            },
+          },
+          {
+            $addFields: {
+              status: {
+                $switch: {
+                  branches: [
+                    {
+                      case: { $eq: ['$isActive', false] },
+                      then: 'inactive',
+                    },
+                    {
+                      case: { $gt: ['$startDate', '$$NOW'] },
+                      then: 'upcoming',
+                    },
+                    {
+                      case: { $lt: ['$endDate', '$$NOW'] },
+                      then: 'expired',
+                    },
+                  ],
+                  default: 'active',
+                },
+              },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+
+  const data = result[0]?.data ?? [];
+  const total = result[0]?.metadata?.[0]?.total ?? 0;
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    metadata: { total, page, totalPages, limit },
+    data,
+  };
 };
 
 export const getDiscountById = async (id: string) => {

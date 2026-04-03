@@ -35,6 +35,7 @@ const discountSchema = new Schema<IDiscount>(
   { timestamps: true },
 );
 
-discountSchema.index({ isActive: 1, startDate: 1, endDate: 1 });
+discountSchema.index({ name: 1, isActive: 1, startDate: 1, endDate: 1 });
+discountSchema.index({ discountType: 1, targetType: 1 });
 
 export default model<IDiscount>('Discount', discountSchema);

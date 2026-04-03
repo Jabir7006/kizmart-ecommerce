@@ -37,6 +37,16 @@ const BrandListPage = lazy(() => import("@/pages/admin/brand/BrandListPage"));
 const BrandAddPage = lazy(() => import("@/pages/admin/brand/BrandAddPage"));
 const BrandEditPage = lazy(() => import("@/pages/admin/brand/BrandEditPage"));
 
+const DiscountListPage = lazy(
+  () => import("@/pages/admin/discount/DiscountListPage"),
+);
+const DiscountAddPage = lazy(
+  () => import("@/pages/admin/discount/DiscountAddPage"),
+);
+const DiscountEditPage = lazy(
+  () => import("@/pages/admin/discount/DiscountEditPage"),
+);
+
 export const adminRoutes = [
   {
     element: <AdminRoute />,
@@ -55,6 +65,9 @@ export const adminRoutes = [
       { path: "/admin/brands", element: <BrandListPage /> },
       { path: "/admin/brands/new", element: <BrandAddPage /> },
       { path: "/admin/brands/:id/edit", element: <BrandEditPage /> },
+      { path: "/admin/discounts", element: <DiscountListPage /> },
+      { path: "/admin/discounts/new", element: <DiscountAddPage /> },
+      { path: "/admin/discounts/:id/edit", element: <DiscountEditPage /> },
     ],
   },
 ];
