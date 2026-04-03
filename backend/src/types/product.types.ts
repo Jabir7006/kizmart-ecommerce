@@ -32,6 +32,10 @@ export interface ProductQueryOptions {
   isFeatured?: boolean | string | undefined;
 }
 
+export interface SimilarProductsOptions {
+  limit?: number | undefined;
+}
+
 export interface PaginatedResult<T> {
   metadata: {
     total: number;

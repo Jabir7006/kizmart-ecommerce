@@ -2,11 +2,15 @@ import { HTTP_STATUS } from '../constants/http.js';
 import {
   createProduct,
   getAllProducts,
+  getSimilarProductsBySlug,
   getProductBySlug,
   updateProduct,
   deleteProduct,
 } from '../services/product.service.js';
-import type { ProductQueryOptions } from '../types/product.types.js';
+import type {
+  ProductQueryOptions,
+  SimilarProductsOptions,
+} from '../types/product.types.js';
 import catchAsync from '../utils/catchAsync.js';
 
 export const handleCreateProduct = catchAsync(async (req, res) => {
@@ -78,6 +82,21 @@ export const handleGetSinleProduct = catchAsync(async (req, res) => {
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
     data: product,
+  });
+});
+
+export const handleGetSimilarProducts = catchAsync(async (req, res) => {
+  const { slug } = req.params;
+
+  const options: SimilarProductsOptions = {
+    limit: req.query.limit ? Math.max(1, Number(req.query.limit)) : 8,
+  };
+
+  const products = await getSimilarProductsBySlug(slug as string, options);
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    data: products,
   });
 });
 

@@ -23,6 +23,11 @@ export const getAllProducts = async (filters: ProductFilters) => {
 export const getProductBySlug = async (slug: string) =>
   api.get(`/products/${slug}`);
 
+export const getSimilarProducts = async (slug: string, limit = 8) =>
+  api.get(`/products/${slug}/similar`, {
+    params: { limit },
+  });
+
 export const createProduct = async (data: ProductInput) =>
   api.post("/products/create", data);
 
@@ -31,4 +36,3 @@ export const updateProduct = async (id: string, data: Partial<ProductInput>) =>
 
 export const deleteProduct = async (id: string) =>
   api.delete(`/products/${id}`);
-

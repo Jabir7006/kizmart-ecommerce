@@ -1,12 +1,15 @@
 import { useParams } from "react-router-dom";
-import { useSingleProduct } from "@/hooks/useProduct";
+import { useSimilarProducts, useSingleProduct } from "@/hooks/useProduct";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
+import ProductList from "@/components/product/ProductList";
 
 const ProductDetails = () => {
   const { slug } = useParams();
   const { data: product, isLoading, error } = useSingleProduct(slug!);
+  const similarProductsQuery = useSimilarProducts(slug!, 8);
+  const similarProducts = similarProductsQuery.data ?? [];
 
   if (isLoading) {
     return (
@@ -34,10 +37,10 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-start">
           {/* Left Column: Gallery */}
           <div className="w-full lg:sticky lg:top-24">
-            <ProductGallery 
-              thumbnail={product.thumbnail} 
-              gallery={product.gallery} 
-              title={product.title} 
+            <ProductGallery
+              thumbnail={product.thumbnail}
+              gallery={product.gallery}
+              title={product.title}
             />
           </div>
 
@@ -57,6 +60,22 @@ const ProductDetails = () => {
               {product.longDescription}
             </div>
           </div>
+        </div>
+
+        <div className="mt-16 lg:mt-24 pt-12 border-t border-gray-100">
+          <div className="flex items-end justify-between gap-4 mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                You May Also Like
+              </h3>
+            </div>
+          </div>
+
+          <ProductList
+            products={similarProducts}
+            productsQuery={similarProductsQuery}
+            className="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+          />
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ const ProductList = ({
   className,
 }: {
   products: Product[];
-  productsQuery?: UseQueryResult<PaginatedProducts, Error>;
+  productsQuery?: UseQueryResult<PaginatedProducts | Product[], Error>;
   prioritizeFirst?: boolean;
   className?: string;
 }) => {

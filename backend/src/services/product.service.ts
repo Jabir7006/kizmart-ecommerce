@@ -4,6 +4,7 @@ import type {
   PaginatedResult,
   ProductInput,
   ProductQueryOptions,
+  SimilarProductsOptions,
 } from '../types/product.types.js';
 import Product, { type IImage } from '../models/product.model.js';
 import { HTTP_STATUS } from '../constants/http.js';
@@ -131,6 +132,90 @@ export const getProductBySlug = async (slug: string) => {
   return product;
 };
 
+export const getSimilarProductsBySlug = async (
+  slug: string,
+  options: SimilarProductsOptions = {},
+) => {
+  const currentProduct = await Product.findOne({ slug, status: 'active' })
+    .select('_id category brand price')
+    .lean();
+
+  if (!currentProduct) {
+    throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const limit = options.limit || 8;
+  const minPrice = Math.max(0, currentProduct.price * 0.8);
+  const maxPrice = currentProduct.price * 1.2;
+
+  const currentBrand = currentProduct.brand || null;
+
+  const similarProducts = await Product.aggregate([
+    {
+      $match: {
+        _id: { $ne: currentProduct._id },
+        status: 'active',
+        category: currentProduct.category,
+      },
+    },
+    {
+      $addFields: {
+        similarityScore: {
+          $add: [
+            {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ['$brand', null] },
+                    { $eq: ['$brand', currentBrand] },
+                  ],
+                },
+                3,
+                0,
+              ],
+            },
+            {
+              $cond: [
+                {
+                  $and: [
+                    { $gte: ['$price', minPrice] },
+                    { $lte: ['$price', maxPrice] },
+                  ],
+                },
+                2,
+                0,
+              ],
+            },
+            {
+              $cond: [
+                { $gt: [{ $ifNull: ['$ratings', 0] }, 0] },
+                '$ratings',
+                0,
+              ],
+            },
+          ],
+        },
+      },
+    },
+    { $sort: { similarityScore: -1, sold: -1, createdAt: -1 } },
+    { $limit: limit },
+    {
+      $project: {
+        title: 1,
+        slug: 1,
+        shortDescription: 1,
+        thumbnail: 1,
+        price: 1,
+        salePrice: 1,
+        ratings: 1,
+        numReviews: 1,
+        brand: 1,
+      },
+    },
+  ]);
+
+  return similarProducts;
+};
 import { UploadService } from './upload.service.js';
 
 export const updateProduct = async (

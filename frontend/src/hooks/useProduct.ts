@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   getAllProducts,
   getProductBySlug,
+  getSimilarProducts,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -26,6 +27,8 @@ export const productKeys = {
   list: (filters: object) => [...productKeys.lists(), filters] as const,
   search: (q: string) => [...productKeys.all, "search", q] as const,
   detail: (slug: string) => ["product", slug] as const,
+  similar: (slug: string, limit: number) =>
+    [...productKeys.detail(slug), "similar", limit] as const,
 };
 
 // ─── Admin product list hook (URL-driven, per-page filters) ─────────────────
@@ -239,6 +242,18 @@ export const useSingleProduct = (slug: string) => {
     queryKey: productKeys.detail(slug),
     queryFn: async () => {
       const response = await getProductBySlug(slug);
+      return response.data.data;
+    },
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useSimilarProducts = (slug: string, limit = 8) => {
+  return useQuery<Product[]>({
+    queryKey: productKeys.similar(slug, limit),
+    queryFn: async () => {
+      const response = await getSimilarProducts(slug, limit);
       return response.data.data;
     },
     enabled: !!slug,

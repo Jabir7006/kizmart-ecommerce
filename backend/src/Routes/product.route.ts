@@ -3,6 +3,7 @@ import {
   handleCreateProduct,
   handleDeleteProduct,
   handleGetAllProducts,
+  handleGetSimilarProducts,
   handleGetSinleProduct,
   handleUpdateProduct,
 } from '../controllers/product.controller.js';
@@ -28,6 +29,7 @@ productRoute.post(
   handleCreateProduct,
 );
 productRoute.get('/', handleGetAllProducts);
+productRoute.get('/:slug/similar', handleGetSimilarProducts);
 productRoute.get('/:slug', handleGetSinleProduct);
 productRoute.patch(
   '/:id',
