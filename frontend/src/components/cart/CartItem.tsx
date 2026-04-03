@@ -2,6 +2,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CartItem as CartItemType } from "@/types/cartType";
 import { useUpdateCartQuantity, useRemoveFromCart } from "@/hooks/useCart";
+import { getProductPricing } from "@/lib/productPricing";
 
 interface CartItemProps {
   item: CartItemType;
@@ -10,6 +11,17 @@ interface CartItemProps {
 export default function CartItem({ item }: CartItemProps) {
   const updateQuantity = useUpdateCartQuantity();
   const removeFromCart = useRemoveFromCart();
+  const { displayPrice, originalPrice, discountPercentage, hasDiscount } =
+    getProductPricing({
+      price: item.product.price,
+      salePrice:
+        item.price < item.product.price
+          ? item.price
+          : item.product.salePrice,
+    });
+  const lineTotal = displayPrice * item.quantity;
+  const originalLineTotal =
+    hasDiscount && originalPrice !== null ? originalPrice * item.quantity : null;
 
   const handleUpdateQuantity = (
     productId: string,
@@ -41,10 +53,31 @@ export default function CartItem({ item }: CartItemProps) {
           <h4 className="font-medium text-sm leading-tight line-clamp-2">
             {item.product?.title}
           </h4>
-          <p className="font-semibold text-sm shrink-0 mt-0.5">
-            ৳{item.price * item.quantity}
-          </p>
+          <div className="shrink-0 mt-0.5 text-right">
+            <p className="font-semibold text-sm">
+              ৳{lineTotal.toLocaleString()}
+            </p>
+            {originalLineTotal !== null && discountPercentage !== null && (
+              <p className="text-[11px] text-muted-foreground">
+                <span className="line-through">
+                  ৳{originalLineTotal.toLocaleString()}
+                </span>
+                <span className="ml-1 font-medium text-emerald-600">
+                  {discountPercentage}% OFF
+                </span>
+              </p>
+            )}
+          </div>
         </div>
+
+        <p className="text-xs text-muted-foreground">
+          ৳{displayPrice.toLocaleString()} each
+          {originalPrice !== null && (
+            <span className="ml-1 line-through">
+              ৳{originalPrice.toLocaleString()}
+            </span>
+          )}
+        </p>
 
         <div className="flex items-center justify-between mt-auto">
           {/* Quantity Controls */}

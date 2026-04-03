@@ -15,6 +15,8 @@ export interface Product {
   thumbnail: Image;
   gallery?: Image[];
   price: number;
+  salePrice?: number;
+  activeDiscount?: string | null;
   quantity: number;
   sold: number;
   category: {

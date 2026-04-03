@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { Product } from "@/types/productType";
 import { useAddToCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/useCartStore";
+import { getProductPricing } from "@/lib/productPricing";
 
 interface ProductInfoProps {
   product: Product;
@@ -20,6 +21,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
     title,
     shortDescription,
     price,
+    salePrice,
     ratings,
     numReviews,
     category,
@@ -28,14 +30,11 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
     quantity: stockQuantity,
     _id,
   } = product;
-
-  const productBadge = (product as any).badge;
-  const productDiscount = (product as any).discountPercentage;
-  const productOriginalPrice = (product as any).originalPrice;
-
-  const badge = productBadge;
-  const discountPercentage = productDiscount || 25;
-  const originalPrice = productOriginalPrice || Math.round(price * 1.33);
+  const { badge, discountPercentage, displayPrice, originalPrice } =
+    getProductPricing({
+      price,
+      salePrice,
+    });
 
   const isOutOfStock = stockQuantity <= 0 || status !== "active";
 
@@ -54,7 +53,11 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   return (
     <div className="flex flex-col w-full">
       {badge && (
-        <span className="bg-purple-600 text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded inline-block w-max mb-4 uppercase tracking-wider shadow-sm">
+        <span
+          className={`text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded inline-block w-max mb-4 uppercase tracking-wider shadow-sm ${
+            badge === "Sale" ? "bg-rose-600" : "bg-purple-800"
+          }`}
+        >
           {badge}
         </span>
       )}
@@ -95,12 +98,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
       <div className="flex items-end gap-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
         <p className="font-bold text-4xl lg:text-5xl text-orange-500 tracking-tight">
-          ৳{price}
+          ৳{displayPrice.toLocaleString()}
         </p>
-        {discountPercentage && (
+        {discountPercentage !== null && originalPrice !== null && (
           <div className="flex flex-col mb-1.5 border-l-2 border-gray-200 pl-3 ml-1">
             <p className="text-gray-400 line-through text-base leading-none mb-1 text-left">
-              ৳{originalPrice}
+              ৳{originalPrice.toLocaleString()}
             </p>
             <p className="text-green-600 font-bold text-sm leading-none bg-green-100 px-2 py-0.5 rounded-sm inline-flex items-center">
               {discountPercentage}% OFF

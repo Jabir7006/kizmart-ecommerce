@@ -7,7 +7,7 @@ export interface CartItemInput {
 
 export interface CartItem {
   _id: string;
-  product: Pick<Product, "_id" | "title" | "price" | "thumbnail">;
+  product: Pick<Product, "_id" | "title" | "price" | "salePrice" | "thumbnail">;
   quantity: number;
   price: number;
 }

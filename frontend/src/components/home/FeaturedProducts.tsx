@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useFeaturedProducts } from "@/hooks/useProduct";
 import SectionHeader from "./SectionHeader";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { getProductPricing } from "@/lib/productPricing";
 import placeholderSvg from "@/assets/product-placeholder.svg";
 import type { Product } from "@/types/productType";
 
@@ -17,6 +18,11 @@ const FeaturedCard = ({
     isLarge ? "full" : "mobile",
     placeholderSvg,
   );
+  const { badge, discountPercentage, displayPrice, originalPrice } =
+    getProductPricing({
+      price: product.price,
+      salePrice: product.salePrice,
+    });
 
   return (
     <Link
@@ -37,6 +43,15 @@ const FeaturedCard = ({
 
       {/* Content wrapper */}
       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 lg:p-6 flex flex-col justify-end">
+        <div className="mb-2">
+          <span
+            className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white ${
+              badge === "Sale" ? "bg-rose-600/90" : "bg-purple-900/85"
+            }`}
+          >
+            {badge}
+          </span>
+        </div>
         {product.brand?.title && (
           <span className="mb-1 sm:mb-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white/80 drop-shadow-md">
             {product.brand.title}
@@ -55,8 +70,18 @@ const FeaturedCard = ({
           <p
             className={`text-white font-bold drop-shadow-md ${isLarge ? "text-lg sm:text-xl" : "text-sm sm:text-base"}`}
           >
-            ৳{product.price}
+            ৳{displayPrice.toLocaleString()}
           </p>
+          {discountPercentage !== null && originalPrice !== null && (
+            <p className="mt-1 text-xs text-white/80 drop-shadow-md">
+              <span className="line-through">
+                ৳{originalPrice.toLocaleString()}
+              </span>
+              <span className="ml-2 font-semibold text-emerald-300">
+                {discountPercentage}% OFF
+              </span>
+            </p>
+          )}
         </div>
       </div>
     </Link>

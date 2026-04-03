@@ -6,8 +6,15 @@ import { useProductStore } from "@/store/useProductStore";
 import { useAddToCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/useCartStore";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { getProductPricing } from "@/lib/productPricing";
 
-const ProductCard = ({ product, priority = false }: { product: Product | any; priority?: boolean }) => {
+const ProductCard = ({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  priority?: boolean;
+}) => {
   const { title, slug, price, thumbnail, _id } = product;
 
   const imgSrc = getImageUrl(thumbnail, "thumbnail", placeholderSvg);
@@ -15,11 +22,11 @@ const ProductCard = ({ product, priority = false }: { product: Product | any; pr
   const imgFull = getImageUrl(thumbnail, "full", placeholderSvg);
   const rating = product.ratings || 0;
   const reviewCount = product.numReviews || 0;
-
-  // we will implement badge and discountPercentage later
-  const badge = product.badge || "New";
-  const discountPercentage = product.discountPercentage || 25;
-  const originalPrice = product.originalPrice || Math.round(price * 1.33);
+  const { badge, discountPercentage, displayPrice, originalPrice } =
+    getProductPricing({
+      price,
+      salePrice: product.salePrice,
+    });
 
   const setSelectedProduct = useProductStore(
     (state) => state.setSelectedProduct,
@@ -49,18 +56,22 @@ const ProductCard = ({ product, priority = false }: { product: Product | any; pr
       <div className="relative overflow-hidden rounded-lg bg-white transition-all duration-200 hover:shadow-md">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           <img
-              srcSet={`${imgSrc} 400w, ${imgMobile} 800w, ${imgFull} 1200w`}
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-              src={imgFull}
-              alt={product.thumbnail?.altText || title}
-              width={400}
-              height={400}
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
-              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-            />
+            srcSet={`${imgSrc} 400w, ${imgMobile} 800w, ${imgFull} 1200w`}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+            src={imgFull}
+            alt={product.thumbnail?.altText || title}
+            width={400}
+            height={400}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+          />
           {badge && (
-            <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-medium px-2 py-1 rounded">
+            <div
+              className={`absolute top-2 left-2 text-white text-xs font-medium px-2 py-1 rounded ${
+                badge === "Sale" ? "bg-rose-600" : "bg-purple-800"
+              }`}
+            >
               {badge}
             </div>
           )}
@@ -90,11 +101,13 @@ const ProductCard = ({ product, priority = false }: { product: Product | any; pr
           <div className="mt-1 flex items-center justify-between">
             <div className="flex flex-col">
               <p className="font-bold text-xs xs:text-[13px] sm:text-base text-orange-500">
-                ৳{price}
+                ৳{displayPrice.toLocaleString()}
               </p>
-              {discountPercentage && (
+              {discountPercentage !== null && originalPrice !== null && (
                 <p className="text-[10px] xs:text-xs text-gray-500">
-                  <span className="line-through">৳{originalPrice}</span>
+                  <span className="line-through">
+                    ৳{originalPrice.toLocaleString()}
+                  </span>
                   <span className="ml-1 text-green-600">
                     -{discountPercentage}%
                   </span>

@@ -9,6 +9,7 @@ import { Star } from "lucide-react";
 import { useAddToCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/useCartStore";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { getProductPricing } from "@/lib/productPricing";
 
 const QuickViewDialog = () => {
   const { selectedProduct, setSelectedProduct } = useProductStore();
@@ -22,18 +23,16 @@ const QuickViewDialog = () => {
     shortDescription,
     thumbnail,
     price,
+    salePrice,
     ratings,
     numReviews,
     _id,
   } = selectedProduct;
-
-  const productBadge = (selectedProduct as any).badge;
-  const productDiscount = (selectedProduct as any).discountPercentage;
-  const productOriginalPrice = (selectedProduct as any).originalPrice;
-
-  const badge = productBadge || "New";
-  const discountPercentage = productDiscount || 25;
-  const originalPrice = productOriginalPrice || Math.round(price * 1.33);
+  const { badge, discountPercentage, displayPrice, originalPrice } =
+    getProductPricing({
+      price,
+      salePrice,
+    });
 
   return (
     <Dialog
@@ -57,7 +56,11 @@ const QuickViewDialog = () => {
           {/* Content Section */}
           <div className="p-5 sm:p-8 flex flex-col justify-center bg-white">
             {badge && (
-              <span className="bg-purple-600 text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded inline-block w-max mb-4 uppercase tracking-wider">
+              <span
+                className={`text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded inline-block w-max mb-4 uppercase tracking-wider ${
+                  badge === "Sale" ? "bg-rose-600" : "bg-purple-800"
+                }`}
+              >
                 {badge}
               </span>
             )}
@@ -85,11 +88,13 @@ const QuickViewDialog = () => {
             </div>
 
             <div className="flex items-end gap-3 mb-6">
-              <p className="font-bold text-4xl text-orange-500">৳{price}</p>
-              {discountPercentage && (
+              <p className="font-bold text-4xl text-orange-500">
+                ৳{displayPrice.toLocaleString()}
+              </p>
+              {discountPercentage !== null && originalPrice !== null && (
                 <div className="flex flex-col mb-1">
                   <p className="text-gray-400 line-through text-sm leading-none mb-1 text-left">
-                    ৳{originalPrice}
+                    ৳{originalPrice.toLocaleString()}
                   </p>
                   <p className="text-green-600 font-bold text-sm leading-none">
                     {discountPercentage}% OFF
