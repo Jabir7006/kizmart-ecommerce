@@ -19,6 +19,8 @@ export const useBrand = () => {
       const response = await getBrands();
       return response.data.data;
     },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   });
 
   const createBrandMutation = useMutation({

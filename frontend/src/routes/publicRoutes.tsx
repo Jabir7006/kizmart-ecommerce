@@ -3,10 +3,10 @@ import MainLayout from "@/components/layouts/MainLayout";
 import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import GuestRoute from "@/components/routes/GuestRoute";
 import VerifyEmailRoute from "@/components/routes/VerifyEmailRoute";
-import Home from "@/pages/Home";
 import CartPage from "@/pages/CartPage";
 
 // Lazy loads
+const Home = lazy(() => import("@/pages/Home"));
 const Signin = lazy(() => import("@/pages/auth/Signin"));
 const Signup = lazy(() => import("@/pages/auth/Signup"));
 const VerifyEmail = lazy(() => import("@/pages/auth/VerifyEmail"));

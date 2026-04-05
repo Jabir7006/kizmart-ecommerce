@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePromoBanners } from "@/hooks/useBanner";
-import { getImageUrl } from "@/lib/getImageUrl";
+import { getResponsiveImageUrl } from "@/lib/getImageUrl";
 import bannerFallback from "@/assets/banner-fallback.svg";
 import SectionHeader from "./SectionHeader";
 import type { Banner } from "@/types/bannerType";
@@ -17,17 +17,18 @@ const PromoCard = ({
   index: number;
   aspectClass: string;
 }) => {
-  const mobileSrc = getImageUrl(banner.image, "mobile", bannerFallback);
-  const fullSrc = getImageUrl(banner.image, "full", bannerFallback);
+  const smallSrc = getResponsiveImageUrl(banner.image, 320, bannerFallback);
+  const mobileSrc = getResponsiveImageUrl(banner.image, 480, bannerFallback);
+  const fullSrc = getResponsiveImageUrl(banner.image, 960, bannerFallback);
 
   const img = (
     <div
       className={`relative overflow-hidden rounded-xl bg-muted ${aspectClass}`}
     >
       <img
-        srcSet={`${mobileSrc} 480w, ${fullSrc} 960w`}
+        srcSet={`${smallSrc} 320w, ${mobileSrc} 480w, ${fullSrc} 960w`}
         sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
-        src={fullSrc}
+        src={mobileSrc}
         alt={banner.image?.altText || "Promo banner"}
         width={480}
         height={360}

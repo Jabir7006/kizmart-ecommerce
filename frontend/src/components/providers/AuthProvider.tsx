@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { checkAuth } from "@/services/api/auth/authApi";
 import { useAuthStore } from "@/store/useAuthStore";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -11,9 +10,8 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const setUser = useAuthStore((state) => state.setUser);
   const logout = useAuthStore((state) => state.logout);
-  const isInitialized = useAuthStore((state) => state.isInitialized);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: checkAuth,
     retry: false,
@@ -27,14 +25,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       logout();
     }
   }, [data, isError, setUser, logout]);
-
-  if (isLoading || !isInitialized) {
-    return (
-      <div className="flex items-center justify-center min-h-svh">
-        <LoadingSpinner size={32} className="text-primary" />
-      </div>
-    );
-  }
 
   return <>{children}</>;
 };

@@ -21,6 +21,8 @@ export const useBanner = (params?: { type?: string; status?: string }) => {
       const response = await getBanners(params);
       return response.data.data;
     },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
   const createBannerMutation = useMutation({
@@ -103,6 +105,7 @@ export const usePromoBanners = (type: "promo" | "offer" = "promo") => {
         (a, b) => a.displayOrder - b.displayOrder,
       );
     },
-    staleTime: 10 * 60 * 1000, // 10 min
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 };

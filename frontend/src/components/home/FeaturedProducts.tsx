@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useFeaturedProducts } from "@/hooks/useProduct";
 import SectionHeader from "./SectionHeader";
-import { getImageUrl } from "@/lib/getImageUrl";
+import { getResponsiveImageUrl } from "@/lib/getImageUrl";
 import { getProductPricing } from "@/lib/productPricing";
 import placeholderSvg from "@/assets/product-placeholder.svg";
 import type { Product } from "@/types/productType";
@@ -13,9 +13,15 @@ const FeaturedCard = ({
   product: Product;
   isLarge?: boolean;
 }) => {
-  const imgSrc = getImageUrl(
+  const smallSrc = getResponsiveImageUrl(product.thumbnail, 240, placeholderSvg);
+  const mediumSrc = getResponsiveImageUrl(
     product.thumbnail,
-    isLarge ? "full" : "mobile",
+    isLarge ? 800 : 400,
+    placeholderSvg,
+  );
+  const largeSrc = getResponsiveImageUrl(
+    product.thumbnail,
+    isLarge ? 1200 : 600,
     placeholderSvg,
   );
   const { badge, discountPercentage, displayPrice, originalPrice } =
@@ -32,9 +38,18 @@ const FeaturedCard = ({
       }`}
     >
       <img
-        src={imgSrc}
+        srcSet={`${smallSrc} 240w, ${mediumSrc} ${isLarge ? 800 : 400}w, ${largeSrc} ${isLarge ? 1200 : 600}w`}
+        sizes={
+          isLarge
+            ? "(max-width: 640px) 92vw, (max-width: 1024px) 60vw, 40vw"
+            : "(max-width: 640px) 44vw, (max-width: 1024px) 30vw, 20vw"
+        }
+        src={mediumSrc}
         alt={product.thumbnail?.altText || product.title}
+        width={isLarge ? 800 : 400}
+        height={isLarge ? 800 : 400}
         loading="lazy"
+        decoding="async"
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
 

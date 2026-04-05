@@ -293,6 +293,7 @@ export const useNewArrivalsProducts = () => {
       return response.data.data;
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 };
 
@@ -311,5 +312,6 @@ export const useFeaturedProducts = () => {
       return response.data.data;
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 };

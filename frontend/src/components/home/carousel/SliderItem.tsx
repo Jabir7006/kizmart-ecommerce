@@ -1,5 +1,5 @@
 import { CarouselItem } from "@/components/ui/carousel";
-import { getImageUrl } from "@/lib/getImageUrl";
+import { getResponsiveImageUrl } from "@/lib/getImageUrl";
 import type { Banner } from "@/types/bannerType";
 import bannerFallback from "@/assets/banner-fallback.svg";
 import { Link } from "react-router-dom";
@@ -10,15 +10,16 @@ interface SliderItemProps {
 }
 
 const SliderItem = ({ banner, index }: SliderItemProps) => {
-  const mobileSrc = getImageUrl(banner.image, "mobile", bannerFallback);
-  const fullSrc = getImageUrl(banner.image, "full", bannerFallback);
+  const smallSrc = getResponsiveImageUrl(banner.image, 480, bannerFallback);
+  const mobileSrc = getResponsiveImageUrl(banner.image, 768, bannerFallback);
+  const fullSrc = getResponsiveImageUrl(banner.image, 1280, bannerFallback);
 
   const content = (
     <div className="relative w-full aspect-video sm:aspect-16/7 lg:aspect-21/7">
       <img
-        srcSet={`${mobileSrc} 768w, ${fullSrc} 1920w`}
+        srcSet={`${smallSrc} 480w, ${mobileSrc} 768w, ${fullSrc} 1280w`}
         sizes="100vw"
-        src={fullSrc}
+        src={mobileSrc}
         alt={banner.image?.altText || "Banner"}
         width={1920}
         height={640}

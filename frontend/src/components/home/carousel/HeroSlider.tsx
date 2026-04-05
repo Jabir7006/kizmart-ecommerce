@@ -1,59 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselPrevious,
-  CarouselNext,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-import SliderItem from "./SliderItem";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useBanner } from "@/hooks/useBanner";
 import type { Banner } from "@/types/bannerType";
+import { getResponsiveImageUrl } from "@/lib/getImageUrl";
+import bannerFallback from "@/assets/banner-fallback.svg";
 
-const AUTO_SLIDE_INTERVAL = 5000;
-
-/* ── Dot indicators ──────────────────────────────────────────────────────── */
-const CarouselDots = ({
-  api,
-  count,
-}: {
-  api: CarouselApi | undefined;
-  count: number;
-}) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  useEffect(() => {
-    if (!api) return;
-    const onSelect = () => setSelectedIndex(api.selectedScrollSnap());
-    api.on("select", onSelect);
-    api.on("reInit", onSelect);
-    onSelect();
-    return () => {
-      api.off("select", onSelect);
-      api.off("reInit", onSelect);
-    };
-  }, [api]);
-
-  if (count <= 1) return null;
-
-  return (
-    <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-      {Array.from({ length: count }).map((_, index) => (
-        <button
-          key={index}
-          onClick={() => api?.scrollTo(index)}
-          aria-label={`Go to slide ${index + 1}`}
-          className={`h-2 rounded-full transition-all duration-300 ${
-            index === selectedIndex
-              ? "w-8 bg-secondary"
-              : "w-2 bg-white/50 hover:bg-white/80"
-          }`}
-        />
-      ))}
-    </div>
-  );
-};
+const HeroCarousel = lazy(() => import("./HeroCarousel"));
 
 /* ── Skeleton placeholder while loading ─────────────────────────────────────── */
 const HeroSkeleton = () => (
@@ -67,49 +18,76 @@ const HeroEmpty = () => (
   </div>
 );
 
+const StaticHeroBanner = ({ banner }: { banner: Banner }) => {
+  const smallSrc = getResponsiveImageUrl(banner.image, 480, bannerFallback);
+  const mobileSrc = getResponsiveImageUrl(banner.image, 768, bannerFallback);
+  const fullSrc = getResponsiveImageUrl(banner.image, 1280, bannerFallback);
+
+  return (
+    <section className="relative w-full overflow-hidden bg-primary/5">
+      <div className="relative w-full aspect-video sm:aspect-16/7 lg:aspect-21/7">
+        <img
+          srcSet={`${smallSrc} 480w, ${mobileSrc} 768w, ${fullSrc} 1280w`}
+          sizes="100vw"
+          src={mobileSrc}
+          alt={banner.image?.altText || "Banner"}
+          width={1920}
+          height={640}
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = bannerFallback;
+          }}
+        />
+      </div>
+    </section>
+  );
+};
+
 /* ── Main slider ─────────────────────────────────────────────────────────── */
 const HeroSlider = () => {
-  const [api, setApi] = useState<CarouselApi>();
-  const plugin = useRef(
-    Autoplay({ delay: AUTO_SLIDE_INTERVAL, stopOnInteraction: true }),
-  );
-
-  const { banners, bannersQuery } = useBanner({ type: "banner" });
+  const [carouselReady, setCarouselReady] = useState(false);
+  const { banners, bannersQuery } = useBanner({
+    type: "banner",
+    status: "active",
+  });
 
   const activeBanners: Banner[] = banners.filter(
     (b: Banner) => b.status === "active" && b.type === "banner",
   );
 
+  useEffect(() => {
+    if (activeBanners.length <= 1) return;
+
+    const idleCallback = window.requestIdleCallback?.(
+      () => setCarouselReady(true),
+      { timeout: 1500 },
+    );
+
+    if (idleCallback) {
+      return () => window.cancelIdleCallback?.(idleCallback);
+    }
+
+    const timeoutId = window.setTimeout(() => setCarouselReady(true), 600);
+    return () => window.clearTimeout(timeoutId);
+  }, [activeBanners.length]);
+
   if (bannersQuery.isLoading) return <HeroSkeleton />;
   if (activeBanners.length === 0) return <HeroEmpty />;
+  if (activeBanners.length === 1) {
+    return <StaticHeroBanner banner={activeBanners[0]} />;
+  }
 
   return (
-    <section className="relative w-full overflow-hidden bg-primary/5 group">
-      <Carousel
-        setApi={setApi}
-        plugins={[plugin.current]}
-        opts={{ loop: activeBanners.length > 1 }}
-        onMouseEnter={plugin.current.stop}
-        onMouseLeave={plugin.current.reset}
-        className="w-full"
-      >
-        <CarouselContent className="ml-0">
-          {activeBanners.map((banner, index) => (
-            <SliderItem key={banner._id} banner={banner} index={index} />
-          ))}
-        </CarouselContent>
-
-        {activeBanners.length > 1 && (
-          <>
-            {/* Always visible on mobile, hover-only on desktop */}
-            <CarouselPrevious className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white border-transparent transition-all hover:bg-black/50 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer" />
-            <CarouselNext className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white border-transparent transition-all hover:bg-black/50 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer" />
-          </>
-        )}
-      </Carousel>
-
-      <CarouselDots api={api} count={activeBanners.length} />
-    </section>
+    <Suspense fallback={<StaticHeroBanner banner={activeBanners[0]} />}>
+      {carouselReady ? (
+        <HeroCarousel banners={activeBanners} />
+      ) : (
+        <StaticHeroBanner banner={activeBanners[0]} />
+      )}
+    </Suspense>
   );
 };
 
