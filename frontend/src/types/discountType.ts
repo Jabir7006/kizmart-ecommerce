@@ -1,3 +1,5 @@
+import type { BaseEntity, PaginatedResponse } from "./baseType";
+
 export type DiscountType = "percentage" | "fixed";
 export type DiscountTargetType = "product" | "category" | "all";
 export type DiscountStatus = "active" | "inactive" | "upcoming" | "expired";
@@ -15,8 +17,7 @@ export interface DiscountTargetCategory {
   slug: string;
 }
 
-export interface Discount {
-  _id: string;
+export interface Discount extends BaseEntity {
   name: string;
   discountType: DiscountType;
   value: number;
@@ -27,8 +28,6 @@ export interface Discount {
   endDate: string;
   isActive: boolean;
   status?: DiscountStatus;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface DiscountFilters {
@@ -40,14 +39,4 @@ export interface DiscountFilters {
   limit: number;
 }
 
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  totalPages: number;
-  limit: number;
-}
-
-export interface PaginatedDiscounts {
-  metadata: PaginationMeta;
-  data: Discount[];
-}
+export type PaginatedDiscounts = PaginatedResponse<Discount>;

@@ -1,3 +1,5 @@
+import type { BaseEntity, PaginatedResponse } from "./baseType";
+
 export interface Image {
   publicId: string;
   secureUrl: string;
@@ -6,8 +8,7 @@ export interface Image {
   altText?: string;
 }
 
-export interface Product {
-  _id: string;
+export interface Product extends BaseEntity {
   title: string;
   slug: string;
   shortDescription: string;
@@ -33,8 +34,6 @@ export interface Product {
   ratings: number;
   numReviews: number;
   isFeatured: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export interface ProductFilters {
@@ -51,14 +50,4 @@ export interface ProductFilters {
   isFeatured?: boolean | string;
 }
 
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  totalPages: number;
-  limit: number;
-}
-
-export interface PaginatedProducts {
-  metadata: PaginationMeta;
-  data: Product[];
-}
+export type PaginatedProducts = PaginatedResponse<Product>;

@@ -1,3 +1,4 @@
+import type { BaseEntity, PaginatedResponse } from "./baseType";
 import type { Image } from "./productType";
 
 export interface OrderItem {
@@ -18,15 +19,13 @@ export interface ShippingAddress {
   postalCode: string;
 }
 
-export interface Payment {
-  _id: string;
+export interface Payment extends BaseEntity {
   method: "cash_on_delivery" | "card" | "upi" | "bank_transfer";
   status: "pending" | "paid" | "failed" | "refunded";
   amount: number;
 }
 
-export interface Order {
-  _id: string;
+export interface Order extends BaseEntity {
   user: string;
   items: OrderItem[];
   subtotal: number;
@@ -35,8 +34,6 @@ export interface Order {
   shippingAddress: ShippingAddress;
   payment: string | Payment;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
-  createdAt: string;
-  updatedAt: string;
   userDetails?: {
     email: string;
   };
@@ -62,15 +59,7 @@ export interface OrderFilters {
   limit?: number;
 }
 
-export interface OrderListResponse {
-  metadata: {
-    total: number;
-    page: number;
-    totalPages: number;
-    limit: number;
-  };
-  data: Order[];
-}
+export type OrderListResponse = PaginatedResponse<Order>;
 
 export interface OrderResponse {
   status: string;

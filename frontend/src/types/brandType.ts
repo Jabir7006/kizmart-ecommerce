@@ -1,3 +1,4 @@
+import type { BaseEntity } from "./baseType";
 import type { Image } from "./productType";
 
 export interface BrandInput {
@@ -6,8 +7,4 @@ export interface BrandInput {
   logo?: Image;
 }
 
-export interface Brand extends BrandInput {
-  _id: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export interface Brand extends BaseEntity, BrandInput {}
