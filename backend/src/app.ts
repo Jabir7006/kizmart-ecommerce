@@ -19,6 +19,7 @@ import paymentRoute from './Routes/payment.route.js';
 import uploadRoute from './Routes/upload.route.js';
 import bannerRoute from './Routes/banner.route.js';
 import discountRoute from './Routes/discount.route.js';
+import reviewRoute from './Routes/review.route.js';
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/v1/payments', protect, paymentRoute);
 app.use('/api/v1/upload', protect, uploadRoute);
 app.use('/api/v1/banners', bannerRoute);
 app.use('/api/v1/discounts', protect, restrictTo('admin'), discountRoute);
+app.use('/api/v1/reviews', reviewRoute);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
