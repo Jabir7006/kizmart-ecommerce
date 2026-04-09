@@ -78,9 +78,7 @@ export const createReview = async (userId: string, data: CreateReviewInput) => {
 
   await updateProductReviewStats(review.product);
 
-  return Review.findById(review._id)
-    .populate('user', 'fullName')
-    .populate('product', 'title slug thumbnail');
+  return Review.findById(review._id).populate('user', 'fullName');
 };
 
 export const getAllReviews = async (options: ReviewQueryOptions) => {
@@ -163,9 +161,7 @@ export const updateReview = async (
   await review.save();
   await updateProductReviewStats(review.product);
 
-  return Review.findById(review._id)
-    .populate('user', 'fullName')
-    .populate('product', 'title slug thumbnail');
+  return Review.findById(review._id).populate('user', 'fullName');
 };
 
 export const deleteReview = async (
