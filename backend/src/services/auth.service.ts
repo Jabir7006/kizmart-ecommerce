@@ -73,7 +73,16 @@ export const verifyEmail = async (userId: string, code: string) => {
     type: 'email_verification',
   });
 
-  return { user: updatedUser };
+  const accessToken = signToken(
+    {
+      userId: updatedUser!._id,
+      role: updatedUser!.role,
+      verified: updatedUser!.verified,
+    },
+    accessTokenSignOptions,
+  );
+
+  return { user: updatedUser, accessToken };
 };
 
 export const resendVerificationEmail = async (userId : string) => {

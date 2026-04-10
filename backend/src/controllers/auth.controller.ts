@@ -53,7 +53,9 @@ export const handleVerifyEmail = catchAsync(async (req, res) => {
   if (!userId) {
     throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
   }
-  const { user } = await verifyEmail(userId, code);
+  const { user, accessToken } = await verifyEmail(userId, code);
+
+  setAuthCookies({ res, accessToken });
 
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
