@@ -85,9 +85,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
         </div>
         <div className="w-1 h-1 bg-gray-300 rounded-full" />
-        <span className="text-sm text-gray-500 font-medium hover:text-blue-600 hover:underline cursor-pointer transition-colors">
+        <a
+          href="#reviews"
+          className="text-sm text-gray-500 font-medium hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+        >
           {numReviews || 0} reviews
-        </span>
+        </a>
         <div className="w-1 h-1 bg-gray-300 rounded-full" />
         <span
           className={`text-sm font-semibold px-2 py-0.5 rounded ${isOutOfStock ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}

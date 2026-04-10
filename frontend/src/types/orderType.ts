@@ -34,6 +34,8 @@ export interface Order extends BaseEntity {
   shippingAddress: ShippingAddress;
   payment: string | Payment;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  createdAt: string;
+  updatedAt: string;
   userDetails?: {
     email: string;
   };

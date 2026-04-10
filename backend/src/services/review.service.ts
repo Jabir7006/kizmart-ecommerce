@@ -23,6 +23,17 @@ type ReviewQueryOptions = {
   star?: number;
 };
 
+export const getMyReview = async (userId: string, productId: string) => {
+  const review = await Review.findOne({
+    product: productId,
+    user: userId,
+  })
+    .populate('user', 'fullName')
+    .lean();
+
+  return review;
+};
+
 const updateProductReviewStats = async (productId: Types.ObjectId | string) => {
   const normalizedProductId =
     typeof productId === 'string' ? new Types.ObjectId(productId) : productId;
@@ -136,7 +147,7 @@ export const getAllReviews = async (options: ReviewQueryOptions) => {
 
 export const updateReview = async (
   id: string,
-  user: { _id: string; role: string },
+  user: { userId: string; role: string },
   data: UpdateReviewInput,
 ) => {
   const review = await Review.findById(id);
@@ -145,7 +156,7 @@ export const updateReview = async (
     throw new AppError('Review not found', HTTP_STATUS.NOT_FOUND);
   }
 
-  const isOwner = review.user.toString() === user._id;
+  const isOwner = review.user.toString() === user.userId;
   const isPrivileged = ['admin', 'manager'].includes(user.role);
 
   if (!isOwner && !isPrivileged) {
@@ -166,7 +177,7 @@ export const updateReview = async (
 
 export const deleteReview = async (
   id: string,
-  user: { _id: string; role: string },
+  user: { userId: string; role: string },
 ) => {
   const review = await Review.findById(id);
 
@@ -174,7 +185,7 @@ export const deleteReview = async (
     throw new AppError('Review not found', HTTP_STATUS.NOT_FOUND);
   }
 
-  const isOwner = review.user.toString() === user._id;
+  const isOwner = review.user.toString() === user.userId;
   const isPrivileged = ['admin', 'manager'].includes(user.role);
 
   if (!isOwner && !isPrivileged) {

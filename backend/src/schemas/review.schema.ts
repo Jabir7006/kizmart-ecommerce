@@ -44,3 +44,9 @@ export const getAllReviewsSchema = z.object({
     star: z.coerce.number().int().min(1).max(5).optional(),
   }),
 });
+
+export const getMyReviewSchema = z.object({
+  query: z.object({
+    productId: objectIdSchema,
+  }),
+});

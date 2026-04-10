@@ -4,6 +4,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
 import ProductList from "@/components/product/ProductList";
+import ProductReviewsSection from "@/components/product/ProductReviewsSection";
 
 const ProductDetails = () => {
   const { slug } = useParams();
@@ -61,6 +62,8 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
+
+        <ProductReviewsSection product={product} />
 
         <div className="mt-16 lg:mt-24 pt-12 border-t border-gray-100">
           <div className="flex items-end justify-between gap-4 mb-6">

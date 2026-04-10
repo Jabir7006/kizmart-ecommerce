@@ -3,12 +3,13 @@ import {
   createReview,
   deleteReview,
   getAllReviews,
+  getMyReview,
   updateReview,
 } from '../services/review.service.js';
 import catchAsync from '../utils/catchAsync.js';
 
 export const handleCreateReview = catchAsync(async (req, res) => {
-  const review = await createReview(req.user._id as string, req.body);
+  const review = await createReview(req.user.userId as string, req.body);
 
   res.status(HTTP_STATUS.CREATED).json({
     status: 'success',
@@ -42,10 +43,22 @@ export const handleGetAllReviews = catchAsync(async (req, res) => {
   });
 });
 
+export const handleGetMyReview = catchAsync(async (req, res) => {
+  const review = await getMyReview(
+    req.user.userId as string,
+    req.query.productId as string,
+  );
+
+  res.status(HTTP_STATUS.SUCCESS).json({
+    status: 'success',
+    data: review,
+  });
+});
+
 export const handleUpdateReview = catchAsync(async (req, res) => {
   const review = await updateReview(
     req.params.id as string,
-    req.user as { _id: string; role: string },
+    req.user,
     req.body,
   );
 
@@ -57,10 +70,7 @@ export const handleUpdateReview = catchAsync(async (req, res) => {
 });
 
 export const handleDeleteReview = catchAsync(async (req, res) => {
-  await deleteReview(
-    req.params.id as string,
-    req.user as { _id: string; role: string },
-  );
+  await deleteReview(req.params.id as string, req.user);
 
   res.status(HTTP_STATUS.SUCCESS).json({
     status: 'success',
