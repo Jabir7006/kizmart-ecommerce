@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import Header from "@/components/header/Header";
 import { useCartStore } from "@/store/useCartStore";
 
@@ -11,6 +11,7 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-svh flex flex-col">
+      <ScrollRestoration />
       <Header />
       <main className="flex-1">
         <Outlet />

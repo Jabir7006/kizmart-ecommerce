@@ -215,14 +215,14 @@ const ProductReviewsSection = ({ product }: ProductReviewsSectionProps) => {
     <section
       ref={containerRef}
       id="reviews"
-      className="mt-16 lg:mt-24 pt-12 border-t border-gray-100 scroll-mt-24"
+      className="mt-8 sm:mt-16 lg:mt-24 pt-6 sm:pt-12 border-t border-gray-100 scroll-mt-24"
     >
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-4 sm:mb-8 flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-orange-600">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.24em] text-orange-600">
             Ratings & Reviews
           </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+          <h2 className="mt-1 sm:mt-2 text-xl sm:text-3xl font-bold tracking-tight text-slate-900">
             What shoppers are saying
           </h2>
         </div>
@@ -233,23 +233,23 @@ const ProductReviewsSection = ({ product }: ProductReviewsSectionProps) => {
       ) : (
         <div
           className={cn(
-            "rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-8 shadow-sm",
-            "min-h-[320px]",
+            "rounded-2xl sm:rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 sm:p-8 shadow-sm",
+            "min-h-[200px] sm:min-h-[320px]",
           )}
         >
           <div className="max-w-xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">
               Lazy loaded
             </p>
-            <h3 className="mt-3 text-2xl font-semibold text-slate-900">
+            <h3 className="mt-2 sm:mt-3 text-lg sm:text-2xl font-semibold text-slate-900">
               Reviews appear when you reach this section
             </h3>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
+            <p className="mt-2 sm:mt-3 text-xs sm:text-sm leading-5 sm:leading-6 text-slate-600">
               We delay fetching reviews until this block enters the viewport to
               keep the product page fast and focused.
             </p>
           </div>
-          <div className="mt-8">
+          <div className="mt-4 sm:mt-8">
             <ReviewListSkeleton />
           </div>
         </div>
