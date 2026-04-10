@@ -63,7 +63,7 @@ export const OrderSummary = ({
               <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
                 <span className="text-sm">Subtotal</span>
                 <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  ৳{subtotal.toFixed(2)}
+                  ৳{Math.round(subtotal).toLocaleString()}
                 </span>
               </div>
 
@@ -71,7 +71,7 @@ export const OrderSummary = ({
                 <span className="text-sm">Shipping</span>
                 <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   {shippingFee > 0
-                    ? `৳${shippingFee.toFixed(2)}`
+                    ? `৳${Math.round(shippingFee).toLocaleString()}`
                     : "Calculated at next step"}
                 </span>
               </div>
@@ -81,7 +81,7 @@ export const OrderSummary = ({
               <div className="flex justify-between items-end">
                 <span className="text-base font-medium">Total</span>
                 <span className="text-2xl font-bold">
-                  ৳{totalPrice.toFixed(2)}
+                  ৳{Math.round(totalPrice).toLocaleString()}
                 </span>
               </div>
             </div>

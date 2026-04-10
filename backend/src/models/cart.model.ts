@@ -59,9 +59,11 @@ const cartSchema = new Schema<Cart>(
 );
 
 cartSchema.pre('save', function () {
-  return (this.totalPrice = this.items.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0));
+  return (this.totalPrice = Math.round(
+    this.items.reduce((acc, item) => {
+      return acc + item.price * item.quantity;
+    }, 0)
+  ));
 });
 
 export const Cart = model<Cart>('Cart', cartSchema);

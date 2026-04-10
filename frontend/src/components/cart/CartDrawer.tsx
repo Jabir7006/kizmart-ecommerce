@@ -63,7 +63,7 @@ export default function CartDrawer() {
           <SheetFooter className="flex-col gap-4 sm:flex-col p-6 bg-background border-t">
             <div className="flex items-center justify-between text-base font-semibold">
               <span>Subtotal</span>
-              <span>৳{cartItems?.totalPrice || 0}</span>
+              <span>৳{Math.round(cartItems?.totalPrice || 0).toLocaleString()}</span>
             </div>
             <p className="text-xs text-muted-foreground">
               Shipping and taxes calculated at checkout.

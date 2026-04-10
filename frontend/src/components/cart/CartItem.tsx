@@ -19,9 +19,9 @@ export default function CartItem({ item }: CartItemProps) {
           ? item.price
           : item.product.salePrice,
     });
-  const lineTotal = displayPrice * item.quantity;
+  const lineTotal = Math.round(displayPrice * item.quantity);
   const originalLineTotal =
-    hasDiscount && originalPrice !== null ? originalPrice * item.quantity : null;
+    hasDiscount && originalPrice !== null ? Math.round(originalPrice * item.quantity) : null;
 
   const handleUpdateQuantity = (
     productId: string,
@@ -71,10 +71,10 @@ export default function CartItem({ item }: CartItemProps) {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          ৳{displayPrice.toLocaleString()} each
+          ৳{Math.round(displayPrice).toLocaleString()} each
           {originalPrice !== null && (
             <span className="ml-1 line-through">
-              ৳{originalPrice.toLocaleString()}
+              ৳{Math.round(originalPrice).toLocaleString()}
             </span>
           )}
         </p>

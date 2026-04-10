@@ -17,7 +17,7 @@ export function prepareOrderData(
       throw new AppError('Product missing', HTTP_STATUS.INTERNAL_SERVER_ERROR);
     }
 
-    const effectivePrice = product.salePrice ?? product.price;
+    const effectivePrice = Math.round(product.salePrice ?? product.price);
     subtotal += effectivePrice * i.quantity;
 
     return {
