@@ -25,7 +25,7 @@ const ZoomableImage = ({ image, alt }: ZoomableImageProps) => {
 
   return (
     <div
-      className="w-full flex items-center justify-center overflow-hidden cursor-zoom-in rounded-lg"
+      className="w-full h-full flex items-center justify-center overflow-hidden cursor-zoom-in rounded-lg"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}
@@ -42,7 +42,7 @@ const ZoomableImage = ({ image, alt }: ZoomableImageProps) => {
           transform: isHovering ? "scale(2)" : "scale(1)",
         }}
         className={cn(
-          "w-full h-auto object-contain max-h-[250px] sm:max-h-[350px] md:max-h-[450px] mix-blend-multiply",
+          "w-full h-full object-contain mix-blend-multiply",
           !isHovering && "transition-transform duration-500",
         )}
       />

@@ -41,11 +41,11 @@ const ProductGallery = ({ thumbnail, gallery, title }: ProductGalleryProps) => {
 
   if (allImages.length === 0) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center min-h-[220px] sm:min-h-[300px] md:min-h-[500px] sm:rounded-2xl w-full">
+      <div className="bg-gray-50 aspect-square w-full max-w-[500px] xl:max-w-[600px] mx-auto flex items-center justify-center sm:rounded-2xl">
         <img
           src="/placeholder.svg"
           alt={title}
-          className="w-full h-auto object-contain max-h-[400px] mix-blend-multiply"
+          className="w-full h-full object-contain mix-blend-multiply"
         />
       </div>
     );
@@ -54,12 +54,12 @@ const ProductGallery = ({ thumbnail, gallery, title }: ProductGalleryProps) => {
   return (
     <div className="flex flex-col gap-2 sm:gap-4 w-full">
       {/* Main Image Slider */}
-      <div className="relative w-full bg-gray-50 sm:rounded-2xl overflow-hidden group">
+      <div className="relative w-full max-w-[500px] xl:max-w-[600px] mx-auto bg-gray-50 sm:rounded-2xl overflow-hidden group">
         <Carousel setApi={setApi} className="w-full">
           <CarouselContent>
             {allImages.map((image, index) => (
               <CarouselItem key={index}>
-                <div className="flex items-center justify-center min-h-[220px] sm:min-h-[300px] md:min-h-[500px] p-2 sm:p-4 md:p-8">
+                <div className="aspect-square w-full flex items-center justify-center">
                   <ZoomableImage
                     image={image}
                     alt={image.altText || `${title} - Image ${index + 1}`}
@@ -88,7 +88,7 @@ const ProductGallery = ({ thumbnail, gallery, title }: ProductGalleryProps) => {
 
       {/* Thumbnail Navigation — visible on all screen sizes */}
       {allImages.length > 1 && (
-        <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-2 scrollbar-hide snap-x px-2 sm:px-0">
+        <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-2 scrollbar-hide snap-x px-2 sm:px-0 max-w-[500px] xl:max-w-[600px] mx-auto w-full">
           {allImages.map((image, index) => (
             <button
               key={index}

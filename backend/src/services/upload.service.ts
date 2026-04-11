@@ -45,16 +45,18 @@ const FOLDER_CONFIGS: Record<string, UploadApiOptions> = {
 
   products: {
     width: 1200,
+    height: 1200,
     crop: 'limit',
     quality: 'auto:good',
     eager: [
-      { width: 800, crop: 'limit' },
-      { width: 400, crop: 'limit' },
+      { width: 800, height: 800, crop: 'limit' },
+      { width: 400, height: 400, crop: 'limit' },
     ],
   },
 
   galleries: {
     width: 1400,
+    height: 1400,
     crop: 'limit',
     quality: 'auto:eco',
   },

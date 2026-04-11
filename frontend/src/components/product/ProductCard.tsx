@@ -64,7 +64,7 @@ const ProductCard = ({
             height={400}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
-            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105"
           />
           {badge && (
             <div

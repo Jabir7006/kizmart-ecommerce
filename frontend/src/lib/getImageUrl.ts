@@ -4,8 +4,20 @@ type ImageVariant = "thumbnail" | "mobile" | "full";
 
 function withCloudinaryOptimizations(url: string): string {
   if (!url || !url.includes("res.cloudinary.com")) return url;
-  if (url.includes("f_auto") || url.includes("q_auto")) return url; // already optimized
-  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+
+  // If it's already optimized by us with e_trim, return
+  if (url.includes("e_trim")) return url;
+
+  // Strip out existing f_auto or q_auto to avoid duplicates, then prepend our standard optimizing block
+  let cleanUrl = url
+    .replace(/f_auto,?/g, "")
+    .replace(/q_auto,?/g, "")
+    .replace(/\/+$/, "");
+  // Clean up trailing commas from the replacement
+  cleanUrl = cleanUrl.replace(/,\//g, "/");
+
+  // Use e_trim:10:white to strictly trim the white padding introduced by lpad and never real product colors
+  return cleanUrl.replace("/upload/", "/upload/e_trim:10:white,f_auto,q_auto/");
 }
 
 interface CloudinaryTransformOptions {
