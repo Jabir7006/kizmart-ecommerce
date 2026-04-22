@@ -36,14 +36,20 @@ api.interceptors.response.use(
 
     // Check if the error is 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
-    
-      const isAuthRoute =
-        originalRequest.url?.includes("/auth/refresh") ||
-        originalRequest.url?.includes("/auth/signin");
-        originalRequest.url?.includes("/auth/signup");
-        originalRequest.url?.includes("/auth/verify-email");
-        originalRequest.url?.includes("/auth/resend-verification-email");
-        originalRequest.url?.includes("/auth/signout");
+      const authRoutes = [
+        "/auth/refresh",
+        "/auth/signin",
+        "/auth/signup",
+        "/auth/verify-email",
+        "/auth/resend-verification-email",
+        "/auth/signout",
+      ];
+
+      const isAuthRoute = authRoutes.some((route) =>
+        originalRequest.url?.includes(route),
+      );
+
+      // Jodi auth route e 401 khay, tahole ar kono retry korar dorkar nei
       if (isAuthRoute) {
         return Promise.reject(error);
       }
@@ -65,6 +71,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Backend theke notun token anlam (Cookies te automatically set hobe)
         await api.post("/auth/refresh");
 
         isRefreshing = false;
@@ -76,7 +83,6 @@ api.interceptors.response.use(
         isRefreshing = false;
         processQueue(refreshError as AxiosError, null);
 
-        // Log out the user if the refresh token fails
         useAuthStore.getState().logout();
 
         return Promise.reject(refreshError);
